@@ -23,8 +23,8 @@ export function CourseSelector({ title, options, selected, onChange }: CourseSel
             onClick={() => onChange(option.id)}
             className={`w-full text-left px-5 py-4 rounded-xl border transition-all duration-200 ${
               selected === option.id
-                ? 'border-resto-accent bg-resto-accent/10 text-resto-text'
-                : 'border-white/8 bg-white/3 text-resto-text/70 hover:border-white/20 hover:text-resto-text'
+                ? 'border-resto-accent bg-resto-accent/15 text-resto-text'
+                : 'border-resto-border bg-resto-surface/50 text-resto-text/70 hover:border-resto-accent/40 hover:text-resto-text'
             }`}
           >
             <div className="flex items-start justify-between gap-3">

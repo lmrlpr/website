@@ -52,7 +52,7 @@ export function AccessCodeGate({ onSuccess }: AccessCodeGateProps) {
                 value={code}
                 onChange={(e) => { setCode(e.target.value.toUpperCase()); setError('') }}
                 placeholder="CODE D'ACCÈS"
-                className="w-full bg-white/5 border border-white/10 text-resto-text placeholder:text-white/20 text-center text-lg tracking-[0.3em] uppercase px-4 py-4 rounded-xl outline-none focus:border-resto-accent transition-colors"
+                className="w-full bg-resto-surface border border-resto-border text-resto-text placeholder:text-resto-text/30 text-center text-lg tracking-[0.3em] uppercase px-4 py-4 rounded-xl outline-none focus:border-resto-accent transition-colors"
                 autoFocus
               />
             </motion.div>

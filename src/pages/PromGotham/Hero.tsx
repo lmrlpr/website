@@ -1,6 +1,38 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
+const EVENT_DATE = new Date('2026-07-03T00:00:00')
+
+function useCountdown(target: Date) {
+  const [diff, setDiff] = useState(() => target.getTime() - Date.now())
+
+  useEffect(() => {
+    const interval = setInterval(() => setDiff(target.getTime() - Date.now()), 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const total = Math.max(0, diff)
+  const days = Math.floor(total / 86400000)
+  const hours = Math.floor((total % 86400000) / 3600000)
+  const minutes = Math.floor((total % 3600000) / 60000)
+  const seconds = Math.floor((total % 60000) / 1000)
+  return { days, hours, minutes, seconds }
+}
+
+function CountdownUnit({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex flex-col items-center">
+      <span className="font-bold text-white tabular-nums" style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)' }}>
+        {String(value).padStart(2, '0')}
+      </span>
+      <span className="text-white/30 text-[10px] tracking-[0.3em] uppercase mt-1">{label}</span>
+    </div>
+  )
+}
+
 export function GothamHero() {
+  const { days, hours, minutes, seconds } = useCountdown(EVENT_DATE)
+
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gotham-bg">
       {/* Atmospheric glow orbs */}
@@ -48,29 +80,36 @@ export function GothamHero() {
           GOTHAM
         </motion.h1>
 
+        {/* Countdown */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          className="mt-8 flex items-center justify-center gap-6 md:gap-10"
+        >
+          <CountdownUnit value={days} label="Jours" />
+          <span className="text-white/20 font-light text-2xl mb-4">:</span>
+          <CountdownUnit value={hours} label="Heures" />
+          <span className="text-white/20 font-light text-2xl mb-4">:</span>
+          <CountdownUnit value={minutes} label="Min" />
+          <span className="text-white/20 font-light text-2xl mb-4">:</span>
+          <CountdownUnit value={seconds} label="Sec" />
+        </motion.div>
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-6 text-white/40 text-sm md:text-base max-w-md mx-auto leading-relaxed"
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="mt-3 text-white/25 text-xs tracking-[0.3em] uppercase"
         >
-          <a
-            href="https://maps.google.com/?q=14+Avenue+de+la+Faiencerie+1510+Limpertsberg+Luxembourg"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline underline-offset-4 hover:text-gotham-blue transition-colors"
-          >
-            14 Av. de la Faïencerie · Limpertsberg
-          </a>
-          <br />
-          Capacité : 300 personnes · Ouvert à tous
+          3 Juillet 2026
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="mt-12 flex flex-col sm:flex-row gap-4 justify-center"
+          transition={{ duration: 0.5, delay: 0.65 }}
+          className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
         >
           <a
             href="#tickets"

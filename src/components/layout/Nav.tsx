@@ -11,7 +11,7 @@ export function Nav() {
 
   useScrollLock(open)
 
-  const isLight = location.pathname === '/' || location.pathname === '/merch'
+  const isLight = location.pathname === '/' || location.pathname === '/merch' || location.pathname === '/restaurant'
 
   return (
     <>

@@ -55,11 +55,11 @@ export function ProductModal({ product, open, onClose }: ProductModalProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.97 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="fixed inset-x-4 bottom-4 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-xl z-50 bg-white rounded-3xl shadow-2xl overflow-hidden"
+            className="fixed inset-x-3 bottom-3 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-xl z-50 bg-white rounded-3xl shadow-2xl overflow-hidden max-h-[88vh] flex flex-col"
           >
-            <div className="flex flex-col md:flex-row">
-              {/* Image */}
-              <div className="md:w-56 aspect-square bg-gray-100 flex items-center justify-center shrink-0">
+            <div className="flex flex-col md:flex-row overflow-y-auto">
+              {/* Image — hidden on mobile to save space */}
+              <div className="hidden md:flex md:w-56 aspect-square bg-gray-100 items-center justify-center shrink-0">
                 <p className="text-gray-300 text-xs uppercase tracking-[0.2em]">{product.name}</p>
               </div>
 

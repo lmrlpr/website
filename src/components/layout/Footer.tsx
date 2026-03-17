@@ -7,8 +7,7 @@ export function Footer() {
           <p className="text-xs text-gray-400 mt-1">Lycée Michel Rodange Luxembourg (LMRL)</p>
         </div>
         <div className="text-xs text-gray-400 text-right">
-          <p>14 Av. de la Faïencerie, 1510 Limpertsberg</p>
-          <p className="mt-1">© {new Date().getFullYear()} Primaner ASBL</p>
+          <p>© {new Date().getFullYear()} Primaner ASBL</p>
         </div>
       </div>
     </footer>

@@ -46,12 +46,12 @@ export default function PromRestaurant() {
       </div>
 
       {/* Divider */}
-      <div className="border-t border-white/8 max-w-4xl mx-auto" />
+      <div className="border-t border-resto-border max-w-4xl mx-auto" />
 
       {/* Form */}
       <MenuForm />
 
-      <div className="border-t border-white/8" style={{ marginTop: '2rem' }}>
+      <div className="border-t border-resto-border" style={{ marginTop: '2rem' }}>
         <Footer />
       </div>
     </div>

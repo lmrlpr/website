@@ -20,9 +20,11 @@ export default {
         ink: '#1A1A1A',
         parchment: '#F8F7F4',
         resto: {
-          bg: '#1C1410',
-          text: '#F5ECD7',
-          accent: '#D4A853',
+          bg: '#FDF8F0',
+          text: '#2C1A0E',
+          accent: '#B87A20',
+          surface: '#F5EAD6',
+          border: '#E5D4B8',
         },
       },
       boxShadow: {

@@ -33,15 +33,15 @@ export function DrinkSelector({ selected, onChange }: DrinkSelectorProps) {
             onClick={() => onChange(pkg.id)}
             className={`text-left px-5 py-5 rounded-xl border transition-all duration-200 ${
               selected === pkg.id
-                ? 'border-resto-accent bg-resto-accent/10 text-resto-text'
-                : 'border-white/8 bg-white/3 text-resto-text/70 hover:border-white/20 hover:text-resto-text'
+                ? 'border-resto-accent bg-resto-accent/15 text-resto-text'
+                : 'border-resto-border bg-resto-surface/50 text-resto-text/70 hover:border-resto-accent/40 hover:text-resto-text'
             }`}
           >
             <p className="font-semibold text-sm mb-1">{pkg.label}</p>
             <p className="text-xs leading-relaxed opacity-70">{pkg.description}</p>
             {pkg.surcharge > 0 && (
               <div className={`mt-3 inline-block text-xs px-2.5 py-1 rounded-full font-medium ${
-                selected === pkg.id ? 'bg-resto-accent/20 text-resto-accent' : 'bg-white/10 text-white/50'
+                selected === pkg.id ? 'bg-resto-accent/20 text-resto-accent' : 'bg-resto-border text-resto-text/40'
               }`}>
                 +{pkg.surcharge} €
               </div>
