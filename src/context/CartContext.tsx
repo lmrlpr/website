@@ -1,89 +1,137 @@
-import { createContext, useContext, useState, useMemo, type ReactNode } from 'react'
-import type { CartItem, ProductColor, ProductSize } from '../types'
+import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react'
+import type { CartItem } from '../types/product'
+import { VALID_PROMO_CODES } from '../utils/constants'
 
-interface CartContextType {
+interface CartState {
   items: CartItem[]
-  addItem: (item: Omit<CartItem, 'quantity'>) => void
-  removeItem: (index: number) => void
-  updateQuantity: (index: number, qty: number) => void
-  promoCode: string
-  setPromoCode: (code: string) => void
+  promoCode: string | null
   discount: number
-  subtotal: number
-  total: number
+  discountLabel: string
   isOpen: boolean
-  setIsOpen: (open: boolean) => void
 }
 
-const CartContext = createContext<CartContextType | null>(null)
+type CartAction =
+  | { type: 'ADD_ITEM'; payload: CartItem }
+  | { type: 'REMOVE_ITEM'; payload: { productId: string; color: string; size?: string } }
+  | { type: 'UPDATE_QTY'; payload: { productId: string; color: string; size?: string; quantity: number } }
+  | { type: 'APPLY_PROMO'; payload: { code: string; discount: number; label: string } }
+  | { type: 'CLEAR_PROMO' }
+  | { type: 'TOGGLE_CART' }
+  | { type: 'OPEN_CART' }
+  | { type: 'CLOSE_CART' }
+  | { type: 'CLEAR_CART' }
+  | { type: 'HYDRATE'; payload: Partial<CartState> }
 
-const VALID_PROMO_CODES: Record<string, number> = {
-  PRIMANER2025: 0.1,
+function cartReducer(state: CartState, action: CartAction): CartState {
+  switch (action.type) {
+    case 'HYDRATE':
+      return { ...state, ...action.payload }
+    case 'ADD_ITEM': {
+      const key = `${action.payload.productId}-${action.payload.color}-${action.payload.size ?? ''}`
+      const existing = state.items.find(i => `${i.productId}-${i.color}-${i.size ?? ''}` === key)
+      if (existing) {
+        return { ...state, items: state.items.map(i => `${i.productId}-${i.color}-${i.size ?? ''}` === key ? { ...i, quantity: i.quantity + action.payload.quantity } : i) }
+      }
+      return { ...state, items: [...state.items, action.payload] }
+    }
+    case 'REMOVE_ITEM': {
+      const key = `${action.payload.productId}-${action.payload.color}-${action.payload.size ?? ''}`
+      return { ...state, items: state.items.filter(i => `${i.productId}-${i.color}-${i.size ?? ''}` !== key) }
+    }
+    case 'UPDATE_QTY': {
+      const key = `${action.payload.productId}-${action.payload.color}-${action.payload.size ?? ''}`
+      if (action.payload.quantity <= 0) {
+        return { ...state, items: state.items.filter(i => `${i.productId}-${i.color}-${i.size ?? ''}` !== key) }
+      }
+      return { ...state, items: state.items.map(i => `${i.productId}-${i.color}-${i.size ?? ''}` === key ? { ...i, quantity: action.payload.quantity } : i) }
+    }
+    case 'APPLY_PROMO':
+      return { ...state, promoCode: action.payload.code, discount: action.payload.discount, discountLabel: action.payload.label }
+    case 'CLEAR_PROMO':
+      return { ...state, promoCode: null, discount: 0, discountLabel: '' }
+    case 'TOGGLE_CART':
+      return { ...state, isOpen: !state.isOpen }
+    case 'OPEN_CART':
+      return { ...state, isOpen: true }
+    case 'CLOSE_CART':
+      return { ...state, isOpen: false }
+    case 'CLEAR_CART':
+      return { ...state, items: [], promoCode: null, discount: 0, discountLabel: '', isOpen: false }
+    default:
+      return state
+  }
 }
+
+const initialState: CartState = { items: [], promoCode: null, discount: 0, discountLabel: '', isOpen: false }
+
+interface CartContextValue extends CartState {
+  totalItems: number
+  subtotal: number
+  discountAmount: number
+  total: number
+  addToCart: (item: CartItem) => void
+  removeFromCart: (productId: string, color: string, size?: string) => void
+  updateQuantity: (productId: string, color: string, size: string | undefined, quantity: number) => void
+  applyPromoCode: (code: string) => boolean
+  clearPromoCode: () => void
+  toggleCart: () => void
+  openCart: () => void
+  closeCart: () => void
+  clearCart: () => void
+}
+
+const CartContext = createContext<CartContextValue | null>(null)
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([])
-  const [promoCode, setPromoCodeState] = useState('')
-  const [discount, setDiscount] = useState(0)
-  const [isOpen, setIsOpen] = useState(false)
+  const [state, dispatch] = useReducer(cartReducer, initialState)
 
-  function addItem(item: Omit<CartItem, 'quantity'>) {
-    setItems(prev => {
-      const idx = prev.findIndex(
-        i => i.productId === item.productId && i.color === item.color && i.size === item.size
-      )
-      if (idx >= 0) {
-        const next = [...prev]
-        next[idx] = { ...next[idx], quantity: next[idx].quantity + 1 }
-        return next
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('lmrl-cart')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        dispatch({ type: 'HYDRATE', payload: { items: parsed.items ?? [], promoCode: parsed.promoCode, discount: parsed.discount ?? 0, discountLabel: parsed.discountLabel ?? '' } })
       }
-      return [...prev, { ...item, quantity: 1 }]
-    })
-  }
+    } catch { /* ignore */ }
+  }, [])
 
-  function removeItem(index: number) {
-    setItems(prev => prev.filter((_, i) => i !== index))
-  }
+  useEffect(() => {
+    localStorage.setItem('lmrl-cart', JSON.stringify({ items: state.items, promoCode: state.promoCode, discount: state.discount, discountLabel: state.discountLabel }))
+  }, [state.items, state.promoCode, state.discount, state.discountLabel])
 
-  function updateQuantity(index: number, qty: number) {
-    if (qty <= 0) {
-      removeItem(index)
-      return
+  const totalItems = state.items.reduce((sum, i) => sum + i.quantity, 0)
+  const subtotal = state.items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  let discountAmount = 0
+  if (state.promoCode && state.discount > 0) {
+    const promo = VALID_PROMO_CODES.find(p => p.code === state.promoCode)
+    if (promo) {
+      discountAmount = promo.discountType === 'percent' ? Math.round(subtotal * (promo.value / 100) * 100) / 100 : promo.value
     }
-    setItems(prev => {
-      const next = [...prev]
-      next[index] = { ...next[index], quantity: qty }
-      return next
-    })
+  }
+  const total = Math.max(0, subtotal - discountAmount)
+
+  const value: CartContextValue = {
+    ...state, totalItems, subtotal, discountAmount, total,
+    addToCart: (item) => dispatch({ type: 'ADD_ITEM', payload: item }),
+    removeFromCart: (productId, color, size) => dispatch({ type: 'REMOVE_ITEM', payload: { productId, color, size } }),
+    updateQuantity: (productId, color, size, quantity) => dispatch({ type: 'UPDATE_QTY', payload: { productId, color, size, quantity } }),
+    applyPromoCode: (code) => {
+      const promo = VALID_PROMO_CODES.find(p => p.code.toLowerCase() === code.trim().toLowerCase())
+      if (promo) { dispatch({ type: 'APPLY_PROMO', payload: { code: promo.code, discount: promo.value, label: promo.label } }); return true }
+      return false
+    },
+    clearPromoCode: () => dispatch({ type: 'CLEAR_PROMO' }),
+    toggleCart: () => dispatch({ type: 'TOGGLE_CART' }),
+    openCart: () => dispatch({ type: 'OPEN_CART' }),
+    closeCart: () => dispatch({ type: 'CLOSE_CART' }),
+    clearCart: () => dispatch({ type: 'CLEAR_CART' }),
   }
 
-  function setPromoCode(code: string) {
-    setPromoCodeState(code)
-    const upper = code.trim().toUpperCase()
-    setDiscount(VALID_PROMO_CODES[upper] ?? 0)
-  }
-
-  const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
-    [items]
-  )
-
-  const total = useMemo(() => subtotal * (1 - discount), [subtotal, discount])
-
-  return (
-    <CartContext.Provider
-      value={{ items, addItem, removeItem, updateQuantity, promoCode, setPromoCode, discount, subtotal, total, isOpen, setIsOpen }}
-    >
-      {children}
-    </CartContext.Provider>
-  )
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
 
-export function useCart() {
+export function useCart(): CartContextValue {
   const ctx = useContext(CartContext)
-  if (!ctx) throw new Error('useCart must be used within CartProvider')
+  if (!ctx) throw new Error('useCart must be used inside CartProvider')
   return ctx
 }
-
-// Re-export types for convenience
-export type { ProductColor, ProductSize }
