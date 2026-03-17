@@ -1,9 +1,6 @@
-import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 
 export default function Accueil() {
-  const navigate = useNavigate()
-
   return (
     <main className="bg-accueil min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
       {/* Subtle radial highlight */}
@@ -62,26 +59,15 @@ export default function Accueil() {
           Hei fannt der all d&apos;Informatiounen zu Kommenden Eventer.
         </motion.p>
 
-        {/* CTAs */}
-        <motion.div
-          className="flex flex-col sm:flex-row gap-4"
+        {/* Year label */}
+        <motion.p
+          className="text-ink/60 text-sm font-medium tracking-[0.2em] uppercase"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.5 }}
         >
-          <button
-            onClick={() => navigate('/prom/restaurant')}
-            className="px-8 py-3.5 bg-ink text-white text-sm font-semibold tracking-wide rounded-full hover:bg-ink/80 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-          >
-            Prom Night →
-          </button>
-          <button
-            onClick={() => navigate('/merch')}
-            className="px-8 py-3.5 bg-white/30 text-ink text-sm font-semibold tracking-wide rounded-full border border-ink/20 hover:bg-white/50 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] backdrop-blur-sm"
-          >
-            LMRL Merch →
-          </button>
-        </motion.div>
+          2025 / 2026
+        </motion.p>
       </motion.div>
 
       {/* Bottom micro-label */}

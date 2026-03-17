@@ -136,7 +136,7 @@ export default function Restaurant() {
       {/* Info block */}
       <section className="max-w-2xl mx-auto px-6 pb-16 grid md:grid-cols-3 gap-6 text-center">
         {[
-          { label: 'Adresse', value: '14 Av. de la Faïencerie\n1510 Limpertsberg', link: 'https://maps.app.goo.gl/porta-nova' },
+          { label: 'Adresse', value: '14 Av. de la Faïencerie\n1510 Limpertsberg', link: 'https://www.google.com/maps/search/14+Av.+de+la+Faïencerie,+1510+Limpertsberg,+Luxembourg' },
           { label: 'Capacité', value: '175 personnes\nÉlèves & professeurs uniquement' },
           { label: 'Programme', value: '20h00 — Accueil\n22h00 — Dîner\n00h00 — Suite à Gotham' },
         ].map(item => (

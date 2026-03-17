@@ -11,7 +11,7 @@ const ROUTES = [
       { label: 'Gotham', path: '/prom/gotham' },
     ],
   },
-  { label: 'LMRL Merch', path: '/merch' },
+  { label: 'Merch', path: '/merch' },
 ]
 
 export default function Nav() {
@@ -27,8 +27,7 @@ export default function Nav() {
   }
 
   // Determine text/icon color based on current route
-  const isDark =
-    location.pathname.startsWith('/prom') || location.pathname === '/merch'
+  const isDark = location.pathname.startsWith('/prom')
 
   return (
     <>
@@ -78,12 +77,6 @@ export default function Nav() {
                         className="text-white/90 hover:text-white text-4xl md:text-5xl font-bold tracking-tight py-3 transition-colors flex items-center gap-3"
                       >
                         {route.label}
-                        <span
-                          className={`text-2xl transition-transform duration-200 ${promExpanded ? 'rotate-180' : ''}`}
-                          style={{ display: 'inline-block' }}
-                        >
-                          ˅
-                        </span>
                       </button>
                       <AnimatePresence>
                         {promExpanded && (

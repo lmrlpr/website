@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import type { GothamRegistration } from '../types'
 
-const MAPS_URL = 'https://maps.app.goo.gl/porta-nova'
+const MAPS_URL = 'https://www.google.com/maps/search/14+Av.+de+la+Faïencerie,+1510+Limpertsberg,+Luxembourg'
 
 function NeonDivider({ color = 'blue' }: { color?: 'blue' | 'purple' }) {
   return (
