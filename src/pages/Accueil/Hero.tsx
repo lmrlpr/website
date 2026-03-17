@@ -42,25 +42,14 @@ export function Hero() {
           Hei fannt der all d'Informatiounen zu Kommenden Eventer.
         </motion.p>
 
-        <motion.div
+        <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.45 }}
-          className="mt-12 flex flex-col sm:flex-row gap-4"
+          className="mt-10 text-ink/50 text-sm tracking-[0.25em] uppercase font-medium"
         >
-          <Link
-            to="/prom/restaurant"
-            className="px-8 py-3.5 bg-ink text-white text-sm font-medium rounded-full hover:bg-ink/80 transition-colors"
-          >
-            Prom Night →
-          </Link>
-          <Link
-            to="/merch"
-            className="px-8 py-3.5 bg-transparent border border-ink/40 text-ink text-sm font-medium rounded-full hover:border-ink hover:bg-ink/5 transition-all"
-          >
-            LMRL Merch
-          </Link>
-        </motion.div>
+          2025 / 2026
+        </motion.p>
       </div>
 
       {/* Scroll indicator */}

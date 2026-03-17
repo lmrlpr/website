@@ -54,7 +54,14 @@ export function GothamHero() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-6 text-white/40 text-sm md:text-base max-w-md mx-auto leading-relaxed"
         >
-          14 Av. de la Faïencerie · Limpertsberg
+          <a
+            href="https://maps.google.com/?q=14+Avenue+de+la+Faiencerie+1510+Limpertsberg+Luxembourg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-4 hover:text-gotham-blue transition-colors"
+          >
+            14 Av. de la Faïencerie · Limpertsberg
+          </a>
           <br />
           Capacité : 300 personnes · Ouvert à tous
         </motion.p>

@@ -25,7 +25,7 @@ export function NavOverlay({ open, onClose }: NavOverlayProps) {
         { label: 'Gotham', to: '/prom/gotham' },
       ],
     },
-    { label: 'LMRL Merch', to: '/merch' },
+    { label: 'Merch', to: '/merch' },
   ]
 
   return (
@@ -39,27 +39,21 @@ export function NavOverlay({ open, onClose }: NavOverlayProps) {
           transition={{ duration: 0.3 }}
           className="fixed inset-0 z-40 bg-ink flex flex-col justify-center px-10 md:px-20"
         >
-          <nav className="flex flex-col gap-2">
+          <nav className="flex flex-col items-center gap-2 text-center">
             {navItems.map((item, i) =>
               item.sub ? (
                 <motion.div
                   key={item.label}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.05 * i, duration: 0.4 }}
+                  className="flex flex-col items-center"
                 >
                   <button
                     onClick={() => setPromOpen(!promOpen)}
-                    className="flex items-center gap-3 text-white/80 hover:text-white transition-colors text-4xl md:text-6xl font-semibold tracking-tight text-left w-full"
+                    className="text-white/80 hover:text-white transition-colors text-4xl md:text-6xl font-semibold tracking-tight"
                   >
                     {item.label}
-                    <motion.span
-                      animate={{ rotate: promOpen ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-2xl md:text-3xl opacity-60"
-                    >
-                      ↓
-                    </motion.span>
                   </button>
                   <AnimatePresence>
                     {promOpen && (
@@ -68,7 +62,7 @@ export function NavOverlay({ open, onClose }: NavOverlayProps) {
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className="overflow-hidden pl-4 mt-1 flex flex-col gap-1"
+                        className="overflow-hidden mt-1 flex flex-col items-center gap-1"
                       >
                         {item.sub.map((sub) => (
                           <Link
@@ -87,8 +81,8 @@ export function NavOverlay({ open, onClose }: NavOverlayProps) {
               ) : (
                 <motion.div
                   key={item.to}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.05 * i, duration: 0.4 }}
                 >
                   <Link
