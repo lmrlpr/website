@@ -1,12 +1,29 @@
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCart } from '../../context/CartContext'
 import { formatCurrency } from '../../utils/formatCurrency'
 import { COLOR_MAP } from '../../utils/constants'
 import { PromoCodeInput } from './PromoCodeInput'
 import { redirectToCheckout } from '../../services/stripe'
+import { createMerchOrder } from '../../services/supabase'
 
 export function CartDrawer() {
-  const { isOpen, closeCart, items, subtotal, discountAmount, total, removeFromCart, updateQuantity } = useCart()
+  const { isOpen, closeCart, items, promoCode, subtotal, discountAmount, total, removeFromCart, updateQuantity } = useCart()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleCheckout() {
+    setLoading(true)
+    setError(null)
+    try {
+      await createMerchOrder(items, promoCode ?? undefined)
+      await redirectToCheckout(items, promoCode)
+    } catch {
+      setError('Une erreur est survenue lors du paiement. Veuillez réessayer.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -111,11 +128,21 @@ export function CartDrawer() {
                   </div>
                 </div>
 
+                {error && (
+                  <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200">
+                    <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-xs text-red-700">{error}</span>
+                  </div>
+                )}
+
                 <button
-                  onClick={() => redirectToCheckout(items)}
-                  className="w-full py-4 bg-ink text-white text-sm font-semibold rounded-xl hover:bg-ink/80 transition-colors"
+                  onClick={handleCheckout}
+                  disabled={loading}
+                  className="w-full py-4 bg-ink text-white text-sm font-semibold rounded-xl hover:bg-ink/80 transition-colors disabled:opacity-50"
                 >
-                  Commander →
+                  {loading ? 'Chargement...' : 'Commander →'}
                 </button>
               </div>
             )}

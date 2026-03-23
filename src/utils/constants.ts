@@ -64,24 +64,6 @@ export const PRODUCTS: Product[] = [
   },
 ]
 
-export interface PromoCode {
-  code: string
-  discountType: 'percent' | 'flat'
-  value: number
-  label: string
-}
-
-export const VALID_PROMO_CODES: PromoCode[] = [
-  {
-    code: 'PRIMANER2025',
-    discountType: 'percent',
-    value: 10,
-    label: 'Réduction Primaner -10%',
-  },
-]
-
-export const RESTAURANT_ACCESS_CODE = 'LMRL2025'
-
 export const DRINK_SURCHARGE = 7
 
 export const STARTERS = [

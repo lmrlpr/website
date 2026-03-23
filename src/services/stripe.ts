@@ -1,28 +1,46 @@
-import { loadStripe } from '@stripe/stripe-js'
 import type { CartItem } from '../types/product'
 
-const STRIPE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? ''
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? ''
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
 
-let stripePromise: ReturnType<typeof loadStripe> | null = null
+export async function redirectToCheckout(items: CartItem[], promoCode?: string | null): Promise<void> {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify({ items, promoCode }),
+  })
 
-export function getStripe() {
-  if (!STRIPE_KEY) return Promise.resolve(null)
-  if (!stripePromise) {
-    stripePromise = loadStripe(STRIPE_KEY)
+  if (!res.ok) {
+    const { error } = await res.json()
+    throw new Error(error ?? 'Checkout failed')
   }
-  return stripePromise
+
+  const { url } = await res.json()
+  window.location.href = url
 }
 
-export async function redirectToCheckout(items: CartItem[]): Promise<void> {
-  const stripe = await getStripe()
-  if (!stripe) {
-    console.log('[STUB] redirectToCheckout', items)
-    alert('Checkout coming soon — payment integration not yet active.')
-    return
+export async function redirectToGothamCheckout(data: {
+  firstName: string
+  lastName: string
+  email: string
+}): Promise<void> {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/create-gotham-checkout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify(data),
+  })
+
+  if (!res.ok) {
+    const { error } = await res.json()
+    throw new Error(error ?? 'Checkout failed')
   }
-  // When Stripe is configured:
-  // 1. POST to your backend to create a Checkout Session
-  // 2. const { sessionId } = await response.json()
-  // 3. await stripe.redirectToCheckout({ sessionId })
-  console.log('[STUB] Stripe configured but backend not yet wired')
+
+  const { url } = await res.json()
+  window.location.href = url
 }

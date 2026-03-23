@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { createGothamRegistration } from '../../services/supabase'
+import { redirectToGothamCheckout } from '../../services/stripe'
 
 const tickets = [
   {
@@ -28,24 +30,43 @@ const tickets = [
 ]
 
 export function TicketOptions() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [selected, setSelected] = useState<'primaner' | 'external' | null>(null)
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' })
   const [loading, setLoading] = useState(false)
-  const [done, setDone] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState(() => searchParams.get('success') === '1')
+
+  // Clean up URL params on mount
+  if (searchParams.get('success') === '1' || searchParams.get('cancelled') === '1') {
+    setSearchParams({}, { replace: true })
+  }
+
+  const cancelled = searchParams.get('cancelled') === '1'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selected) return
     setLoading(true)
+    setError(null)
     try {
       await createGothamRegistration({
         ...form,
         ticketType: selected,
         price: selected === 'external' ? 53 : 0,
       })
-      setDone(true)
+
+      if (selected === 'external') {
+        await redirectToGothamCheckout({
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+        })
+      } else {
+        setDone(true)
+      }
     } catch {
-      alert('Erreur. Veuillez réessayer.')
+      setError('Erreur. Veuillez réessayer.')
     } finally {
       setLoading(false)
     }
@@ -78,6 +99,16 @@ export function TicketOptions() {
           <p className="text-gotham-blue/50 text-xs tracking-[0.4em] uppercase mb-3">Billets</p>
           <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">Choisissez votre option</h2>
         </motion.div>
+
+        {cancelled && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 px-5 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm"
+          >
+            Paiement annulé. Vous pouvez réessayer ci-dessous.
+          </motion.div>
+        )}
 
         <div className="grid sm:grid-cols-2 gap-4 mb-10">
           {tickets.map((ticket, i) => (
@@ -138,12 +169,24 @@ export function TicketOptions() {
                 className="w-full bg-white/5 border border-white/10 text-white placeholder:text-white/20 px-4 py-3 rounded-xl text-sm outline-none focus:border-gotham-blue/50 transition-colors"
               />
             </div>
+
+            {error && (
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                <svg className="w-4 h-4 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-xs text-red-300">{error}</span>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
               className="mt-2 py-3.5 border border-gotham-blue/50 text-gotham-blue text-sm font-semibold rounded-xl hover:shadow-neon hover:bg-gotham-blue/10 transition-all disabled:opacity-40"
             >
-              {loading ? 'Inscription...' : "S'inscrire →"}
+              {loading
+                ? (selected === 'external' ? 'Redirection vers le paiement...' : 'Inscription...')
+                : (selected === 'external' ? 'Payer 53 € →' : "S'inscrire →")}
             </button>
           </motion.form>
         )}

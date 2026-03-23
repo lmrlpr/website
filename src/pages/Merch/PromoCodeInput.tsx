@@ -3,15 +3,16 @@ import { useCart } from '../../context/CartContext'
 
 export function PromoCodeInput() {
   const [code, setCode] = useState('')
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const { promoCode, applyPromoCode, clearPromoCode, discountLabel } = useCart()
 
-  const handleApply = () => {
-    if (!code.trim()) return
-    const ok = applyPromoCode(code)
+  const handleApply = async () => {
+    if (!code.trim() || status === 'loading') return
+    setStatus('loading')
+    const ok = await applyPromoCode(code)
     setStatus(ok ? 'success' : 'error')
     if (ok) setCode('')
-    setTimeout(() => setStatus('idle'), 3000)
+    if (!ok) setTimeout(() => setStatus('idle'), 3000)
   }
 
   if (promoCode) {
@@ -38,15 +39,17 @@ export function PromoCodeInput() {
         onChange={(e) => { setCode(e.target.value.toUpperCase()); setStatus('idle') }}
         onKeyDown={(e) => e.key === 'Enter' && handleApply()}
         placeholder="CODE PROMO"
+        disabled={status === 'loading'}
         className={`flex-1 px-4 py-2.5 text-sm border rounded-xl outline-none transition-colors uppercase tracking-wider ${
           status === 'error' ? 'border-red-300 bg-red-50 text-red-600' : 'border-gray-200 bg-gray-50 text-ink focus:border-ink'
-        }`}
+        } disabled:opacity-50`}
       />
       <button
         onClick={handleApply}
-        className="px-4 py-2.5 text-sm font-medium bg-ink text-white rounded-xl hover:bg-ink/80 transition-colors"
+        disabled={status === 'loading'}
+        className="px-4 py-2.5 text-sm font-medium bg-ink text-white rounded-xl hover:bg-ink/80 transition-colors disabled:opacity-50"
       >
-        Appliquer
+        {status === 'loading' ? '...' : 'Appliquer'}
       </button>
     </div>
   )
