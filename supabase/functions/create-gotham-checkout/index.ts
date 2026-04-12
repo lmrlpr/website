@@ -4,11 +4,14 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
   apiVersion: '2024-06-20',
 })
 
-const ORIGIN = Deno.env.get('SITE_URL') ?? 'http://localhost:5173'
+const SITE_URL = Deno.env.get('SITE_URL') ?? 'http://localhost:5173'
+const ALLOWED_ORIGIN = new URL(SITE_URL).origin  // e.g. https://lmrlpr.github.io
 
 function getCorsHeaders(req: Request) {
   const requestOrigin = req.headers.get('origin') ?? ''
-  const allowed = requestOrigin === 'http://localhost:5173' ? requestOrigin : ORIGIN
+  const allowed = (requestOrigin === 'http://localhost:5173' || requestOrigin === ALLOWED_ORIGIN)
+    ? requestOrigin
+    : ALLOWED_ORIGIN
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Headers': 'content-type, authorization',
@@ -53,8 +56,8 @@ Deno.serve(async (req) => {
         email,
         ticket_type: 'external',
       },
-      success_url: `${ORIGIN}/prom/gotham?success=1`,
-      cancel_url: `${ORIGIN}/prom/gotham?cancelled=1`,
+      success_url: `${SITE_URL}/prom/gotham?success=1`,
+      cancel_url: `${SITE_URL}/prom/gotham?cancelled=1`,
     })
 
     return new Response(JSON.stringify({ url: session.url }), {
