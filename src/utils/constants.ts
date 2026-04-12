@@ -58,7 +58,7 @@ export const PRODUCTS: Product[] = [
     id: 'socks',
     name: 'Chaussettes',
     category: 'socks',
-    price: null,
+    price: 1,
     colors: ['Rouge', 'Noir', 'Gris', 'Vert'],
     description: 'Chaussettes — LMRL Primaner',
   },
