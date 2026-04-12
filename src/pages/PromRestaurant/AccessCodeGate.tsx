@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? ''
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
+const ACCESS_CODE = 'PROM2026'
 
 interface AccessCodeGateProps {
   onSuccess: () => void
@@ -12,40 +11,19 @@ export function AccessCodeGate({ onSuccess }: AccessCodeGateProps) {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [shake, setShake] = useState(false)
-  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!code.trim() || loading) return
+    if (!code.trim()) return
 
-    setLoading(true)
-    setError('')
-
-    try {
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/validate-access-code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({ code: code.trim() }),
-      })
-
-      const { valid } = await res.json()
-
-      if (valid) {
-        sessionStorage.setItem('restaurant_access', 'true')
-        onSuccess()
-      } else {
-        setError('Code incorrect. Veuillez réessayer.')
-        setShake(true)
-        setTimeout(() => setShake(false), 500)
-        setCode('')
-      }
-    } catch {
-      setError('Erreur de connexion. Veuillez réessayer.')
-    } finally {
-      setLoading(false)
+    if (code.trim().toUpperCase() === ACCESS_CODE) {
+      sessionStorage.setItem('restaurant_access', 'true')
+      onSuccess()
+    } else {
+      setError('Code incorrect. Veuillez réessayer.')
+      setShake(true)
+      setTimeout(() => setShake(false), 500)
+      setCode('')
     }
   }
 
@@ -79,7 +57,6 @@ export function AccessCodeGate({ onSuccess }: AccessCodeGateProps) {
                 placeholder="CODE D'ACCÈS"
                 className="w-full bg-resto-surface border border-resto-border text-resto-text placeholder:text-resto-text/30 text-center text-lg tracking-[0.3em] uppercase px-4 py-4 rounded-xl outline-none focus:border-resto-accent transition-colors"
                 autoFocus
-                disabled={loading}
               />
             </motion.div>
           </AnimatePresence>
@@ -96,10 +73,9 @@ export function AccessCodeGate({ onSuccess }: AccessCodeGateProps) {
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full mt-5 py-3.5 bg-resto-accent text-ink font-semibold text-sm rounded-xl hover:bg-resto-accent/90 transition-colors disabled:opacity-50"
+            className="w-full mt-5 py-3.5 bg-resto-accent text-ink font-semibold text-sm rounded-xl hover:bg-resto-accent/90 transition-colors"
           >
-            {loading ? 'Vérification...' : 'Accéder'}
+            Accéder
           </button>
         </form>
 
