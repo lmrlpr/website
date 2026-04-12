@@ -53,7 +53,7 @@ export function TicketOptions() {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [done, setDone] = useState(() => searchParams.get('success') === '1')
+  const done = searchParams.get('success') === '1'
 
   if (searchParams.get('success') === '1' || searchParams.get('cancelled') === '1') {
     setSearchParams({}, { replace: true })

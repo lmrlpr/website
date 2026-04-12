@@ -9,7 +9,6 @@ const ALCOHOL_SURCHARGE = 7
 interface ReservationFormProps {
   menuSelection: MenuSelection
   surcharge: number
-  onSubmit: () => void
 }
 
 export function ReservationForm({ menuSelection, surcharge }: ReservationFormProps) {
