@@ -8,6 +8,7 @@ import Accueil from './pages/Accueil/index'
 import PromRestaurant from './pages/PromRestaurant/index'
 import PromGotham from './pages/PromGotham/index'
 import Merch from './pages/Merch/index'
+import Admin from './pages/Admin/index'
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -18,6 +19,7 @@ function AnimatedRoutes() {
         <Route path="/prom/restaurant" element={<PageTransition><PromRestaurant /></PageTransition>} />
         <Route path="/prom/gotham" element={<PageTransition><PromGotham /></PageTransition>} />
         <Route path="/merch" element={<PageTransition><Merch /></PageTransition>} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </AnimatePresence>
   )
@@ -25,7 +27,7 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <CartProvider>
         <AuthProvider>
           <Nav />

@@ -50,12 +50,6 @@ export function TicketOptions() {
     setLoading(true)
     setError(null)
     try {
-      await createGothamRegistration({
-        ...form,
-        ticketType: selected,
-        price: selected === 'external' ? 53 : 0,
-      })
-
       if (selected === 'external') {
         await redirectToGothamCheckout({
           firstName: form.firstName,
@@ -63,10 +57,15 @@ export function TicketOptions() {
           email: form.email,
         })
       } else {
+        await createGothamRegistration({
+          ...form,
+          ticketType: selected,
+          price: 0,
+        })
         setDone(true)
       }
-    } catch {
-      setError('Erreur. Veuillez réessayer.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur. Veuillez réessayer.')
     } finally {
       setLoading(false)
     }

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build)",
+      "Bash(npm run dev)",
+      "Bash(git status)",
+      "Bash(ls *)",
+      "Bash(supabase --version)",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Bash(done)"
+    ]
+  }
+}

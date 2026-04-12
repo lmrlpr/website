@@ -11,23 +11,30 @@ export function Nav() {
 
   useScrollLock(open)
 
-  const isLight = location.pathname === '/' || location.pathname === '/merch' || location.pathname === '/restaurant'
+  const isLight = location.pathname === '/' || location.pathname === '/merch' || location.pathname === '/prom/restaurant'
 
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-16 ${
-          isLight ? 'mix-blend-multiply' : ''
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-16"
         style={{ pointerEvents: 'auto' }}
       >
         {/* Logo */}
         <Link
           to="/"
           onClick={() => setOpen(false)}
-          className={`text-sm font-semibold tracking-[0.2em] uppercase ${isLight ? 'text-ink' : 'text-white'} hover:opacity-70 transition-opacity`}
+          className="flex items-center gap-2.5 hover:opacity-70 transition-opacity"
         >
-          PRIMANER
+          <img
+            src="/logo.png"
+            alt="LMRL"
+            className={`h-9 w-9 rounded-full object-cover flex-shrink-0 ${
+              isLight ? '' : 'ring-1 ring-white/20'
+            }`}
+          />
+          <span className={`text-sm font-semibold tracking-[0.2em] uppercase ${isLight ? 'text-ink' : 'text-white'}`}>
+            PRIMANER
+          </span>
         </Link>
 
         <div className="flex items-center gap-4">
