@@ -21,6 +21,8 @@ interface MenuSelection {
 
 interface MerchOrder {
   id: string
+  name?: string
+  email?: string
   items: CartItem[]
   promo_code?: string
   created_at: string
@@ -73,6 +75,7 @@ export default function Admin() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
+    if (!password.trim()) { setError('Mot de passe requis'); return }
     setLoading(true)
     setError('')
     try {
@@ -218,16 +221,18 @@ export default function Admin() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  {['Articles', 'Promo', 'Date'].map(h => (
+                  {['Nom', 'Email', 'Articles', 'Promo', 'Date'].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {merch_orders.length === 0 ? (
-                  <tr><td colSpan={3} className="px-4 py-8 text-center text-gray-400">Aucune commande</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">Aucune commande</td></tr>
                 ) : merch_orders.map(o => (
                   <tr key={o.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{o.name ?? '—'}</td>
+                    <td className="px-4 py-3 text-gray-600">{o.email ?? '—'}</td>
                     <td className="px-4 py-3">
                       <ul className="space-y-1">
                         {o.items.map((item, i) => (
