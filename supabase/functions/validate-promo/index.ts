@@ -4,15 +4,24 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
   apiVersion: '2024-06-20',
 })
 
-const ORIGIN = Deno.env.get('SITE_URL') ?? 'http://localhost:5173'
+const SITE_URL = Deno.env.get('SITE_URL') ?? 'http://localhost:5173'
+const ALLOWED_ORIGIN = new URL(SITE_URL).origin
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': ORIGIN,
-  'Access-Control-Allow-Headers': 'content-type, authorization',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+function getCorsHeaders(req: Request) {
+  const requestOrigin = req.headers.get('origin') ?? ''
+  const allowed = (requestOrigin === 'http://localhost:5173' || requestOrigin === ALLOWED_ORIGIN)
+    ? requestOrigin
+    : ALLOWED_ORIGIN
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Headers': 'content-type, authorization',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  }
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req)
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
