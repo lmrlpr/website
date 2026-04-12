@@ -26,7 +26,7 @@ export function Nav() {
           className="flex items-center gap-2.5 hover:opacity-70 transition-opacity"
         >
           <img
-            src="/logo.png"
+            src={`${import.meta.env.BASE_URL}logo.png`}
             alt="LMRL"
             className={`h-9 w-9 rounded-full object-cover flex-shrink-0 ${
               isLight ? '' : 'ring-1 ring-white/20'
