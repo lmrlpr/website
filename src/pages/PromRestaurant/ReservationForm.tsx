@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Input } from '../../components/ui/Input'
 import { createRestaurantReservation } from '../../services/supabase'
 import type { MenuSelection } from '../../types/menuSelection'
+import { pushEntry } from '../../utils/localStore'
+import { STARTERS, MAINS, DESSERTS } from '../../utils/constants'
 
 interface ReservationFormProps {
   menuSelection: MenuSelection
@@ -34,6 +36,21 @@ export function ReservationForm({ menuSelection, surcharge, onSubmit }: Reservat
         menuSelection: { ...menuSelection, drinkSurcharge: surcharge },
         totalSurcharge: surcharge,
         accessCode: sessionStorage.getItem('restaurant_access') ?? '',
+      })
+      pushEntry({
+        type: 'restaurant',
+        id: crypto.randomUUID(),
+        firstName: form.firstName,
+        lastName: form.lastName,
+        classGroup: form.classGroup,
+        email: form.email,
+        phone: form.phone,
+        starter: STARTERS.find(s => s.id === menuSelection.starter)?.label ?? menuSelection.starter,
+        main: MAINS.find(m => m.id === menuSelection.main)?.label ?? menuSelection.main,
+        dessert: DESSERTS.find(d => d.id === menuSelection.dessert)?.label ?? menuSelection.dessert,
+        drinks: menuSelection.drinks,
+        surcharge,
+        savedAt: new Date().toISOString(),
       })
       onSubmit()
     } catch {

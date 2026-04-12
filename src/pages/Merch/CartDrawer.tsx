@@ -6,6 +6,7 @@ import { COLOR_MAP } from '../../utils/constants'
 import { PromoCodeInput } from './PromoCodeInput'
 import { redirectToCheckout } from '../../services/stripe'
 import { createMerchOrder } from '../../services/supabase'
+import { pushEntry } from '../../utils/localStore'
 
 export function CartDrawer() {
   const { isOpen, closeCart, items, promoCode, subtotal, discountAmount, total, removeFromCart, updateQuantity } = useCart()
@@ -17,6 +18,13 @@ export function CartDrawer() {
     setError(null)
     try {
       await createMerchOrder(items, promoCode ?? undefined)
+      pushEntry({
+        type: 'merch',
+        id: crypto.randomUUID(),
+        items: items.map(i => ({ name: i.productName, color: i.color, size: i.size, qty: i.quantity, price: i.price })),
+        promoCode: promoCode ?? undefined,
+        savedAt: new Date().toISOString(),
+      })
       await redirectToCheckout(items, promoCode)
     } catch {
       setError('Une erreur est survenue lors du paiement. Veuillez réessayer.')

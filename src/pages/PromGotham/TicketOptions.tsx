@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { createGothamRegistration } from '../../services/supabase'
 import { redirectToGothamCheckout } from '../../services/stripe'
+import { pushEntry } from '../../utils/localStore'
 
 const tickets = [
   {
@@ -51,6 +52,16 @@ export function TicketOptions() {
     setError(null)
     try {
       if (selected === 'external') {
+        pushEntry({
+          type: 'gotham',
+          id: crypto.randomUUID(),
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          ticketType: 'external',
+          price: 53,
+          savedAt: new Date().toISOString(),
+        })
         await redirectToGothamCheckout({
           firstName: form.firstName,
           lastName: form.lastName,
@@ -61,6 +72,16 @@ export function TicketOptions() {
           ...form,
           ticketType: selected,
           price: 0,
+        })
+        pushEntry({
+          type: 'gotham',
+          id: crypto.randomUUID(),
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          ticketType: 'primaner',
+          price: 0,
+          savedAt: new Date().toISOString(),
         })
         setDone(true)
       }
