@@ -11,12 +11,17 @@ export function CartDrawer() {
   const { isOpen, closeCart, items, promoCode, subtotal, discountAmount, total, removeFromCart, updateQuantity } = useCart()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+
+  const canCheckout = name.trim().length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   async function handleCheckout() {
+    if (!canCheckout) return
     setLoading(true)
     setError(null)
     try {
-      await createMerchOrder(items, promoCode ?? undefined)
+      await createMerchOrder(items, promoCode ?? undefined, name.trim(), email.trim())
       await redirectToCheckout(items, promoCode)
     } catch {
       setError('Une erreur est survenue lors du paiement. Veuillez réessayer.')
@@ -128,6 +133,23 @@ export function CartDrawer() {
                   </div>
                 </div>
 
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="text"
+                    placeholder="Nom complet"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink/20 focus:border-ink placeholder-gray-300"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Adresse email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ink/20 focus:border-ink placeholder-gray-300"
+                  />
+                </div>
+
                 {error && (
                   <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 border border-red-200">
                     <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,7 +161,7 @@ export function CartDrawer() {
 
                 <button
                   onClick={handleCheckout}
-                  disabled={loading}
+                  disabled={loading || !canCheckout}
                   className="w-full py-4 bg-ink text-white text-sm font-semibold rounded-xl hover:bg-ink/80 transition-colors disabled:opacity-50"
                 >
                   {loading ? 'Chargement...' : 'Commander →'}

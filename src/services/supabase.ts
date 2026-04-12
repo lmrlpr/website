@@ -32,10 +32,12 @@ export async function createGothamRegistration(data: GothamRegistration): Promis
   if (error) throw error
 }
 
-export async function createMerchOrder(items: CartItem[], promoCode?: string): Promise<void> {
+export async function createMerchOrder(items: CartItem[], promoCode?: string, name?: string, email?: string): Promise<void> {
   const { error } = await supabase.from('merch_orders').insert({
     items,
     promo_code: promoCode ?? null,
+    name: name ?? null,
+    email: email ?? null,
   })
   if (error) throw error
 }
