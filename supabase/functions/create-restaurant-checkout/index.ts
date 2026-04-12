@@ -19,18 +19,6 @@ function getCorsHeaders(req: Request) {
   }
 }
 
-const PRICE_MAP: Record<string, number> = {
-  eleve: 1000,
-  prof: 5500,
-  plus_un: 5500,
-}
-
-const NAME_MAP: Record<string, string> = {
-  eleve: 'Gotham — Élève de Première',
-  prof: 'Gotham — Professeur',
-  plus_un: 'Gotham — +1 Invité',
-}
-
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req)
 
@@ -39,47 +27,61 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { firstName, lastName, email, ticketType } = await req.json()
+    const { firstName, lastName, classGroup, email, phone, starter, main, dessert, drinks, hasAlcohol } = await req.json()
 
-    if (!firstName || !lastName || !email || !ticketType) {
+    if (!firstName || !lastName || !classGroup || !email || !starter || !main || !dessert || !drinks) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       })
     }
 
-    const unitAmount = PRICE_MAP[ticketType]
-    const productName = NAME_MAP[ticketType]
+    const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+      {
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: 'Porta Nova',
+            description: `${firstName} ${lastName} — Dîner Prom Night`,
+          },
+          unit_amount: 2000,
+        },
+        quantity: 1,
+      },
+    ]
 
-    if (!unitAmount || !productName) {
-      return new Response(JSON.stringify({ error: 'Invalid ticket type' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    if (hasAlcohol) {
+      line_items.push({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: 'Alcool',
+            description: 'Cocktail + 1/3 bouteille de vin + 1 Soft + 1 Bière',
+          },
+          unit_amount: 700,
+        },
+        quantity: 1,
       })
     }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      line_items: [{
-        price_data: {
-          currency: 'eur',
-          product_data: {
-            name: productName,
-            description: `${firstName} ${lastName}`,
-          },
-          unit_amount: unitAmount,
-        },
-        quantity: 1,
-      }],
+      line_items,
       metadata: {
-        type: 'gotham_ticket',
+        type: 'restaurant_reservation',
         first_name: firstName,
         last_name: lastName,
+        class_group: classGroup,
         email,
-        ticket_type: ticketType,
+        phone: phone ?? '',
+        starter,
+        main,
+        dessert,
+        drinks,
+        has_alcohol: hasAlcohol ? 'true' : 'false',
       },
-      success_url: `${SITE_URL}/prom/gotham?success=1`,
-      cancel_url: `${SITE_URL}/prom/gotham?cancelled=1`,
+      success_url: `${SITE_URL}/prom/restaurant?success=1`,
+      cancel_url: `${SITE_URL}/prom/restaurant?cancelled=1`,
     })
 
     return new Response(JSON.stringify({ url: session.url }), {

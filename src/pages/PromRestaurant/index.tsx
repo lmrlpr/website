@@ -1,16 +1,28 @@
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { AccessCodeGate } from './AccessCodeGate'
 import { MenuForm } from './MenuForm'
 import { Footer } from '../../components/layout/Footer'
 
 export default function PromRestaurant() {
   const [hasAccess, setHasAccess] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const success = searchParams.get('success') === '1'
+  const cancelled = searchParams.get('cancelled') === '1'
 
   useEffect(() => {
     if (sessionStorage.getItem('restaurant_access') === 'true') {
       setHasAccess(true)
     }
   }, [])
+
+  useEffect(() => {
+    if (success || cancelled) {
+      setSearchParams({}, { replace: true })
+    }
+  }, [success, cancelled, setSearchParams])
 
   if (!hasAccess) {
     return <AccessCodeGate onSuccess={() => setHasAccess(true)} />
@@ -38,18 +50,45 @@ export default function PromRestaurant() {
               14 Av. de la Faïencerie, 1510 Limpertsberg
             </a>
           </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            175 personnes · Élèves & professeurs uniquement
-          </div>
         </div>
       </div>
 
       {/* Divider */}
       <div className="border-t border-resto-border max-w-4xl mx-auto" />
 
-      {/* Form */}
-      <MenuForm />
+      {/* Success state */}
+      {success ? (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center justify-center min-h-[50vh] text-center px-6 py-16"
+        >
+          <div className="w-16 h-16 rounded-full bg-green-900/30 border border-green-600/30 flex items-center justify-center mb-6">
+            <svg className="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 className="text-2xl font-bold text-resto-text mb-3">Réservation confirmée</h3>
+          <p className="text-resto-text/60 text-sm max-w-sm leading-relaxed">
+            Votre paiement a été accepté. Vous recevrez une confirmation par email.
+          </p>
+        </motion.div>
+      ) : (
+        <>
+          {cancelled && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-xl mx-auto px-6 pt-8"
+            >
+              <div className="px-5 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm">
+                Paiement annulé. Vous pouvez réessayer ci-dessous.
+              </div>
+            </motion.div>
+          )}
+          <MenuForm />
+        </>
+      )}
 
       <div className="border-t border-resto-border" style={{ marginTop: '2rem' }}>
         <Footer />

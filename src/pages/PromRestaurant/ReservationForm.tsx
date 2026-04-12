@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { Input } from '../../components/ui/Input'
-import { createRestaurantReservation } from '../../services/supabase'
+import { redirectToRestaurantCheckout } from '../../services/stripe'
 import type { MenuSelection } from '../../types/menuSelection'
+
+const BASE_PRICE = 20
+const ALCOHOL_SURCHARGE = 7
 
 interface ReservationFormProps {
   menuSelection: MenuSelection
@@ -9,10 +12,13 @@ interface ReservationFormProps {
   onSubmit: () => void
 }
 
-export function ReservationForm({ menuSelection, surcharge, onSubmit }: ReservationFormProps) {
+export function ReservationForm({ menuSelection, surcharge }: ReservationFormProps) {
   const [form, setForm] = useState({ firstName: '', lastName: '', classGroup: '', email: '', phone: '' })
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Partial<typeof form>>({})
+
+  const hasAlcohol = surcharge > 0
+  const total = BASE_PRICE + (hasAlcohol ? ALCOHOL_SURCHARGE : 0)
 
   const validate = () => {
     const e: Partial<typeof form> = {}
@@ -29,13 +35,18 @@ export function ReservationForm({ menuSelection, surcharge, onSubmit }: Reservat
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setLoading(true)
     try {
-      await createRestaurantReservation({
-        ...form,
-        menuSelection: { ...menuSelection, drinkSurcharge: surcharge },
-        totalSurcharge: surcharge,
-        accessCode: sessionStorage.getItem('restaurant_access') ?? '',
+      await redirectToRestaurantCheckout({
+        firstName: form.firstName,
+        lastName: form.lastName,
+        classGroup: form.classGroup,
+        email: form.email,
+        phone: form.phone,
+        starter: menuSelection.starter,
+        main: menuSelection.main,
+        dessert: menuSelection.dessert,
+        drinks: menuSelection.drinks,
+        hasAlcohol,
       })
-onSubmit()
     } catch {
       alert('Une erreur est survenue. Veuillez réessayer.')
     } finally {
@@ -60,19 +71,30 @@ onSubmit()
       <Input dark label="Email" type="email" value={form.email} onChange={set('email')} placeholder="jean@lycee.lu" error={errors.email} />
       <Input dark label="Téléphone (optionnel)" type="tel" value={form.phone} onChange={set('phone')} placeholder="+352 123 456 789" />
 
-      {surcharge > 0 && (
-        <div className="px-4 py-3 rounded-xl bg-resto-accent/10 border border-resto-accent/20 flex justify-between">
-          <span className="text-xs text-resto-text/60">Supplément boissons alcoolisées</span>
-          <span className="text-sm font-semibold text-resto-accent">+{surcharge} €</span>
+      {/* Price summary */}
+      <div className="rounded-xl border border-resto-border overflow-hidden">
+        <div className="flex justify-between px-4 py-3 text-sm">
+          <span className="text-resto-text/60">Porta Nova</span>
+          <span className="text-resto-text font-medium">{BASE_PRICE} €</span>
         </div>
-      )}
+        {hasAlcohol && (
+          <div className="flex justify-between px-4 py-3 text-sm border-t border-resto-border">
+            <span className="text-resto-text/60">Alcool</span>
+            <span className="text-resto-accent font-medium">+{ALCOHOL_SURCHARGE} €</span>
+          </div>
+        )}
+        <div className="flex justify-between px-4 py-3 border-t border-resto-border bg-resto-surface/50">
+          <span className="text-sm font-semibold text-resto-text">Total</span>
+          <span className="text-sm font-bold text-resto-text">{total} €</span>
+        </div>
+      </div>
 
       <button
         type="submit"
         disabled={loading}
         className="w-full py-4 bg-resto-accent text-ink font-semibold text-sm rounded-xl hover:bg-resto-accent/90 transition-colors disabled:opacity-50 mt-2"
       >
-        {loading ? 'Envoi en cours...' : 'Confirmer ma réservation'}
+        {loading ? 'Redirection vers le paiement...' : `Payer ${total} € →`}
       </button>
     </form>
   )

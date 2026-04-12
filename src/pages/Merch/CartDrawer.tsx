@@ -123,7 +123,7 @@ export function CartDrawer() {
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-green-600">
-                      <span>Réduction</span>
+                      <span>Code promo{promoCode ? ` (${promoCode})` : ''}</span>
                       <span>−{formatCurrency(discountAmount)}</span>
                     </div>
                   )}

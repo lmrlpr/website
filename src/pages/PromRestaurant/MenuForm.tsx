@@ -6,36 +6,14 @@ import { ReservationForm } from './ReservationForm'
 import { STARTERS, MAINS, DESSERTS, DRINK_SURCHARGE } from '../../utils/constants'
 import type { MenuSelection } from '../../types/menuSelection'
 
+const BASE_PRICE = 20
+
 export function MenuForm() {
   const [selection, setSelection] = useState<Partial<MenuSelection>>({})
   const [showReservation, setShowReservation] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
 
   const surcharge = selection.drinks === 'alcoholic' ? DRINK_SURCHARGE : 0
   const allSelected = Boolean(selection.starter && selection.main && selection.dessert && selection.drinks)
-
-  if (submitted) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6"
-      >
-        <div className="w-16 h-16 rounded-full bg-green-900/30 border border-green-600/30 flex items-center justify-center mb-6">
-          <svg className="w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-        <h3 className="text-2xl font-bold text-resto-text mb-3">Réservation confirmée</h3>
-        <p className="text-resto-text/60 text-sm max-w-sm leading-relaxed">
-          Votre réservation a été enregistrée. Vous recevrez une confirmation par email.
-        </p>
-        {surcharge > 0 && (
-          <p className="mt-4 text-sm text-resto-accent">Supplément boissons: +{surcharge} € sera réglé sur place</p>
-        )}
-      </motion.div>
-    )
-  }
 
   if (showReservation) {
     return (
@@ -46,16 +24,9 @@ export function MenuForm() {
         >
           ← Modifier mon menu
         </button>
-        {surcharge > 0 && (
-          <div className="mb-6 flex items-center justify-between px-4 py-3 rounded-xl bg-resto-accent/10 border border-resto-accent/20">
-            <span className="text-xs text-resto-text/70">Supplément boissons alcoolisées</span>
-            <span className="text-sm font-semibold text-resto-accent">+{DRINK_SURCHARGE} €</span>
-          </div>
-        )}
         <ReservationForm
           menuSelection={selection as MenuSelection}
           surcharge={surcharge}
-          onSubmit={() => setSubmitted(true)}
         />
       </div>
     )
@@ -95,16 +66,26 @@ export function MenuForm() {
         onChange={(pkg) => setSelection(s => ({ ...s, drinks: pkg }))}
       />
 
-      {selection.drinks === 'alcoholic' && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between px-4 py-3 rounded-xl bg-resto-accent/10 border border-resto-accent/20"
-        >
-          <span className="text-xs text-resto-text/70">Supplément boissons alcoolisées</span>
-          <span className="text-sm font-semibold text-resto-accent">+{DRINK_SURCHARGE} €</span>
-        </motion.div>
-      )}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-xl border border-resto-border overflow-hidden"
+      >
+        <div className="flex justify-between px-4 py-3 text-sm">
+          <span className="text-resto-text/60">Porta Nova</span>
+          <span className="text-resto-text font-medium">{BASE_PRICE} €</span>
+        </div>
+        {selection.drinks === 'alcoholic' && (
+          <div className="flex justify-between px-4 py-3 text-sm border-t border-resto-border">
+            <span className="text-resto-text/60">Alcool</span>
+            <span className="text-resto-accent font-medium">+{DRINK_SURCHARGE} €</span>
+          </div>
+        )}
+        <div className="flex justify-between px-4 py-3 border-t border-resto-border bg-resto-surface/50">
+          <span className="text-sm font-semibold text-resto-text">Total</span>
+          <span className="text-sm font-bold text-resto-text">{BASE_PRICE + surcharge} €</span>
+        </div>
+      </motion.div>
 
       <button
         onClick={() => setShowReservation(true)}

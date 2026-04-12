@@ -54,14 +54,6 @@ export const PRODUCTS: Product[] = [
     colors: ['Noir'],
     description: 'Tote bag — LMRL Primaner',
   },
-  {
-    id: 'socks',
-    name: 'Chaussettes',
-    category: 'socks',
-    price: 1,
-    colors: ['Rouge', 'Noir', 'Gris', 'Vert'],
-    description: 'Chaussettes — LMRL Primaner',
-  },
 ]
 
 export const DRINK_SURCHARGE = 7
