@@ -27,7 +27,7 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+    <BrowserRouter>
       <CartProvider>
         <AuthProvider>
           <Nav />
