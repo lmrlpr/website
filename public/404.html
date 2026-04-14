@@ -6,7 +6,7 @@
     <script>
       // GitHub Pages SPA routing fix — redirects 404s back through the index
       // pathSegmentsToKeep = 1 for /website/ subdirectory
-      var pathSegmentsToKeep = 1;
+      var pathSegmentsToKeep = 0;
       var l = window.location;
       l.replace(
         l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
