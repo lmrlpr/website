@@ -3,14 +3,14 @@ import type { CartItem } from '../types/product'
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? ''
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
 
-export async function redirectToCheckout(items: CartItem[], promoCode?: string | null): Promise<void> {
+export async function redirectToCheckout(items: CartItem[], promoCode?: string | null, name?: string, email?: string): Promise<void> {
   const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
     },
-    body: JSON.stringify({ items, promoCode }),
+    body: JSON.stringify({ items, promoCode, name, email }),
   })
 
   if (!res.ok) {

@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { items, promoCode } = await req.json()
+    const { items, promoCode, name, email } = await req.json()
 
     const line_items = items.map((item: {
       productName: string
@@ -52,6 +52,13 @@ Deno.serve(async (req) => {
       line_items,
       success_url: `${SITE_URL}/merch?success=1`,
       cancel_url: `${SITE_URL}/merch?cancelled=1`,
+      metadata: {
+        type: 'merch_order',
+        name: name ?? '',
+        email: email ?? '',
+        items: JSON.stringify(items),
+        promo_code: promoCode ?? '',
+      },
     }
 
     if (promoCode) {
