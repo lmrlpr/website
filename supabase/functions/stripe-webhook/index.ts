@@ -34,6 +34,21 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    if (session.metadata?.type === 'merch_order') {
+      const { name, email, items: itemsJson, promo_code } = session.metadata
+      const items = JSON.parse(itemsJson)
+      const { error } = await supabase.from('merch_orders').insert({
+        name: name || null,
+        email: email || null,
+        items,
+        promo_code: promo_code || null,
+      })
+      if (error) {
+        console.error('DB insert failed (merch):', error.message)
+        return new Response('Database error', { status: 500 })
+      }
+    }
+
     if (session.metadata?.type === 'gotham_ticket') {
       const { first_name, last_name, email, ticket_type } = session.metadata
       const price = (session.amount_total ?? 0) / 100

@@ -5,7 +5,6 @@ import { formatCurrency } from '../../utils/formatCurrency'
 import { COLOR_MAP } from '../../utils/constants'
 import { PromoCodeInput } from './PromoCodeInput'
 import { redirectToCheckout } from '../../services/stripe'
-import { createMerchOrder } from '../../services/supabase'
 
 export function CartDrawer() {
   const { isOpen, closeCart, items, promoCode, subtotal, discountAmount, total, removeFromCart, updateQuantity } = useCart()
@@ -21,8 +20,7 @@ export function CartDrawer() {
     setLoading(true)
     setError(null)
     try {
-      await createMerchOrder(items, promoCode ?? undefined, name.trim(), email.trim())
-      await redirectToCheckout(items, promoCode)
+      await redirectToCheckout(items, promoCode, name.trim(), email.trim())
     } catch {
       setError('Une erreur est survenue lors du paiement. Veuillez réessayer.')
     } finally {
