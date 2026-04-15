@@ -1,13 +1,25 @@
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { TextEffect } from '../../components/ui/text-effect'
 import { GradientBackground } from '../../components/ui/gradient-background'
 
 export function Hero() {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    const t = setTimeout(() => {
+      document.body.style.overflow = ''
+    }, 1600)
+    return () => {
+      clearTimeout(t)
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   return (
     <GradientBackground>
       {/* Content */}
-      <div className="flex flex-col items-center text-center px-5">
+      <div className="flex flex-col items-center text-center px-5 min-h-[100dvh] justify-center pb-16">
         <motion.div
           initial={{ opacity: 0, y: -60 }}
           animate={{ opacity: 1, y: 0 }}
@@ -46,78 +58,28 @@ export function Hero() {
           2025 / 2026
         </motion.p>
 
-        {/* Navigation cards */}
+        {/* Navigation links — subtle, secondary */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.85, ease: 'easeOut' }}
-          className="mt-12 flex gap-4 flex-wrap justify-center"
+          transition={{ duration: 0.6, delay: 0.85, ease: 'easeOut' }}
+          className="mt-16 flex flex-col items-center gap-3"
         >
-          <Link
-            to="/prom/gotham"
-            className="group flex flex-col items-start gap-1 px-7 py-5 rounded-2xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-            style={{
-              background: 'rgba(30, 8, 0, 0.18)',
-              border: '1px solid rgba(30, 8, 0, 0.2)',
-              backdropFilter: 'blur(6px)',
-              WebkitBackdropFilter: 'blur(6px)',
-              minWidth: '160px',
-            }}
-          >
-            <span className="text-[0.6rem] tracking-[0.3em] uppercase" style={{ color: 'rgba(30, 8, 0, 0.45)' }}>
-              Événement
-            </span>
-            <span className="text-lg font-bold leading-tight" style={{ color: '#1A0800' }}>
-              Prom Gotham
-            </span>
-            <span className="text-xs mt-1 group-hover:translate-x-1 transition-transform duration-200" style={{ color: 'rgba(30, 8, 0, 0.45)' }}>
-              Voir →
-            </span>
-          </Link>
-
-          <Link
-            to="/prom/restaurant"
-            className="group flex flex-col items-start gap-1 px-7 py-5 rounded-2xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-            style={{
-              background: 'rgba(30, 8, 0, 0.18)',
-              border: '1px solid rgba(30, 8, 0, 0.2)',
-              backdropFilter: 'blur(6px)',
-              WebkitBackdropFilter: 'blur(6px)',
-              minWidth: '160px',
-            }}
-          >
-            <span className="text-[0.6rem] tracking-[0.3em] uppercase" style={{ color: 'rgba(30, 8, 0, 0.45)' }}>
-              Événement
-            </span>
-            <span className="text-lg font-bold leading-tight" style={{ color: '#1A0800' }}>
-              Prom Restaurant
-            </span>
-            <span className="text-xs mt-1 group-hover:translate-x-1 transition-transform duration-200" style={{ color: 'rgba(30, 8, 0, 0.45)' }}>
-              Voir →
-            </span>
-          </Link>
-
-          <Link
-            to="/merch"
-            className="group flex flex-col items-start gap-1 px-7 py-5 rounded-2xl transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]"
-            style={{
-              background: 'rgba(30, 8, 0, 0.18)',
-              border: '1px solid rgba(30, 8, 0, 0.2)',
-              backdropFilter: 'blur(6px)',
-              WebkitBackdropFilter: 'blur(6px)',
-              minWidth: '160px',
-            }}
-          >
-            <span className="text-[0.6rem] tracking-[0.3em] uppercase" style={{ color: 'rgba(30, 8, 0, 0.45)' }}>
-              Boutique
-            </span>
-            <span className="text-lg font-bold leading-tight" style={{ color: '#1A0800' }}>
-              Merch
-            </span>
-            <span className="text-xs mt-1 group-hover:translate-x-1 transition-transform duration-200" style={{ color: 'rgba(30, 8, 0, 0.45)' }}>
-              Voir →
-            </span>
-          </Link>
+          {[
+            { to: '/prom/gotham', label: 'Prom Gotham' },
+            { to: '/prom/restaurant', label: 'Prom Restaurant' },
+            { to: '/merch', label: 'Merch' },
+          ].map(({ to, label }) => (
+            <Link
+              key={to}
+              to={to}
+              className="group flex items-center gap-2 text-sm transition-all duration-200 active:opacity-60"
+              style={{ color: 'rgba(30, 8, 0, 0.4)' }}
+            >
+              <span className="group-hover:underline underline-offset-2">{label}</span>
+              <span className="group-hover:translate-x-0.5 transition-transform duration-200">→</span>
+            </Link>
+          ))}
         </motion.div>
       </div>
     </GradientBackground>

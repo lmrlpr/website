@@ -1,133 +1,235 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 
 const EVENT_DATE = new Date('2026-07-03T00:00:00')
 
+// Pre-computed rain streaks — no Math.random() on render
+const RAIN_STREAKS = Array.from({ length: 24 }, (_, i) => ({
+  left: `${2 + i * 4.1}%`,
+  height: `${28 + (i * 11) % 38}%`,
+  duration: 2.8 + (i * 0.35) % 3.5,
+  delay: (i * 0.42) % 5,
+  opacity: 0.12 + (i % 4) * 0.06,
+}))
+
 function useCountdown(target: Date) {
   const [diff, setDiff] = useState(() => target.getTime() - Date.now())
-
   useEffect(() => {
-    const interval = setInterval(() => setDiff(target.getTime() - Date.now()), 1000)
-    return () => clearInterval(interval)
-  }, [])
-
+    const id = setInterval(() => setDiff(target.getTime() - Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [target])
   const total = Math.max(0, diff)
-  const days = Math.floor(total / 86400000)
-  const hours = Math.floor((total % 86400000) / 3600000)
-  const minutes = Math.floor((total % 3600000) / 60000)
-  const seconds = Math.floor((total % 60000) / 1000)
-  return { days, hours, minutes, seconds }
+  return {
+    days:    Math.floor(total / 86400000),
+    hours:   Math.floor((total % 86400000) / 3600000),
+    minutes: Math.floor((total % 3600000) / 60000),
+    seconds: Math.floor((total % 60000) / 1000),
+  }
 }
 
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center">
-      <span className="font-bold text-white tabular-nums" style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)' }}>
+    <div className="flex flex-col items-center min-w-[2.5rem]">
+      <motion.span
+        key={value}
+        initial={{ y: -8, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.18, ease: 'easeOut' }}
+        className="font-bold text-white tabular-nums leading-none"
+        style={{ fontSize: 'clamp(1.6rem, 4.5vw, 2.8rem)' }}
+      >
         {String(value).padStart(2, '0')}
-      </span>
-      <span className="text-white/30 text-[10px] tracking-[0.3em] uppercase mt-1">{label}</span>
+      </motion.span>
+      <span className="text-gotham-blue/40 text-[8px] tracking-[0.4em] uppercase mt-1.5">{label}</span>
     </div>
   )
 }
 
+const LETTERS = ['G', 'O', 'T', 'H', 'A', 'M']
+
 export function GothamHero() {
   const { days, hours, minutes, seconds } = useCountdown(EVENT_DATE)
 
+  const letterVariants = useMemo(() => LETTERS.map((_, i) => ({
+    initial: { y: 100, opacity: 0, skewX: -8 },
+    animate: { y: 0, opacity: 1, skewX: 0 },
+    transition: { delay: 0.15 + i * 0.07, type: 'spring' as const, stiffness: 90, damping: 18 },
+  })), [])
+
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gotham-bg">
-      {/* Atmospheric glow orbs */}
+    <section className="relative min-h-screen flex flex-col items-center justify-center"
+      style={{ background: 'transparent' }}
+    >
+
+      {/* ── Atmospheric orbs ── */}
       <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute top-1/4 left-1/5 w-[600px] h-[600px] rounded-full animate-glow-pulse"
-          style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.15) 0%, transparent 70%)', filter: 'blur(60px)' }}
+        <motion.div
+          animate={{ opacity: [0.12, 0.28, 0.12], scale: [1, 1.12, 1] }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-1/4 -left-1/4 w-[800px] h-[800px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.18) 0%, transparent 65%)', filter: 'blur(70px)' }}
         />
-        <div
-          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full animate-glow-pulse"
-          style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%)', filter: 'blur(80px)', animationDelay: '1.5s' }}
+        <motion.div
+          animate={{ opacity: [0.1, 0.25, 0.1], scale: [1, 1.08, 1] }}
+          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
+          className="absolute bottom-1/4 -right-1/4 w-[700px] h-[700px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, transparent 65%)', filter: 'blur(90px)' }}
         />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(0,212,255,0.05) 0%, transparent 60%)', filter: 'blur(40px)' }}
+        <motion.div
+          animate={{ opacity: [0.05, 0.12, 0.05] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full"
+          style={{ background: 'radial-gradient(ellipse, rgba(0,212,255,0.08) 0%, transparent 60%)', filter: 'blur(50px)' }}
         />
       </div>
 
-      {/* Scanline texture overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 3px)',
-          backgroundSize: '100% 3px',
-        }}
-      />
+      {/* ── Rain streaks ── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {RAIN_STREAKS.map((s, i) => (
+          <motion.div
+            key={i}
+            className="absolute top-0 w-px"
+            style={{
+              left: s.left,
+              height: s.height,
+              opacity: s.opacity,
+              background: 'linear-gradient(to bottom, transparent, rgba(0,212,255,0.6) 40%, rgba(0,212,255,0.8) 60%, transparent)',
+            }}
+            animate={{ y: ['-100%', '120vh'] }}
+            transition={{
+              duration: s.duration,
+              repeat: Infinity,
+              ease: 'linear',
+              delay: s.delay,
+            }}
+          />
+        ))}
+      </div>
 
-      <div className="relative z-10 text-center px-6">
-        <motion.p
+
+      {/* ── Main content ── */}
+      <div className="relative z-10 text-center px-6 w-full max-w-6xl mx-auto">
+
+        {/* Tagline */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-gotham-blue/60 text-xs tracking-[0.5em] uppercase mb-6"
-        >
-          Prom Night · 00h – 06h
-        </motion.p>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="font-bold leading-none tracking-tighter text-gradient-gotham"
-          style={{ fontSize: 'clamp(5rem, 16vw, 13rem)' }}
+          className="flex items-center justify-center gap-3 mb-8"
         >
-          GOTHAM
-        </motion.h1>
+          <div className="h-px w-12 bg-gradient-to-r from-transparent to-gotham-blue/60" />
+          <p className="text-gotham-blue/70 text-xs tracking-[0.6em] uppercase font-medium">
+            Prom Night &nbsp;·&nbsp; 00h – 06h
+          </p>
+          <div className="h-px w-12 bg-gradient-to-l from-transparent to-gotham-blue/60" />
+        </motion.div>
 
-        {/* Countdown */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35 }}
-          className="mt-8 flex items-center justify-center gap-6 md:gap-10"
+        {/* ── GOTHAM — per-letter hover levitation with Bebas Neue ── */}
+        <h1
+          className="font-gotham leading-none tracking-wider select-none mb-2"
+          style={{ fontSize: 'clamp(5rem, 20vw, 16rem)' }}
         >
-          <CountdownUnit value={days} label="Jours" />
-          <span className="text-white/20 font-light text-2xl mb-4">:</span>
-          <CountdownUnit value={hours} label="Heures" />
-          <span className="text-white/20 font-light text-2xl mb-4">:</span>
-          <CountdownUnit value={minutes} label="Min" />
-          <span className="text-white/20 font-light text-2xl mb-4">:</span>
-          <CountdownUnit value={seconds} label="Sec" />
+          {LETTERS.map((letter, i) => (
+            <motion.span
+              key={i}
+              initial={letterVariants[i].initial}
+              animate={letterVariants[i].animate}
+              transition={letterVariants[i].transition}
+              whileHover={{
+                y: -18,
+                filter: 'drop-shadow(0 0 12px rgba(0,212,255,0.55))',
+                transition: { type: 'spring', stiffness: 400, damping: 14 },
+              }}
+              className="inline-block cursor-default text-gradient-gotham"
+            >
+              {letter}
+            </motion.span>
+          ))}
+        </h1>
+
+        {/* Horizontal neon accent line */}
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ delay: 0.9, duration: 1, ease: 'easeOut' }}
+          className="mx-auto mb-8 h-px w-64 bg-gradient-to-r from-transparent via-gotham-blue/70 to-transparent"
+          style={{ boxShadow: '0 0 12px rgba(0,212,255,0.4)' }}
+        />
+
+        {/* ── Countdown ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.6 }}
+          className="flex items-center justify-center gap-4 md:gap-8 mb-3"
+        >
+          <CountdownUnit value={days}    label="Jours"  />
+          <span className="text-gotham-blue/20 font-light mb-4" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)' }}>:</span>
+          <CountdownUnit value={hours}   label="Heures" />
+          <span className="text-gotham-blue/20 font-light mb-4" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)' }}>:</span>
+          <CountdownUnit value={minutes} label="Min"    />
+          <span className="text-gotham-blue/20 font-light mb-4" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)' }}>:</span>
+          <CountdownUnit value={seconds} label="Sec"    />
         </motion.div>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-3 text-white/25 text-xs tracking-[0.3em] uppercase"
+          transition={{ delay: 0.8 }}
+          className="text-white/20 text-xs tracking-[0.5em] uppercase mb-10"
         >
           3 Juillet 2026
         </motion.p>
 
+        {/* ── CTA Buttons ── */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.65 }}
-          className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
+          transition={{ duration: 0.6, delay: 0.95 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center"
         >
+          {/* Primary — cyan neon CTA */}
           <a
             href="#tickets"
-            className="px-8 py-3.5 border border-gotham-blue/50 text-gotham-blue text-sm font-medium rounded-full hover:shadow-neon hover:border-gotham-blue transition-all duration-300"
+            className="group btn-neon relative px-10 py-4 text-sm font-semibold tracking-widest uppercase rounded-full cursor-pointer transition-all duration-200"
+            style={{
+              background: 'linear-gradient(135deg, rgba(0,212,255,0.12) 0%, rgba(139,92,246,0.08) 100%)',
+              border: '1px solid rgba(0,212,255,0.5)',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(0,212,255,0.4), 0 0 40px rgba(0,212,255,0.2)'
+              ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,212,255,0.9)'
+            }}
+            onMouseLeave={e => {
+              ;(e.currentTarget as HTMLElement).style.boxShadow = ''
+              ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,212,255,0.5)'
+            }}
           >
-            Prendre un billet
+            <span className="relative text-gotham-blue group-hover:text-white transition-colors duration-200">
+              Prendre un billet
+            </span>
           </a>
+
+          {/* Secondary — ghost */}
           <a
             href="#info"
-            className="px-8 py-3.5 border border-white/10 text-white/60 text-sm font-medium rounded-full hover:border-white/20 hover:text-white/80 transition-all"
+            className="group relative px-10 py-4 text-sm font-medium tracking-widest uppercase rounded-full cursor-pointer transition-all duration-200"
+            style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.25)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'
+            }}
           >
-            Informations pratiques
+            <span className="text-white/45 group-hover:text-white/80 transition-colors duration-200">
+              Informations pratiques
+            </span>
           </a>
         </motion.div>
+
       </div>
 
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gotham-bg to-transparent" />
     </section>
   )
 }

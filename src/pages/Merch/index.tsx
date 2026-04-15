@@ -1,15 +1,35 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ReactLenis, useLenis } from 'lenis/react'
 import { ProductGrid } from './ProductGrid'
 import { CartDrawer } from './CartDrawer'
 import { Footer } from '../../components/layout/Footer'
 import { useCart } from '../../context/CartContext'
+import { MerchIntro } from './MerchIntro'
+import { MerchAlbum } from './MerchAlbum'
+import { PRODUCTS } from '../../utils/constants'
 
 export default function Merch() {
+  return (
+    <ReactLenis root>
+      <MerchInner />
+    </ReactLenis>
+  )
+}
+
+function MerchInner() {
   const [searchParams, setSearchParams] = useSearchParams()
   const { clearCart } = useCart()
   const [banner, setBanner] = useState<{ type: 'success' | 'cancelled'; message: string } | null>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
+  const lenis = useLenis()
+
+  const scrollToGrid = () => {
+    if (gridRef.current) {
+      lenis?.scrollTo(gridRef.current, { offset: 0 })
+    }
+  }
 
   useEffect(() => {
     if (searchParams.get('success') === '1') {
@@ -23,7 +43,7 @@ export default function Merch() {
   }, [])
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen">
       {/* Stripe return banner */}
       <AnimatePresence>
         {banner && (
@@ -49,32 +69,45 @@ export default function Merch() {
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <div className="pt-32 pb-12 px-6 md:px-10 max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="text-xs tracking-[0.5em] uppercase text-gray-300 mb-4">Collection</p>
-          <div className="flex items-end justify-between">
-            <h1 className="text-4xl md:text-6xl font-bold text-ink tracking-tight">LMRL Merch</h1>
-            <p className="text-sm text-gray-400 hidden md:block">
-              Primaner vum Michel Rodange
-            </p>
-          </div>
-          <div className="h-px bg-gray-100 mt-8" />
-        </motion.div>
-      </div>
+      {/* Cinematic scroll intro */}
+      <MerchIntro onVisit={scrollToGrid} />
 
-      {/* Filter bar */}
-      <div className="px-6 md:px-10 max-w-6xl mx-auto mb-6">
-        <p className="text-xs text-gray-400">{6} produits</p>
-      </div>
+      {/* Product grid section — warm gradient */}
+      <div ref={gridRef} style={{ background: 'linear-gradient(to bottom, #EADFCC 0%, #F5CAA0 24%, #FFF0A8 54%, #FFFFFF 100%)' }}>
+        {/* Header */}
+        <div className="pt-20 pb-12 px-6 md:px-10 max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <p className="text-[0.6rem] tracking-[0.5em] uppercase text-ink/40 mb-6">Collection</p>
+            <div className="flex items-end justify-between">
+              <h1
+                className="font-merch font-light text-ink leading-none"
+                style={{ fontSize: 'clamp(2.5rem, 7vw, 5rem)', letterSpacing: '0.06em' }}
+              >
+                LMRL Merch
+              </h1>
+              <p className="text-xs text-ink/40 hidden md:block tracking-[0.15em]">
+                Primaner vum Michel Rodange
+              </p>
+            </div>
+            <div className="h-px bg-ink/10 mt-8" />
+          </motion.div>
+        </div>
 
-      <ProductGrid />
-      <CartDrawer />
-      <Footer />
+        {/* Filter bar */}
+        <div className="px-6 md:px-10 max-w-6xl mx-auto mb-6">
+          <p className="text-[0.65rem] tracking-[0.2em] uppercase text-ink/40">{PRODUCTS.length} produits</p>
+        </div>
+
+        <ProductGrid />
+        <MerchAlbum />
+        <CartDrawer />
+        <Footer />
+      </div>
     </div>
   )
 }
