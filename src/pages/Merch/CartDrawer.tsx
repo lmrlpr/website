@@ -85,7 +85,7 @@ export function CartDrawer() {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-ink truncate">{item.productName}</p>
                           <p className="text-xs text-gray-400 mt-0.5">
-                            {item.color}{item.size ? ` · ${item.size}` : ''}
+                            {item.color}{item.design ? ` · ${item.design}` : ''}{item.motifColor ? ` · motif ${item.motifColor}` : ''}{item.size ? ` · ${item.size}` : ''}
                           </p>
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">

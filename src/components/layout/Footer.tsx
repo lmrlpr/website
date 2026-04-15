@@ -8,6 +8,18 @@ export function Footer() {
         </div>
         <div className="text-xs text-gray-400 text-right">
           <p>© {new Date().getFullYear()} Primaner ASBL</p>
+          <p className="mt-1 text-xs tracking-[0.15em] uppercase" style={{ color: '#8B5E3C' }}>
+            Pictures by{' '}
+            <a
+              href="https://www.instagram.com/jamie.forman_/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium transition-opacity hover:opacity-70"
+              style={{ color: '#8B5E3C' }}
+            >
+              Jamie Forman
+            </a>
+          </p>
         </div>
       </div>
     </footer>

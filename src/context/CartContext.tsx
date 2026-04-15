@@ -30,10 +30,10 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case 'HYDRATE':
       return { ...state, ...action.payload }
     case 'ADD_ITEM': {
-      const key = `${action.payload.productId}-${action.payload.color}-${action.payload.size ?? ''}`
-      const existing = state.items.find(i => `${i.productId}-${i.color}-${i.size ?? ''}` === key)
+      const key = `${action.payload.productId}-${action.payload.color}-${action.payload.motifColor ?? ''}-${action.payload.design ?? ''}-${action.payload.size ?? ''}`
+      const existing = state.items.find(i => `${i.productId}-${i.color}-${i.motifColor ?? ''}-${i.design ?? ''}-${i.size ?? ''}` === key)
       if (existing) {
-        return { ...state, items: state.items.map(i => `${i.productId}-${i.color}-${i.size ?? ''}` === key ? { ...i, quantity: i.quantity + action.payload.quantity } : i) }
+        return { ...state, items: state.items.map(i => `${i.productId}-${i.color}-${i.motifColor ?? ''}-${i.design ?? ''}-${i.size ?? ''}` === key ? { ...i, quantity: i.quantity + action.payload.quantity } : i) }
       }
       return { ...state, items: [...state.items, action.payload] }
     }

@@ -1,0 +1,103 @@
+import { ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { motion, useMotionTemplate, useScroll, useTransform } from 'framer-motion'
+import { SmoothScrollHero } from '../../components/ui/modern-hero'
+
+const BASE = import.meta.env.BASE_URL
+const CENTER_IMAGE = `${BASE}merch/Tabea_Zoe_main.jpg`
+const MOBILE_IMAGE = `${BASE}merch/Trio.jpg`
+
+function useMobile() {
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 768
+  )
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+  return isMobile
+}
+
+function MobileHero({ onVisit }: { onVisit: () => void }) {
+  const { scrollY } = useScroll()
+  const REVEAL = 400
+
+  const clip1 = useTransform(scrollY, [0, REVEAL], [12, 0])
+  const clip2 = useTransform(scrollY, [0, REVEAL], [88, 100])
+  const clipPath = useMotionTemplate`polygon(${clip1}% ${clip1}%, ${clip2}% ${clip1}%, ${clip2}% ${clip2}%, ${clip1}% ${clip2}%)`
+
+  return (
+    <div style={{ backgroundColor: '#EADFCC' }}>
+      {/* Image — clip-path reveals on scroll, cropped to faces */}
+      <motion.div
+        style={{
+          clipPath,
+          backgroundImage: `url(${MOBILE_IMAGE})`,
+          backgroundPosition: 'center 18%',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+          willChange: 'clip-path',
+        }}
+        className="w-full h-[62vh]"
+      />
+
+      {/* Text below the image */}
+      <div className="flex flex-col items-center pt-8 pb-12 px-6">
+        <p className="text-[0.6rem] tracking-[0.5em] uppercase text-ink/40 mb-4">Collection</p>
+        <h1
+          className="font-merch font-light text-ink leading-none text-center"
+          style={{ fontSize: 'clamp(3.5rem, 22vw, 5rem)', letterSpacing: '0.08em' }}
+        >
+          MERCH
+        </h1>
+        <div className="h-px w-10 bg-ink/20 my-6" />
+        <button
+          type="button"
+          onClick={onVisit}
+          className="cursor-pointer inline-flex items-center gap-3 px-8 py-3 rounded-full border border-ink/30 text-ink text-xs tracking-[0.4em] uppercase transition-colors duration-200 focus:outline-none"
+        >
+          Visit Store
+          <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.5} />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export function MerchIntro({ onVisit }: { onVisit: () => void }) {
+  const isMobile = useMobile()
+
+  if (isMobile) {
+    return <MobileHero onVisit={onVisit} />
+  }
+
+  return (
+    <SmoothScrollHero
+      centerImage={CENTER_IMAGE}
+      centerImagePosition="73% 5%"
+      parallaxImages={[]}
+      bgColor="#EADFCC"
+      sectionHeight={900}
+      parallaxPaddingTop={0}
+      keepImageVisible
+    >
+      <p className="text-[0.65rem] tracking-[0.5em] uppercase mb-6 text-white/70">Collection</p>
+      <h1
+        className="font-merch font-light text-white leading-none mb-10 text-center drop-shadow-lg"
+        style={{ fontSize: 'clamp(5rem, 18vw, 12rem)', letterSpacing: '0.08em' }}
+      >
+        MERCH
+      </h1>
+      <div className="h-px w-10 mb-10 bg-white/50" />
+      <button
+        type="button"
+        onClick={onVisit}
+        className="cursor-pointer inline-flex items-center gap-3 px-10 py-3 rounded-full border border-white/50 text-white text-xs tracking-[0.4em] uppercase transition-colors duration-200 hover:bg-white hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+      >
+        Visit Store
+        <ArrowRight className="w-3.5 h-3.5" strokeWidth={1.5} />
+      </button>
+    </SmoothScrollHero>
+  )
+}
