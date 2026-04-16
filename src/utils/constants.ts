@@ -71,14 +71,22 @@ export const PRODUCT_IMAGES: Record<
   },
 }
 
-/** All photos for a given product/color/design/side. Empty array = no photo. */
+/** All photos for a given product/color/design/side.
+ *  Falls back to design 1 of the same color when the exact design has no photos. */
 export function getProductImages(
   productId: string,
   color: ProductColor,
   design: number,
   side: 'front' | 'back',
 ): string[] {
-  return PRODUCT_IMAGES[productId]?.[color]?.[design]?.[side] ?? []
+  const exact = PRODUCT_IMAGES[productId]?.[color]?.[design]?.[side] ?? []
+  if (exact.length > 0) return exact
+  // Fall back to design 1 of the same color
+  if (design !== 1) {
+    const d1 = PRODUCT_IMAGES[productId]?.[color]?.[1]?.[side] ?? []
+    if (d1.length > 0) return d1
+  }
+  return []
 }
 
 /** First photo for a given combination+side, or null. */
@@ -91,14 +99,21 @@ export function getProductImage(
   return getProductImages(productId, color, design, side)[0] ?? null
 }
 
-/** Returns true if any photo exists for the given product/color/design. */
+/** Returns true if any photo exists for the given product/color/design.
+ *  Falls back to design 1 of the same color so all 3 designs appear available. */
 export function hasProductImages(
   productId: string,
   color: ProductColor,
   design: number,
 ): boolean {
   const entry = PRODUCT_IMAGES[productId]?.[color]?.[design]
-  return !!((entry?.front?.length ?? 0) > 0 || (entry?.back?.length ?? 0) > 0)
+  if ((entry?.front?.length ?? 0) > 0 || (entry?.back?.length ?? 0) > 0) return true
+  // Fall back to design 1 of the same color
+  if (design !== 1) {
+    const d1 = PRODUCT_IMAGES[productId]?.[color]?.[1]
+    return !!((d1?.front?.length ?? 0) > 0 || (d1?.back?.length ?? 0) > 0)
+  }
+  return false
 }
 
 /** Returns the first available front photo for a product (used as hero/card image). */
@@ -139,12 +154,12 @@ export const PRODUCTS: Product[] = [
     name: 'Hoodie',
     category: 'hoodie',
     price: 50,
-    colors: ['Gris', 'Noir', 'Bleu foncé', 'Vert foncé'],
+    colors: ['Gris', 'Noir', 'Blanc', 'Bleu foncé'],
     motifColors: {
-      Gris: ['Noir'],
-      Noir: ['Blanc', 'Orange', 'Rose'],
+      Gris: ['Blanc', 'Noir'],
+      Noir: ['Rose', 'Blanc'],
+      Blanc: ['Noir'],
       'Bleu foncé': ['Blanc'],
-      'Vert foncé': ['Blanc'],
     },
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
@@ -155,12 +170,12 @@ export const PRODUCTS: Product[] = [
     name: 'Crewneck',
     category: 'crewneck',
     price: 50,
-    colors: ['Gris', 'Noir', 'Bleu foncé', 'Vert foncé'],
+    colors: ['Gris', 'Noir', 'Blanc', 'Bleu foncé'],
     motifColors: {
-      Gris: ['Noir'],
-      Noir: ['Blanc', 'Orange', 'Rose'],
+      Gris: ['Blanc', 'Noir'],
+      Noir: ['Rose', 'Blanc'],
+      Blanc: ['Noir'],
       'Bleu foncé': ['Blanc'],
-      'Vert foncé': ['Blanc'],
     },
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
@@ -171,12 +186,12 @@ export const PRODUCTS: Product[] = [
     name: 'Zip Hoodie',
     category: 'zip-hoodie',
     price: 55,
-    colors: ['Gris', 'Noir', 'Bleu foncé', 'Vert foncé'],
+    colors: ['Gris', 'Noir', 'Blanc', 'Bleu foncé'],
     motifColors: {
-      Gris: ['Noir'],
-      Noir: ['Blanc', 'Orange', 'Rose'],
+      Gris: ['Blanc', 'Noir'],
+      Noir: ['Rose', 'Blanc'],
+      Blanc: ['Noir'],
       'Bleu foncé': ['Blanc'],
-      'Vert foncé': ['Blanc'],
     },
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
@@ -187,10 +202,12 @@ export const PRODUCTS: Product[] = [
     name: 'T-Shirt',
     category: 't-shirt',
     price: 25,
-    colors: ['Noir', 'Blanc'],
+    colors: ['Noir', 'Blanc', 'Gris', 'Bleu foncé'],
     motifColors: {
-      Noir: ['Blanc'],
-      Blanc: ['Noir', 'Bleu', 'Orange'],
+      Noir: ['Rose', 'Blanc'],
+      Blanc: ['Noir'],
+      Gris: ['Blanc', 'Noir'],
+      'Bleu foncé': ['Blanc'],
     },
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
