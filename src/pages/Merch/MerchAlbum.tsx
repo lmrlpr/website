@@ -13,22 +13,22 @@ interface AlbumPhoto {
 }
 
 const PHOTOS: AlbumPhoto[] = [
-  { src: img('Trio.jpg'),                                         alt: 'La team LMRL'                },
-  { src: img('Lou_grey_crewneck_1.jpg'),                          alt: 'Lou — Crewneck gris'         },
-  { src: img('Zoe_tshirt_black_open_1.jpg'),                      alt: 'Zoé — T-shirt noir'          },
-  { src: img('Tabea_Zoe_main.jpg'),                               alt: 'Tabea & Zoé'                 },
-  { src: img('Tabea_grey_crewneck-1.jpg'),                        alt: 'Tabea — Crewneck gris'       },
-  { src: img('Zoe_crewneck_black_2.jpg'),                         alt: 'Zoé — Crewneck noir'         },
-  { src: img('Lou_white_tshirt_2.jpg'),                           alt: 'Lou — T-shirt blanc'         },
-  { src: img('Tabea_white_tshirt_2.jpg'),                         alt: 'Tabea — T-shirt blanc'       },
-  { src: img('Lou_crewneck_black_2.jpg'),                         alt: 'Lou — Crewneck noir'         },
-  { src: img('Trio_2.jpg'),                                       alt: 'La team LMRL'                },
-  { src: img('Zoe_tshirt_black_back_1.jpg'),                      alt: 'Zoé — T-shirt (dos)'        },
-  { src: img('Lou_grey_cewneck_back_1.jpg'),                      alt: 'Lou — Crewneck (dos)'       },
-  { src: img('Tabea_white_tshirt_Zoe_back_black_tshirt.jpg'),     alt: 'Tabea & Zoé — T-shirts'     },
-  { src: img('Lou_black_crewneck_back_2.jpg'),                    alt: 'Lou — Crewneck noir (dos)'  },
-  { src: img('Tabea_totebag.jpg'),                                alt: 'Tabea — Tote bag'            },
-  { src: img('Tabea_totebag_second_version.jpg'),                 alt: 'Tabea — Tote bag v2'         },
+  { src: img('Trio.webp'),                                         alt: 'La team LMRL'                },
+  { src: img('Lou_grey_crewneck_1.webp'),                          alt: 'Lou — Crewneck gris'         },
+  { src: img('Zoe_tshirt_black_open_1.webp'),                      alt: 'Zoé — T-shirt noir'          },
+  { src: img('Tabea_Zoe_main.webp'),                               alt: 'Tabea & Zoé'                 },
+  { src: img('Tabea_grey_crewneck-1.webp'),                        alt: 'Tabea — Crewneck gris'       },
+  { src: img('Zoe_crewneck_black_2.webp'),                         alt: 'Zoé — Crewneck noir'         },
+  { src: img('Lou_white_tshirt_2.webp'),                           alt: 'Lou — T-shirt blanc'         },
+  { src: img('Tabea_white_tshirt_2.webp'),                         alt: 'Tabea — T-shirt blanc'       },
+  { src: img('Lou_crewneck_black_2.webp'),                         alt: 'Lou — Crewneck noir'         },
+  { src: img('Trio_2.webp'),                                       alt: 'La team LMRL'                },
+  { src: img('Zoe_tshirt_black_back_1.webp'),                      alt: 'Zoé — T-shirt (dos)'        },
+  { src: img('Lou_grey_cewneck_back_1.webp'),                      alt: 'Lou — Crewneck (dos)'       },
+  { src: img('Tabea_white_tshirt_Zoe_back_black_tshirt.webp'),     alt: 'Tabea & Zoé — T-shirts'     },
+  { src: img('Lou_black_crewneck_back_2.webp'),                    alt: 'Lou — Crewneck noir (dos)'  },
+  { src: img('Tabea_totebag.webp'),                                alt: 'Tabea — Tote bag'            },
+  { src: img('Tabea_totebag_second_version.webp'),                 alt: 'Tabea — Tote bag v2'         },
 ]
 
 export function MerchAlbum() {

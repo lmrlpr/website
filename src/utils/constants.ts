@@ -11,92 +11,92 @@ export const PRODUCT_IMAGES: Record<
   't-shirt': {
     Noir: {
       1: {
-        front: ['/merch/Zoe_tshirt_black_open_1.jpg'],
-        back:  ['/merch/Zoe_tshirt_black_back_1.jpg', '/merch/Lou_black_tshirt_back_1.jpg'],
+        front: ['/merch/Zoe_tshirt_black_open_1.webp'],
+        back:  ['/merch/Zoe_tshirt_black_back_1.webp', '/merch/Lou_black_tshirt_back_1.webp'],
       },
-      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
+      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
     Blanc: {
-      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
+      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
       2: {
-        front: ['/merch/Lou_white_tshirt_2.jpg', '/merch/Tabea_white_tshirt_2.jpg'],
-        back:  ['/merch/Lou_white_tshirt_back_2.jpg', '/merch/Tabea_tshirt_white_back_2.jpg'],
+        front: ['/merch/Lou_white_tshirt_2.webp', '/merch/Tabea_white_tshirt_2.webp'],
+        back:  ['/merch/Lou_white_tshirt_back_2.webp', '/merch/Tabea_tshirt_white_back_2.webp'],
       },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
     Gris: {
-      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
-      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
+      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
+      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
   },
   crewneck: {
     Gris: {
       1: {
-        front: ['/merch/Lou_grey_crewneck_1.jpg', '/merch/Tabea_grey_crewneck-1.jpg'],
-        back:  ['/merch/Lou_grey_cewneck_back_1.jpg', '/merch/Tabe_grey_crewneck_back_1.jpg'],
+        front: ['/merch/Lou_grey_crewneck_1.webp', '/merch/Tabea_grey_crewneck-1.webp'],
+        back:  ['/merch/Lou_grey_cewneck_back_1.webp', '/merch/Tabe_grey_crewneck_back_1.webp'],
       },
       2: {
-        front: ['/merch/design_front_2.jpg'],
-        back:  ['/merch/design_2_back.JPG'],
+        front: ['/merch/design_front_2.webp'],
+        back:  ['/merch/design_2_back.webp'],
       },
       3: {
-        front: ['/merch/design_3_front.jpg'],
-        back:  ['/merch/design_3_back.jpg'],
+        front: ['/merch/design_3_front.webp'],
+        back:  ['/merch/design_3_back.webp'],
       },
     },
     Noir: {
       1: {
-        front: ['/merch/design_1_front.JPG'],
-        back:  ['/merch/design_1_back.JPG'],
+        front: ['/merch/design_1_front.webp'],
+        back:  ['/merch/design_1_back.webp'],
       },
       2: {
-        front: ['/merch/Zoe_crewneck_black_2.jpg', '/merch/Lou_cewneck_black_2.jpg', '/merch/Lou_crewneck_black_2.jpg'],
-        back:  ['/merch/Lou_black_crewneck_back_2.jpg'],
+        front: ['/merch/Zoe_crewneck_black_2.webp', '/merch/Lou_cewneck_black_2.webp', '/merch/Lou_crewneck_black_2.webp'],
+        back:  ['/merch/Lou_black_crewneck_back_2.webp'],
       },
     },
   },
   // Hoodie and Zip Hoodie share the same design flat-lay shots as Crewneck, for all colors
   hoodie: {
     Gris:  {
-      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
-      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
+      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
+      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
     Noir:  {
-      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
-      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
+      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
+      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
     Blanc: {
-      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
-      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
+      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
+      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
   },
   'zip-hoodie': {
     Gris:  {
-      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
-      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
+      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
+      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
     Noir:  {
-      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
-      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
+      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
+      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
     Blanc: {
-      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
-      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
+      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
+      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
   },
   'tote-bag': {
-    Vert:  { 1: { front: ['/merch/Tabea_totebag.jpg'] }, 2: { front: ['/merch/Tabea_totebag_second_version.jpg'] } },
-    Bleu:  { 1: { front: ['/merch/Tabea_totebag.jpg'] }, 2: { front: ['/merch/Tabea_totebag_second_version.jpg'] } },
-    Noir:  { 1: { front: ['/merch/Tabea_totebag.jpg'] }, 2: { front: ['/merch/Tabea_totebag_second_version.jpg'] } },
-    Rose:  { 1: { front: ['/merch/Tabea_totebag.jpg'] }, 2: { front: ['/merch/Tabea_totebag_second_version.jpg'] } },
+    Vert:  { 1: { front: ['/merch/Tabea_totebag.webp'] }, 2: { front: ['/merch/Tabea_totebag_second_version.webp'] } },
+    Bleu:  { 1: { front: ['/merch/Tabea_totebag.webp'] }, 2: { front: ['/merch/Tabea_totebag_second_version.webp'] } },
+    Noir:  { 1: { front: ['/merch/Tabea_totebag.webp'] }, 2: { front: ['/merch/Tabea_totebag_second_version.webp'] } },
+    Rose:  { 1: { front: ['/merch/Tabea_totebag.webp'] }, 2: { front: ['/merch/Tabea_totebag_second_version.webp'] } },
   },
 }
 
