@@ -99,6 +99,7 @@ export function MerchAlbum() {
               <img
                 src={photo.src}
                 alt={photo.alt}
+                loading="lazy"
                 className="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.03]"
                 style={{ display: 'block' }}
               />

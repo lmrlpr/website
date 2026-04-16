@@ -37,6 +37,7 @@ export function HoodieFamilyCard() {
             <img
               src={`${BASE}${heroImage.replace(/^\//, '')}`}
               alt={product.name}
+              loading="lazy"
               className="absolute inset-0 w-full h-full object-contain transition-opacity duration-300"
             />
           ) : (

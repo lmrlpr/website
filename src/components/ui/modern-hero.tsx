@@ -165,6 +165,7 @@ function ParallaxImg({ className, alt, src, start, end, rotation = 0 }: Parallax
       src={src}
       alt={alt ?? ''}
       ref={ref}
+      loading="lazy"
       className={className}
       style={{ transform, opacity, willChange: 'transform, opacity' }}
       draggable={false}

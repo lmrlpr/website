@@ -32,6 +32,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <img
               src={`${BASE}${heroImage.replace(/^\//, '')}`}
               alt={product.name}
+              loading="lazy"
               className="absolute inset-0 w-full h-full object-contain"
             />
           ) : (
