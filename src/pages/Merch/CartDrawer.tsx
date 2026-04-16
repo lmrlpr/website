@@ -73,12 +73,19 @@ export function CartDrawer() {
                     const key = `${item.productId}-${item.color}-${item.size ?? ''}`
                     return (
                       <div key={key} className="flex gap-4">
-                        {/* Mini image */}
+                        {/* Mini half-circle chip (garment + motif) */}
                         <div
                           className="w-16 h-16 rounded-xl shrink-0 flex items-center justify-center"
                           style={{ backgroundColor: `${COLOR_MAP[item.color]}22` }}
                         >
-                          <div className="w-6 h-6 rounded-full" style={{ backgroundColor: COLOR_MAP[item.color] }} />
+                          <div
+                            className="w-6 h-6 rounded-full border border-black/10"
+                            style={{
+                              background: item.motifColor && item.motifColor !== item.color
+                                ? `linear-gradient(90deg, ${COLOR_MAP[item.color]} 0%, ${COLOR_MAP[item.color]} 50%, ${COLOR_MAP[item.motifColor]} 50%, ${COLOR_MAP[item.motifColor]} 100%)`
+                                : COLOR_MAP[item.color],
+                            }}
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-ink truncate">{item.productName}</p>

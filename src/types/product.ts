@@ -1,4 +1,4 @@
-export type ProductColor = 'Noir' | 'Blanc' | 'Gris' | 'Bleu foncé' | 'Vert foncé' | 'Orange' | 'Rose' | 'Bleu' | 'Vert'
+export type ProductColor = 'Noir' | 'Blanc' | 'Gris' | 'Bleu foncé' | 'Vert foncé' | 'Orange' | 'Rose' | 'Bleu' | 'Vert' | 'Beige'
 export type ProductSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL'
 export type ProductCategory = 'hoodie' | 'crewneck' | 'zip-hoodie' | 't-shirt' | 'tote-bag' | 'socks'
 

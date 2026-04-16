@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { STARTERS, MAINS, DESSERTS } from '../../utils/constants'
+import { STARTERS, MAINS, DESSERTS, COLOR_MAP } from '../../utils/constants'
+import type { ProductColor } from '../../types/product'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -8,8 +9,31 @@ interface CartItem {
   productName: string
   price: number
   color: string
+  motifColor?: string
+  design?: string
   size?: string
   quantity: number
+}
+
+function colorHex(name?: string): string {
+  if (!name) return '#9E9E9E'
+  return COLOR_MAP[name as ProductColor] ?? '#9E9E9E'
+}
+
+function ColorPairChip({ color, motifColor }: { color: string; motifColor?: string }) {
+  const gHex = colorHex(color)
+  const mHex = motifColor ? colorHex(motifColor) : gHex
+  return (
+    <span
+      className="inline-block w-3.5 h-3.5 rounded-full border border-black/20 align-middle shrink-0"
+      style={{
+        background: motifColor && motifColor !== color
+          ? `linear-gradient(90deg, ${gHex} 0%, ${gHex} 50%, ${mHex} 50%, ${mHex} 100%)`
+          : gHex,
+      }}
+      title={motifColor && motifColor !== color ? `${color} · motif ${motifColor}` : color}
+    />
+  )
 }
 
 interface MenuSelection {
@@ -234,14 +258,19 @@ export default function Admin() {
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">{o.name ?? '—'}</td>
                     <td className="px-4 py-3 text-gray-600">{o.email ?? '—'}</td>
                     <td className="px-4 py-3">
-                      <ul className="space-y-1">
+                      <ul className="space-y-1.5">
                         {o.items.map((item, i) => (
-                          <li key={i} className="text-gray-700">
-                            <span className="font-semibold">{item.quantity}×</span>{' '}
-                            {item.productName}
-                            {item.size && <span className="text-gray-400"> · {item.size}</span>}
-                            <span className="text-gray-400"> · {item.color}</span>
-                            <span className="text-gray-400"> · €{item.price}</span>
+                          <li key={i} className="text-gray-700 flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold whitespace-nowrap">{item.quantity}×</span>
+                            <span className="font-medium text-gray-900">{item.productName}</span>
+                            <ColorPairChip color={item.color} motifColor={item.motifColor} />
+                            <span className="text-gray-500 text-xs">
+                              {item.color}
+                              {item.motifColor && item.motifColor !== item.color ? ` + motif ${item.motifColor}` : ''}
+                              {item.design ? ` · ${item.design}` : ''}
+                              {item.size ? ` · ${item.size}` : ''}
+                              {' · '}€{item.price}
+                            </span>
                           </li>
                         ))}
                       </ul>

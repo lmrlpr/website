@@ -173,9 +173,109 @@ export const COLOR_MAP: Record<ProductColor, string> = {
   Rose: '#D44C8B',
   Bleu: '#2563EB',
   Vert: '#2D6A4F',
+  Beige: '#EDE0C8',
+}
+
+// ─── /public/design artwork fallback ─────────────────────────────────────────
+// Files live in /public/design and follow the pattern:
+//   Design_{garmentToken}_{N}_{motifToken}_{front|back}.jpeg
+// A few filenames deviate (extra spaces or suffixes) — we list overrides below.
+
+const DESIGN_GARMENT_TOKEN: Record<ProductColor, string> = {
+  Noir: 'black',
+  Blanc: 'white',
+  Gris: 'grey',
+  'Bleu foncé': 'blue',
+  'Vert foncé': 'green',
+  Orange: 'orange',
+  Rose: 'pink',
+  Bleu: 'blue',
+  Vert: 'green',
+  Beige: 'beige',
+}
+
+const DESIGN_MOTIF_TOKEN: Record<ProductColor, string> = {
+  Noir: 'black',
+  Blanc: 'white',
+  Gris: 'grey',
+  'Bleu foncé': 'blue',
+  'Vert foncé': 'green',
+  Orange: 'orange',
+  Rose: 'pink',
+  Bleu: 'blue',
+  Vert: 'green',
+  Beige: 'beige',
+}
+
+// Filenames that deviate from the canonical pattern (directory listing quirks).
+// Key = canonical path; value = actual filename on disk.
+const DESIGN_FILENAME_OVERRIDES: Record<string, string> = {
+  '/design/Design_black_3_orange_front.jpeg': '/design/Design_black_3_orange _front.jpeg',
+  '/design/Design_white_1_blue_front.jpeg':   '/design/Design_white_1_blue _front.jpeg',
+  '/design/Design_white_2_blue_front.jpeg':   '/design/Design_white_2_blue _front.jpeg',
+  '/design/Design_white_3_blue_front.jpeg':   '/design/Design_white_3_blue _front.jpeg',
+}
+
+// Known missing files (no artwork exists on disk).
+const DESIGN_MISSING = new Set<string>([
+  '/design/Design_green_3_white_back.jpeg',
+])
+
+/** Resolve an artwork image from /public/design for a (garment, motif, design, side) tuple.
+ *  Returns null when the file is known to be missing. */
+export function getDesignImage(
+  garment: ProductColor,
+  motif: ProductColor | null | undefined,
+  design: number,
+  side: 'front' | 'back',
+): string | null {
+  if (!motif) return null
+  const g = DESIGN_GARMENT_TOKEN[garment]
+  const m = DESIGN_MOTIF_TOKEN[motif]
+  if (!g || !m) return null
+  const canonical = `/design/Design_${g}_${design}_${m}_${side}.jpeg`
+  if (DESIGN_MISSING.has(canonical)) return null
+  return DESIGN_FILENAME_OVERRIDES[canonical] ?? canonical
+}
+
+/** Resolve the best preview URL for a combination:
+ *  1) photoshoot photo (exact match)
+ *  2) /public/design artwork
+ *  3) null */
+export function getPreviewImage(
+  productId: string,
+  garment: ProductColor,
+  motif: ProductColor | null | undefined,
+  design: number,
+  side: 'front' | 'back',
+): string | null {
+  const photos = PRODUCT_IMAGES[productId]?.[garment]?.[design]?.[side] ?? []
+  if (photos.length > 0) return photos[0]
+  return getDesignImage(garment, motif, design, side)
+}
+
+/** True if either a photoshoot or /public/design artwork exists for this tuple. */
+export function hasAnyPreview(
+  productId: string,
+  garment: ProductColor,
+  motif: ProductColor | null | undefined,
+  design: number,
+  side: 'front' | 'back',
+): boolean {
+  return getPreviewImage(productId, garment, motif, design, side) !== null
 }
 
 export const PRODUCT_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const
+
+// Shared pairing matrix for Hoodie / Crewneck / Zipper — identical per spec.
+const APPAREL_COLORS: ProductColor[] = ['Gris', 'Noir', 'Bleu foncé', 'Vert foncé', 'Blanc']
+const APPAREL_MOTIFS: Partial<Record<ProductColor, ProductColor[]>> = {
+  Gris:         ['Noir'],
+  Noir:         ['Blanc', 'Orange', 'Rose'],
+  'Bleu foncé': ['Blanc'],
+  'Vert foncé': ['Blanc'],
+  Blanc:        ['Noir'],
+}
 
 export const PRODUCTS: Product[] = [
   {
@@ -183,12 +283,8 @@ export const PRODUCTS: Product[] = [
     name: 'Hoodie',
     category: 'hoodie',
     price: 50,
-    colors: ['Gris', 'Noir', 'Blanc'],
-    motifColors: {
-      Gris: ['Blanc', 'Noir'],
-      Noir: ['Rose', 'Blanc'],
-      Blanc: ['Noir'],
-    },
+    colors: APPAREL_COLORS,
+    motifColors: APPAREL_MOTIFS,
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     description: 'Pullover avec capuche — LMRL Primaner',
@@ -198,12 +294,8 @@ export const PRODUCTS: Product[] = [
     name: 'Crewneck',
     category: 'crewneck',
     price: 50,
-    colors: ['Gris', 'Noir', 'Blanc'],
-    motifColors: {
-      Gris: ['Blanc', 'Noir'],
-      Noir: ['Rose', 'Blanc'],
-      Blanc: ['Noir'],
-    },
+    colors: APPAREL_COLORS,
+    motifColors: APPAREL_MOTIFS,
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     description: 'Pullover sans capuche — LMRL Primaner',
@@ -213,12 +305,8 @@ export const PRODUCTS: Product[] = [
     name: 'Zip Hoodie',
     category: 'zip-hoodie',
     price: 55,
-    colors: ['Gris', 'Noir', 'Blanc'],
-    motifColors: {
-      Gris: ['Blanc', 'Noir'],
-      Noir: ['Rose', 'Blanc'],
-      Blanc: ['Noir'],
-    },
+    colors: APPAREL_COLORS,
+    motifColors: APPAREL_MOTIFS,
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
     description: 'Zipper — LMRL Primaner',
@@ -230,9 +318,9 @@ export const PRODUCTS: Product[] = [
     price: 25,
     colors: ['Noir', 'Blanc', 'Gris'],
     motifColors: {
-      Noir: ['Blanc', 'Orange'],
-      Blanc: ['Noir'],
-      Gris: ['Blanc', 'Noir'],
+      Noir:  ['Blanc'],
+      Blanc: ['Noir', 'Bleu', 'Orange'],
+      Gris:  ['Noir'],
     },
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
@@ -243,8 +331,11 @@ export const PRODUCTS: Product[] = [
     name: 'Tote Bag',
     category: 'tote-bag',
     price: 15,
-    colors: ['Vert', 'Bleu', 'Noir', 'Rose'],
-    designs: ['Design 1', 'Design 2'],
+    colors: ['Beige'],
+    motifColors: {
+      Beige: ['Noir', 'Bleu', 'Vert', 'Rose'],
+    },
+    designs: ['Design 1', 'Design 2', 'Design 3'],
     description: 'Tote bag — LMRL Primaner',
   },
 ]

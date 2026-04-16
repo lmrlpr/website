@@ -33,6 +33,8 @@ Deno.serve(async (req) => {
       productName: string
       price: number
       color: string
+      motifColor?: string
+      design?: string
       size?: string
       quantity: number
     }) => ({
@@ -40,7 +42,12 @@ Deno.serve(async (req) => {
         currency: 'eur',
         product_data: {
           name: item.productName,
-          description: [item.color, item.size].filter(Boolean).join(' · '),
+          description: [
+            item.color,
+            item.motifColor ? `motif ${item.motifColor}` : null,
+            item.design,
+            item.size,
+          ].filter(Boolean).join(' · '),
         },
         unit_amount: Math.round(item.price * 100),
       },

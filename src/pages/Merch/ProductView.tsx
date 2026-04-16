@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Product, ProductColor, ProductSize } from '../../types/product'
-import { COLOR_MAP, PRODUCT_SIZES, getProductImages, hasProductImages, getFallbackImage } from '../../utils/constants'
+import { COLOR_MAP, PRODUCT_SIZES, getProductImages, getPreviewImage, hasAnyPreview } from '../../utils/constants'
 import { formatCurrency } from '../../utils/formatCurrency'
 import { useCart } from '../../context/CartContext'
 import { useScrollLock } from '../../hooks/useScrollLock'
@@ -27,9 +27,27 @@ interface ProductViewProps {
   onClose: () => void
 }
 
+// Build a flat list of (garment, motif) pairs from a product's motifColors map.
+function buildColorPairs(product: Product): Array<{ garment: ProductColor; motif: ProductColor }> {
+  const pairs: Array<{ garment: ProductColor; motif: ProductColor }> = []
+  for (const garment of product.colors) {
+    const motifs = product.motifColors?.[garment] ?? []
+    if (motifs.length === 0) {
+      // No motif info — treat the garment itself as both sides of the chip.
+      pairs.push({ garment, motif: garment })
+    } else {
+      for (const motif of motifs) pairs.push({ garment, motif })
+    }
+  }
+  return pairs
+}
+
 export function ProductView({ product, open, onClose }: ProductViewProps) {
-  const [selectedColor, setSelectedColor] = useState<ProductColor>(product.colors[0])
-  const [selectedMotifColor, setSelectedMotifColor] = useState<ProductColor | null>(null)
+  const pairs = buildColorPairs(product)
+  const firstPair = pairs[0] ?? { garment: product.colors[0], motif: product.colors[0] }
+
+  const [selectedColor, setSelectedColor] = useState<ProductColor>(firstPair.garment)
+  const [selectedMotifColor, setSelectedMotifColor] = useState<ProductColor | null>(firstPair.motif)
   const [selectedDesign, setSelectedDesign] = useState<number | null>(null)
   const [selectedSide, setSelectedSide] = useState<'front' | 'back'>('front')
   const [photoIdx, setPhotoIdx] = useState(0)
@@ -41,47 +59,40 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
 
   useScrollLock(open)
 
-  const availableMotifColors = product.motifColors?.[selectedColor] ?? null
-  const needsMotifChoice = availableMotifColors !== null && availableMotifColors.length > 1
   const hasDesigns = product.designs && product.designs.length > 1
   const needsDesignChoice = !!hasDesigns
 
-  // --- Photo resolution ---
+  // --- Preview resolution: photoshoot → design artwork → null ---
   const designNum = selectedDesign ?? 1
   const exactPhotos = getProductImages(product.id, selectedColor, designNum, selectedSide)
-  const hasExact = exactPhotos.length > 0
-  // Fallback: any photo from this product
-  const fallbackUrl = getFallbackImage(product.id)
-  const isFallback = !hasExact && !!fallbackUrl
+  const hasPhotoshoot = exactPhotos.length > 0
 
-  // All photos shown for current view (exact match or empty)
-  const visiblePhotos = hasExact ? exactPhotos : (fallbackUrl ? [fallbackUrl] : [])
+  const previewUrl = getPreviewImage(product.id, selectedColor, selectedMotifColor, designNum, selectedSide)
+  const visiblePhotos = hasPhotoshoot ? exactPhotos : (previewUrl ? [previewUrl] : [])
   const currentPhoto = visiblePhotos[photoIdx] ?? null
   const hasPhoto = !!currentPhoto
+  const showingArtworkFallback = !hasPhotoshoot && !!previewUrl
 
-  // Whether front/back toggle is meaningful
-  const frontPhotos = getProductImages(product.id, selectedColor, designNum, 'front')
-  const backPhotos  = getProductImages(product.id, selectedColor, designNum, 'back')
-  const showSideToggle = selectedDesign !== null && (frontPhotos.length > 0 || backPhotos.length > 0)
+  // Front/back toggle is meaningful when either side has any visual (photoshoot OR artwork)
+  const hasFrontVisual = hasAnyPreview(product.id, selectedColor, selectedMotifColor, designNum, 'front')
+  const hasBackVisual  = hasAnyPreview(product.id, selectedColor, selectedMotifColor, designNum, 'back')
+  const showSideToggle = selectedDesign !== null && (hasFrontVisual || hasBackVisual)
+
+  const selectPair = (garment: ProductColor, motif: ProductColor) => {
+    setSelectedColor(garment)
+    setSelectedMotifColor(motif)
+    setSelectedSide('front')
+    setPhotoIdx(0)
+  }
 
   useEffect(() => {
     setPhotoIdx(0)
-  }, [selectedColor, selectedDesign, selectedSide])
-
-  useEffect(() => {
-    if (availableMotifColors && availableMotifColors.length === 1) {
-      setSelectedMotifColor(availableMotifColors[0])
-    } else {
-      setSelectedMotifColor(null)
-    }
-    setSelectedDesign(null)
-    setSelectedSide('front')
-    setSelectedSize(null)
-  }, [selectedColor])
+  }, [selectedColor, selectedMotifColor, selectedDesign, selectedSide])
 
   useEffect(() => {
     if (open) {
-      setSelectedColor(product.colors[0])
+      setSelectedColor(firstPair.garment)
+      setSelectedMotifColor(firstPair.motif)
       setSelectedDesign(null)
       setSelectedSide('front')
       setPhotoIdx(0)
@@ -93,20 +104,18 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
 
   const canAdd = product.price !== null
     && (!product.sizes || selectedSize !== null)
-    && (!needsMotifChoice || selectedMotifColor !== null)
     && (!needsDesignChoice || selectedDesign !== null)
 
   const handleAdd = () => {
     if (!product.price) return
     if (product.sizes && !selectedSize) return
-    if (needsMotifChoice && !selectedMotifColor) return
     if (needsDesignChoice && !selectedDesign) return
     addToCart({
       productId: product.id,
       productName: product.name,
       price: product.price,
       color: selectedColor,
-      motifColor: selectedMotifColor ?? undefined,
+      motifColor: selectedMotifColor && selectedMotifColor !== selectedColor ? selectedMotifColor : undefined,
       design: selectedDesign && product.designs ? product.designs[selectedDesign - 1] : undefined,
       size: selectedSize ?? undefined,
       quantity,
@@ -165,11 +174,11 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
                       alt={`${product.name} ${selectedColor}`}
                       className="w-full h-full object-contain"
                     />
-                    {/* "No photo for this combination" notice */}
-                    {isFallback && (
+                    {/* Showing design artwork instead of a photoshoot photo */}
+                    {showingArtworkFallback && (
                       <div className="absolute top-3 left-3 right-3 flex justify-center">
                         <span className="bg-black/50 text-white text-[0.6rem] tracking-[0.2em] uppercase px-3 py-1.5 rounded-full backdrop-blur-sm">
-                          Pas de photo pour cette sélection
+                          Aperçu du design
                         </span>
                       </div>
                     )}
@@ -239,7 +248,7 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
               {/* Front / Back toggle */}
               {showSideToggle && (
                 <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-1 bg-black/20 backdrop-blur-sm rounded-full p-1">
-                  {frontPhotos.length > 0 && (
+                  {hasFrontVisual && (
                     <button
                       onClick={() => setSelectedSide('front')}
                       className={`px-3 py-1 rounded-full text-[0.6rem] tracking-[0.2em] uppercase font-medium transition-all ${
@@ -249,7 +258,7 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
                       Front
                     </button>
                   )}
-                  {backPhotos.length > 0 && (
+                  {hasBackVisual && (
                     <button
                       onClick={() => setSelectedSide('back')}
                       className={`px-3 py-1 rounded-full text-[0.6rem] tracking-[0.2em] uppercase font-medium transition-all ${
@@ -314,27 +323,43 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
 
                 <div className="h-px bg-[#E5D5BF]" />
 
-                {/* Garment color */}
+                {/* Couleur — single pair picker */}
                 <div>
                   <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ink/50 mb-3">
-                    Couleur — <span className="normal-case tracking-normal text-ink/80">{selectedColor}</span>
+                    Couleur —{' '}
+                    <span className="normal-case tracking-normal text-ink/80">
+                      {selectedColor}
+                      {selectedMotifColor && selectedMotifColor !== selectedColor
+                        ? <> · motif <span className="text-ink">{selectedMotifColor}</span></>
+                        : null}
+                    </span>
                   </p>
                   <div className="flex gap-2.5 flex-wrap">
-                    {product.colors.map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => setSelectedColor(color)}
-                        title={color}
-                        className={`w-9 h-9 rounded-full transition-all duration-200 ${
-                          selectedColor === color ? 'ring-2 ring-offset-2 ring-ink scale-110' : 'hover:scale-105'
-                        } ${color === 'Blanc' ? 'border border-[#D4C8B4]' : ''}`}
-                        style={{ backgroundColor: COLOR_MAP[color] }}
-                      />
-                    ))}
+                    {pairs.map(({ garment, motif }) => {
+                      const isSelected = selectedColor === garment && selectedMotifColor === motif
+                      const gHex = COLOR_MAP[garment]
+                      const mHex = COLOR_MAP[motif]
+                      const showsRing = garment === 'Blanc' || garment === 'Beige'
+                      return (
+                        <button
+                          key={`${garment}-${motif}`}
+                          onClick={() => selectPair(garment, motif)}
+                          title={`${garment} · motif ${motif}`}
+                          className={`w-10 h-10 rounded-full overflow-hidden transition-all duration-200 relative ${
+                            isSelected ? 'ring-2 ring-offset-2 ring-ink scale-110' : 'hover:scale-105'
+                          } ${showsRing ? 'border border-[#D4C8B4]' : ''}`}
+                          style={{
+                            background: garment === motif
+                              ? gHex
+                              : `linear-gradient(90deg, ${gHex} 0%, ${gHex} 50%, ${mHex} 50%, ${mHex} 100%)`,
+                          }}
+                        />
+                      )
+                    })}
                   </div>
                 </div>
 
-                {/* Design selector */}
+                {/* Design — three visible thumbnails */}
                 {hasDesigns && (
                   <div>
                     <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ink/50 mb-3">
@@ -342,48 +367,43 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
                         ? <> — <span className="normal-case tracking-normal text-ink/80">{product.designs![selectedDesign - 1]}</span></>
                         : ''}
                     </p>
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="grid grid-cols-3 gap-2.5">
                       {product.designs!.map((label, idx) => {
                         const num = idx + 1
-                        const available = hasProductImages(product.id, selectedColor, num)
+                        const thumbUrl = getPreviewImage(product.id, selectedColor, selectedMotifColor, num, 'front')
+                        const isSelected = selectedDesign === num
                         return (
                           <button
                             key={label}
                             onClick={() => { setSelectedDesign(num); setSelectedSide('front'); setPhotoIdx(0) }}
-                            className={`px-4 h-10 text-xs font-medium rounded-lg border transition-all duration-200 ${
-                              selectedDesign === num
-                                ? 'bg-ink text-white border-ink'
-                                : 'bg-transparent text-ink border-[#D4C8B4] hover:border-ink'
-                            } ${!available ? 'opacity-40' : ''}`}
+                            className={`group relative aspect-[3/4] rounded-xl overflow-hidden border-2 transition-all duration-200 bg-[#F0E8D8] ${
+                              isSelected
+                                ? 'border-ink ring-2 ring-ink/10'
+                                : 'border-[#E5D5BF] hover:border-ink/60'
+                            }`}
                           >
-                            {label}
+                            {thumbUrl ? (
+                              <img
+                                src={toUrl(thumbUrl)}
+                                alt={`${product.name} ${label}`}
+                                loading="lazy"
+                                className={`absolute inset-0 w-full h-full object-cover transition-opacity ${
+                                  isSelected ? 'opacity-100' : 'opacity-80 group-hover:opacity-100'
+                                }`}
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center text-ink/30 text-xs">
+                                {label}
+                              </div>
+                            )}
+                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-2 py-1.5">
+                              <p className="text-[0.6rem] font-medium text-white tracking-[0.15em] uppercase">
+                                {label}
+                              </p>
+                            </div>
                           </button>
                         )
                       })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Motif color */}
-                {needsMotifChoice && (
-                  <div>
-                    <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ink/50 mb-3">
-                      Couleur du motif{selectedMotifColor
-                        ? <> — <span className="normal-case tracking-normal text-ink/80">{selectedMotifColor}</span></>
-                        : ''}
-                    </p>
-                    <div className="flex gap-2.5 flex-wrap">
-                      {availableMotifColors!.map((motif) => (
-                        <button
-                          key={motif}
-                          onClick={() => setSelectedMotifColor(motif)}
-                          title={motif}
-                          className={`w-9 h-9 rounded-full transition-all duration-200 ${
-                            selectedMotifColor === motif ? 'ring-2 ring-offset-2 ring-ink scale-110' : 'hover:scale-105'
-                          } ${motif === 'Blanc' ? 'border border-[#D4C8B4]' : ''}`}
-                          style={{ backgroundColor: COLOR_MAP[motif] }}
-                        />
-                      ))}
                     </div>
                   </div>
                 )}
@@ -440,11 +460,9 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
                       ? 'Prix à confirmer'
                       : needsDesignChoice && !selectedDesign
                         ? 'Choisir un design'
-                        : needsMotifChoice && !selectedMotifColor
-                          ? 'Choisir un motif'
-                          : product.sizes && !selectedSize
-                            ? 'Choisir une taille'
-                            : 'Ajouter au panier'
+                        : product.sizes && !selectedSize
+                          ? 'Choisir une taille'
+                          : 'Ajouter au panier'
                   }
                 </button>
 
