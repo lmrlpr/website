@@ -9,20 +9,20 @@ export const PRODUCT_IMAGES: Record<
   Partial<Record<ProductColor, Record<number, { front?: string[]; back?: string[] }>>>
 > = {
   't-shirt': {
-    Blanc: {
-      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
-      2: {
-        front: ['/merch/Lou_white_tshirt_2.jpg', '/merch/Tabea_white_tshirt_2.jpg'],
-        back:  ['/merch/Lou_white_tshirt_back_2.jpg', '/merch/Tabea_tshirt_white_back_2.jpg'],
-      },
-      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
-    },
     Noir: {
       1: {
         front: ['/merch/Zoe_tshirt_black_open_1.jpg'],
         back:  ['/merch/Zoe_tshirt_black_back_1.jpg', '/merch/Lou_black_tshirt_back_1.jpg'],
       },
       2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
+      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+    },
+    Blanc: {
+      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
+      2: {
+        front: ['/merch/Lou_white_tshirt_2.jpg', '/merch/Tabea_white_tshirt_2.jpg'],
+        back:  ['/merch/Lou_white_tshirt_back_2.jpg', '/merch/Tabea_tshirt_white_back_2.jpg'],
+      },
       3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
     },
     Gris: {
