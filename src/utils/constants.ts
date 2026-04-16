@@ -10,16 +10,25 @@ export const PRODUCT_IMAGES: Record<
 > = {
   't-shirt': {
     Blanc: {
+      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
       2: {
         front: ['/merch/Lou_white_tshirt_2.jpg', '/merch/Tabea_white_tshirt_2.jpg'],
         back:  ['/merch/Lou_white_tshirt_back_2.jpg', '/merch/Tabea_tshirt_white_back_2.jpg'],
       },
+      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
     },
     Noir: {
       1: {
         front: ['/merch/Zoe_tshirt_black_open_1.jpg'],
         back:  ['/merch/Zoe_tshirt_black_back_1.jpg', '/merch/Lou_black_tshirt_back_1.jpg'],
       },
+      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
+      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+    },
+    Gris: {
+      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
+      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
+      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
     },
   },
   crewneck: {
@@ -48,16 +57,36 @@ export const PRODUCT_IMAGES: Record<
       },
     },
   },
-  // Hoodie and Zip Hoodie share the same design flat-lay shots as Crewneck
+  // Hoodie and Zip Hoodie share the same design flat-lay shots as Crewneck, for all colors
   hoodie: {
-    Gris: {
+    Gris:  {
+      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
+      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
+      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+    },
+    Noir:  {
+      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
+      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
+      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+    },
+    Blanc: {
       1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
       2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
       3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
     },
   },
   'zip-hoodie': {
-    Gris: {
+    Gris:  {
+      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
+      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
+      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+    },
+    Noir:  {
+      1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
+      2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
+      3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
+    },
+    Blanc: {
       1: { front: ['/merch/design_1_front.JPG'], back: ['/merch/design_1_back.JPG'] },
       2: { front: ['/merch/design_front_2.jpg'], back: ['/merch/design_2_back.JPG'] },
       3: { front: ['/merch/design_3_front.jpg'], back: ['/merch/design_3_back.jpg'] },
@@ -154,12 +183,11 @@ export const PRODUCTS: Product[] = [
     name: 'Hoodie',
     category: 'hoodie',
     price: 50,
-    colors: ['Gris', 'Noir', 'Blanc', 'Bleu foncé'],
+    colors: ['Gris', 'Noir', 'Blanc'],
     motifColors: {
       Gris: ['Blanc', 'Noir'],
       Noir: ['Rose', 'Blanc'],
       Blanc: ['Noir'],
-      'Bleu foncé': ['Blanc'],
     },
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
@@ -170,12 +198,11 @@ export const PRODUCTS: Product[] = [
     name: 'Crewneck',
     category: 'crewneck',
     price: 50,
-    colors: ['Gris', 'Noir', 'Blanc', 'Bleu foncé'],
+    colors: ['Gris', 'Noir', 'Blanc'],
     motifColors: {
       Gris: ['Blanc', 'Noir'],
       Noir: ['Rose', 'Blanc'],
       Blanc: ['Noir'],
-      'Bleu foncé': ['Blanc'],
     },
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
@@ -186,12 +213,11 @@ export const PRODUCTS: Product[] = [
     name: 'Zip Hoodie',
     category: 'zip-hoodie',
     price: 55,
-    colors: ['Gris', 'Noir', 'Blanc', 'Bleu foncé'],
+    colors: ['Gris', 'Noir', 'Blanc'],
     motifColors: {
       Gris: ['Blanc', 'Noir'],
       Noir: ['Rose', 'Blanc'],
       Blanc: ['Noir'],
-      'Bleu foncé': ['Blanc'],
     },
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
@@ -202,12 +228,11 @@ export const PRODUCTS: Product[] = [
     name: 'T-Shirt',
     category: 't-shirt',
     price: 25,
-    colors: ['Noir', 'Blanc', 'Gris', 'Bleu foncé'],
+    colors: ['Noir', 'Blanc', 'Gris'],
     motifColors: {
-      Noir: ['Rose', 'Blanc'],
+      Noir: ['Blanc', 'Orange'],
       Blanc: ['Noir'],
       Gris: ['Blanc', 'Noir'],
-      'Bleu foncé': ['Blanc'],
     },
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
