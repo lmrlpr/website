@@ -8,6 +8,7 @@ import { Footer } from '../../components/layout/Footer'
 import { useCart } from '../../context/CartContext'
 import { MerchIntro } from './MerchIntro'
 import { MerchAlbum } from './MerchAlbum'
+import { MerchLoader } from './MerchLoader'
 import { PRODUCTS } from '../../utils/constants'
 
 export default function Merch() {
@@ -44,6 +45,9 @@ function MerchInner() {
 
   return (
     <div className="min-h-screen">
+      {/* Loading curtain — blocks scroll while photos preload */}
+      <MerchLoader />
+
       {/* Stripe return banner */}
       <AnimatePresence>
         {banner && (
