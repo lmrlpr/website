@@ -6,6 +6,26 @@ import { AccessCodeGate } from './AccessCodeGate'
 import { MenuForm } from './MenuForm'
 import { Footer } from '../../components/layout/Footer'
 
+// Pre-computed particle positions for deterministic rendering
+const PARTICLES = [
+  { left: 12, size: 3, duration: 5.2, delay: 0 },
+  { left: 28, size: 2, duration: 4.8, delay: 0.7 },
+  { left: 45, size: 4, duration: 6.1, delay: 1.4 },
+  { left: 58, size: 2.5, duration: 5.5, delay: 2.1 },
+  { left: 72, size: 3, duration: 4.3, delay: 0.3 },
+  { left: 83, size: 2, duration: 6.4, delay: 1.8 },
+  { left: 91, size: 3.5, duration: 5.0, delay: 0.9 },
+  { left: 37, size: 2, duration: 4.6, delay: 2.5 },
+]
+
+const TITLE_LINE1 = 'PORTA'
+const TITLE_LINE2 = 'NOVA'
+
+// Wave path pair for animation morphing
+const WAVE_A = 'M0 40 C240 0 480 80 720 40 C960 0 1200 80 1440 40 L1440 80 L0 80 Z'
+const WAVE_B = 'M0 60 C240 20 480 80 720 30 C960 -10 1200 60 1440 50 L1440 80 L0 80 Z'
+const WAVE_C = 'M0 20 C240 60 480 10 720 50 C960 80 1200 20 1440 60 L1440 80 L0 80 Z'
+
 function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
@@ -45,105 +65,195 @@ export default function PromRestaurant() {
   }
 
   return (
-    <div className="min-h-screen text-resto-text" style={{ background: 'linear-gradient(180deg, #F0EDF7 0%, #F5F3EF 18%, #F5F3EF 100%)' }}>
+    <div className="min-h-screen text-resto-text" style={{ background: '#FFFFFF' }}>
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <div className="relative pt-28 pb-20 px-6 md:px-10 max-w-4xl mx-auto overflow-hidden">
-
-        {/* Floating decorative orb */}
-        <div
-          className="absolute -top-8 right-0 w-72 h-72 rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, rgba(37,88,201,0.08) 0%, transparent 70%)',
-            animation: 'float 8s ease-in-out infinite',
-          }}
-        />
-
-        {/* Top label */}
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-xs tracking-[0.5em] uppercase text-resto-accent/60 mb-6 font-sans"
-        >
-          Prom Night · 20h – 00h
-        </motion.p>
-
-        {/* Main title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <h1 className="font-resto text-5xl md:text-7xl lg:text-8xl text-resto-text leading-none mb-4" style={{ letterSpacing: '0.02em' }}>
-            Porta Nova
-          </h1>
-        </motion.div>
-
-        {/* Ornamental divider */}
-        <motion.div
-          initial={{ opacity: 0, scaleX: 0.4 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.6, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="flex items-center gap-3 my-6"
-        >
-          <div className="h-px flex-1 max-w-[80px]" style={{ background: 'linear-gradient(90deg, transparent, #2558C9)' }} />
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z" fill="#2558C9" opacity="0.7"/>
-          </svg>
-          <div className="h-px flex-1 max-w-[200px]" style={{ background: 'linear-gradient(90deg, #2558C9, transparent)' }} />
-        </motion.div>
-
-        {/* Tagline */}
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-resto-text/55 text-base md:text-lg max-w-md leading-relaxed mb-8 font-sans italic"
-        >
-          Dîner complet — entrée, plat, dessert et boissons inclus pour les Primaner et professeurs du LMRL.
-        </motion.p>
-
-        {/* Location chip */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          <a
-            href="https://maps.google.com/?q=14+Avenue+de+la+Faiencerie+1510+Limpertsberg+Luxembourg"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border border-resto-border bg-white/60 backdrop-blur-sm text-sm text-resto-text/70 hover:text-resto-accent hover:border-resto-accent/40 hover:bg-white/80 transition-all duration-200 cursor-pointer"
-          >
-            <svg className="w-3.5 h-3.5 shrink-0 text-resto-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            14 Av. de la Faïencerie, 1510 Limpertsberg
-          </a>
-        </motion.div>
-      </div>
-
-      {/* ── Wave Divider ─────────────────────────────────── */}
-      <div className="relative" style={{ marginTop: '-1px' }}>
-        <svg
-          viewBox="0 0 1440 64"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full block"
-          preserveAspectRatio="none"
-          style={{ height: '64px' }}
-        >
-          <path
-            d="M0 0 C240 64 480 0 720 32 C960 64 1200 0 1440 32 L1440 64 L0 64 Z"
-            fill="#EBF0FA"
+      <div
+        className="relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(180deg, #1B2D52 0%, #2558C9 28%, #4B89E4 54%, #7FB3E8 74%, #C8DFF5 88%, #FFFFFF 100%)',
+          paddingBottom: '120px',
+        }}
+      >
+        {/* Floating light particles */}
+        {PARTICLES.map((p, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-white pointer-events-none"
+            style={{
+              left: `${p.left}%`,
+              bottom: '120px',
+              width: p.size,
+              height: p.size,
+            }}
+            animate={{ y: [0, -120, -200], opacity: [0, 0.65, 0] }}
+            transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: 'easeOut' }}
           />
-        </svg>
+        ))}
+
+        {/* Golden sun medallion */}
+        <motion.div
+          className="absolute top-16 right-8 md:right-16 pointer-events-none"
+          animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
+            {/* Outer ring rays */}
+            {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle) => {
+              const rad = (angle * Math.PI) / 180
+              const x1 = 44 + 38 * Math.cos(rad)
+              const y1 = 44 + 38 * Math.sin(rad)
+              const x2 = 44 + 44 * Math.cos(rad)
+              const y2 = 44 + 44 * Math.sin(rad)
+              return <line key={angle} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F5C640" strokeWidth="2" opacity="0.6"/>
+            })}
+            <circle cx="44" cy="44" r="28" fill="#F5C640" opacity="0.18"/>
+            <circle cx="44" cy="44" r="20" fill="#F5C640" opacity="0.25"/>
+            <circle cx="44" cy="44" r="13" fill="#F5C640" opacity="0.5"/>
+          </svg>
+        </motion.div>
+
+        {/* Hero content */}
+        <div className="relative pt-32 pb-8 px-6 md:px-12 max-w-5xl mx-auto">
+
+          {/* Label */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-xs tracking-[0.5em] uppercase text-white/50 mb-8 font-sans"
+          >
+            Prom Night · 20h – 00h
+          </motion.p>
+
+          {/* Main title — letter by letter */}
+          <div className="overflow-hidden mb-2">
+            <div className="font-resto text-[clamp(3.5rem,12vw,8rem)] text-white leading-none" style={{ letterSpacing: '0.04em' }}>
+              {TITLE_LINE1.split('').map((char, i) => (
+                <motion.span
+                  key={i}
+                  className="inline-block"
+                  initial={{ opacity: 0, y: 60, skewX: -8 }}
+                  animate={{ opacity: 1, y: 0, skewX: 0 }}
+                  transition={{ duration: 0.7, delay: 0.25 + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </div>
+            <div className="font-resto text-[clamp(3.5rem,12vw,8rem)] leading-none" style={{ letterSpacing: '0.04em', color: '#F5C640' }}>
+              {TITLE_LINE2.split('').map((char, i) => (
+                <motion.span
+                  key={i}
+                  className="inline-block"
+                  initial={{ opacity: 0, y: 60, skewX: -8 }}
+                  animate={{ opacity: 1, y: 0, skewX: 0 }}
+                  transition={{ duration: 0.7, delay: 0.6 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </div>
+          </div>
+
+          {/* Ornamental divider */}
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0.3 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ duration: 0.7, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center gap-3 my-7"
+            style={{ transformOrigin: 'left' }}
+          >
+            <div className="h-px w-20" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.6), transparent)' }} />
+            <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
+              <path d="M7 0 L8.5 5.5 L14 7 L8.5 8.5 L7 14 L5.5 8.5 L0 7 L5.5 5.5 Z" fill="#F5C640" opacity="0.9"/>
+            </svg>
+            <div className="h-px w-32" style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.6), transparent)' }} />
+          </motion.div>
+
+          {/* Tagline */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.0 }}
+            className="text-white/65 text-base md:text-lg max-w-md leading-relaxed mb-8 font-sans italic"
+          >
+            Dîner complet — entrée, plat, dessert et boissons inclus pour les Primaner et professeurs du LMRL.
+          </motion.p>
+
+          {/* Location chip */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1.1 }}
+          >
+            <a
+              href="https://maps.google.com/?q=14+Avenue+de+la+Faiencerie+1510+Limpertsberg+Luxembourg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border text-sm transition-all duration-200 cursor-pointer"
+              style={{ borderColor: 'rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(8px)' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(255,255,255,0.5)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLAnchorElement).style.borderColor = 'rgba(255,255,255,0.3)' }}
+            >
+              <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              14 Av. de la Faïencerie, 1510 Limpertsberg
+            </a>
+          </motion.div>
+        </div>
+
+        {/* ── 3-Layer Animated Waves ─── */}
+        <div className="absolute bottom-0 left-0 right-0" style={{ height: '100px' }}>
+          {/* Layer 3 — slowest, most opaque */}
+          <svg
+            viewBox="0 0 1440 80"
+            fill="none"
+            className="absolute bottom-0 w-full"
+            style={{ height: '100px' }}
+            preserveAspectRatio="none"
+          >
+            <motion.path
+              d={WAVE_A}
+              fill="white"
+              fillOpacity={0.35}
+              animate={{ d: [WAVE_A, WAVE_C, WAVE_A] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </svg>
+          {/* Layer 2 — medium */}
+          <svg
+            viewBox="0 0 1440 80"
+            fill="none"
+            className="absolute bottom-0 w-full"
+            style={{ height: '100px' }}
+            preserveAspectRatio="none"
+          >
+            <motion.path
+              d={WAVE_B}
+              fill="white"
+              fillOpacity={0.6}
+              animate={{ d: [WAVE_B, WAVE_A, WAVE_B] }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </svg>
+          {/* Layer 1 — fastest, fullest */}
+          <svg
+            viewBox="0 0 1440 80"
+            fill="none"
+            className="absolute bottom-0 w-full"
+            style={{ height: '100px' }}
+            preserveAspectRatio="none"
+          >
+            <path d="M0 50 C360 20 720 80 1080 50 C1260 35 1380 55 1440 50 L1440 80 L0 80 Z" fill="white"/>
+          </svg>
+        </div>
       </div>
 
       {/* ── Menu / Content Area ───────────────────────────── */}
-      <div className="bg-resto-surface" style={{ minHeight: '50vh' }}>
+      <div className="bg-white" style={{ minHeight: '50vh' }}>
 
         {/* Success state */}
         {success ? (
@@ -153,25 +263,25 @@ export default function PromRestaurant() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col items-center justify-center min-h-[50vh] text-center px-6 py-20"
           >
-            {/* Sun / celebration icon */}
             <div className="relative mb-8">
-              <div
-                className="w-20 h-20 rounded-full flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #F5C640 0%, #e8a800 100%)', boxShadow: '0 0 40px rgba(245,198,64,0.4)' }}
+              <motion.div
+                className="w-24 h-24 rounded-full flex items-center justify-center"
+                style={{ background: 'linear-gradient(135deg, #F5C640 0%, #e8a800 100%)', boxShadow: '0 0 60px rgba(245,198,64,0.45)' }}
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
-              </div>
-              {/* Starburst rays */}
-              <svg className="absolute inset-0 w-20 h-20 animate-shimmer" viewBox="0 0 80 80" fill="none">
-                {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => {
+              </motion.div>
+              <svg className="absolute inset-0 w-24 h-24 animate-shimmer" viewBox="0 0 96 96" fill="none">
+                {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => {
                   const rad = (angle * Math.PI) / 180
-                  const x1 = 40 + 44 * Math.cos(rad)
-                  const y1 = 40 + 44 * Math.sin(rad)
-                  const x2 = 40 + 50 * Math.cos(rad)
-                  const y2 = 40 + 50 * Math.sin(rad)
-                  return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F5C640" strokeWidth="2" opacity="0.5"/>
+                  const x1 = 48 + 52 * Math.cos(rad)
+                  const y1 = 48 + 52 * Math.sin(rad)
+                  const x2 = 48 + 60 * Math.cos(rad)
+                  const y2 = 48 + 60 * Math.sin(rad)
+                  return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F5C640" strokeWidth="2" opacity="0.45"/>
                 })}
               </svg>
             </div>
@@ -198,7 +308,7 @@ export default function PromRestaurant() {
       </div>
 
       {/* ── Footer ───────────────────────────────────────── */}
-      <div className="border-t border-resto-border bg-resto-surface">
+      <div className="border-t border-resto-border bg-white">
         <Footer />
       </div>
     </div>
