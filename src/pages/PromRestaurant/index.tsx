@@ -91,28 +91,6 @@ export default function PromRestaurant() {
           />
         ))}
 
-        {/* Golden sun medallion */}
-        <motion.div
-          className="absolute top-16 right-8 md:right-16 pointer-events-none"
-          animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <svg width="88" height="88" viewBox="0 0 88 88" fill="none">
-            {/* Outer ring rays */}
-            {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle) => {
-              const rad = (angle * Math.PI) / 180
-              const x1 = 44 + 38 * Math.cos(rad)
-              const y1 = 44 + 38 * Math.sin(rad)
-              const x2 = 44 + 44 * Math.cos(rad)
-              const y2 = 44 + 44 * Math.sin(rad)
-              return <line key={angle} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#F5C640" strokeWidth="2" opacity="0.6"/>
-            })}
-            <circle cx="44" cy="44" r="28" fill="#F5C640" opacity="0.18"/>
-            <circle cx="44" cy="44" r="20" fill="#F5C640" opacity="0.25"/>
-            <circle cx="44" cy="44" r="13" fill="#F5C640" opacity="0.5"/>
-          </svg>
-        </motion.div>
-
         {/* Hero content */}
         <div className="relative pt-32 pb-8 px-6 md:px-12 max-w-5xl mx-auto">
 
