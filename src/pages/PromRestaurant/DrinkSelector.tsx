@@ -24,8 +24,8 @@ const WineIcon = () => (
 const packages = [
   {
     id: 'non-alcoholic' as DrinkPackage,
-    label: 'Sans alcool',
-    description: 'Cocktail sans alcool + 3 Softs',
+    label: 'Ouni Alcool',
+    description: 'Cocktail ouni Alcool + 3 Softs',
     surcharge: 0,
     Icon: CocktailIcon,
     iconBg: 'rgba(75,137,228,0.10)',
@@ -33,8 +33,8 @@ const packages = [
   },
   {
     id: 'alcoholic' as DrinkPackage,
-    label: 'Avec alcool',
-    description: 'Cocktail + ⅓ bouteille de vin + 1 Soft + 1 Bière',
+    label: 'Mat Alcool',
+    description: 'Cocktail + ⅓ Fläsch Wäin + 1 Soft + 1 Béier',
     surcharge: DRINK_SURCHARGE,
     Icon: WineIcon,
     iconBg: 'rgba(245,198,64,0.12)',
@@ -54,7 +54,7 @@ export function DrinkSelector({ selected, onChange }: DrinkSelectorProps) {
           04
         </div>
         <div style={{ zIndex: 1 }}>
-          <h3 className="font-resto text-2xl text-resto-text" style={{ letterSpacing: '0.05em' }}>Boissons</h3>
+          <h3 className="font-resto text-2xl text-resto-text" style={{ letterSpacing: '0.05em' }}>Gedrénks</h3>
           <div className="mt-1.5 h-0.5 w-10 rounded-full" style={{ background: 'linear-gradient(90deg, #2558C9, #F5C640)' }} />
         </div>
       </div>

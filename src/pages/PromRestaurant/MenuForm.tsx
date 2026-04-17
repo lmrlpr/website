@@ -165,7 +165,7 @@ export function MenuForm() {
               <div>
                 <span className="text-sm font-semibold text-resto-text font-sans">Total</span>
                 {!allSelected && (
-                  <p className="text-xs text-resto-text/35 font-sans mt-0.5">Complétez votre menu pour continuer</p>
+                  <p className="text-xs text-resto-text/35 font-sans mt-0.5">Fëllt Äre Menü aus, fir weiderzemaachen.</p>
                 )}
               </div>
               <span className="font-resto text-2xl" style={{ color: '#1B2D52' }}>{BASE_PRICE + surcharge} €</span>

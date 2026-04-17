@@ -178,7 +178,7 @@ export default function PromRestaurant() {
             transition={{ duration: 0.6, delay: 1.0 }}
             className="text-white/65 text-base md:text-lg max-w-md leading-relaxed mb-8 font-sans italic"
           >
-            Dîner complet — entrée, plat, dessert et boissons inclus pour les Primaner et professeurs du LMRL.
+            Komplett Iessen — Entrée, Haaptplat, Dessert a Gedrénks abegraff fir LMRL-Studenten a Léierpersonal.
           </motion.p>
 
           {/* Location chip */}
