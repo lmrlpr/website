@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 
 const EVENT_DATE = new Date('2026-07-03T00:00:00')
 
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth <= 768
+
 // Pre-computed rain streaks — no Math.random() on render
 const RAIN_STREAKS = Array.from({ length: 24 }, (_, i) => ({
   left: `${2 + i * 4.1}%`,
@@ -11,6 +13,9 @@ const RAIN_STREAKS = Array.from({ length: 24 }, (_, i) => ({
   delay: (i * 0.42) % 5,
   opacity: 0.12 + (i % 4) * 0.06,
 }))
+
+// Fewer streaks on mobile for performance
+const ACTIVE_STREAKS = IS_MOBILE ? RAIN_STREAKS.slice(0, 8) : RAIN_STREAKS
 
 function useCountdown(target: Date) {
   const [diff, setDiff] = useState(() => target.getTime() - Date.now())
@@ -61,31 +66,46 @@ export function GothamHero() {
       style={{ background: 'transparent' }}
     >
 
-      {/* ── Atmospheric orbs ── */}
+      {/* ── Atmospheric orbs — static on mobile, animated on desktop ── */}
       <div className="absolute inset-0 pointer-events-none">
-        <motion.div
-          animate={{ opacity: [0.12, 0.28, 0.12], scale: [1, 1.12, 1] }}
-          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute top-1/4 -left-1/4 w-[800px] h-[800px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.18) 0%, transparent 65%)', filter: 'blur(70px)' }}
-        />
-        <motion.div
-          animate={{ opacity: [0.1, 0.25, 0.1], scale: [1, 1.08, 1] }}
-          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
-          className="absolute bottom-1/4 -right-1/4 w-[700px] h-[700px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, transparent 65%)', filter: 'blur(90px)' }}
-        />
-        <motion.div
-          animate={{ opacity: [0.05, 0.12, 0.05] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse, rgba(0,212,255,0.08) 0%, transparent 60%)', filter: 'blur(50px)' }}
-        />
+        {IS_MOBILE ? (
+          <>
+            <div
+              className="absolute top-1/4 -left-1/4 w-[800px] h-[800px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.15) 0%, transparent 65%)', filter: 'blur(40px)', opacity: 0.2 }}
+            />
+            <div
+              className="absolute bottom-1/4 -right-1/4 w-[700px] h-[700px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.18) 0%, transparent 65%)', filter: 'blur(50px)', opacity: 0.18 }}
+            />
+          </>
+        ) : (
+          <>
+            <motion.div
+              animate={{ opacity: [0.12, 0.28, 0.12], scale: [1, 1.12, 1] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute top-1/4 -left-1/4 w-[800px] h-[800px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.18) 0%, transparent 65%)', filter: 'blur(70px)' }}
+            />
+            <motion.div
+              animate={{ opacity: [0.1, 0.25, 0.1], scale: [1, 1.08, 1] }}
+              transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
+              className="absolute bottom-1/4 -right-1/4 w-[700px] h-[700px] rounded-full"
+              style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.22) 0%, transparent 65%)', filter: 'blur(90px)' }}
+            />
+            <motion.div
+              animate={{ opacity: [0.05, 0.12, 0.05] }}
+              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full"
+              style={{ background: 'radial-gradient(ellipse, rgba(0,212,255,0.08) 0%, transparent 60%)', filter: 'blur(50px)' }}
+            />
+          </>
+        )}
       </div>
 
       {/* ── Rain streaks ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {RAIN_STREAKS.map((s, i) => (
+        {ACTIVE_STREAKS.map((s, i) => (
           <motion.div
             key={i}
             className="absolute top-0 w-px"
@@ -135,7 +155,7 @@ export function GothamHero() {
               initial={letterVariants[i].initial}
               animate={letterVariants[i].animate}
               transition={letterVariants[i].transition}
-              whileHover={{
+              whileHover={IS_MOBILE ? undefined : {
                 y: -18,
                 filter: 'drop-shadow(0 0 12px rgba(0,212,255,0.55))',
                 transition: { type: 'spring', stiffness: 400, damping: 14 },
@@ -219,7 +239,7 @@ export function GothamHero() {
               (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.25)'
             }}
             onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'
+              ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'
             }}
           >
             <span className="text-white/45 group-hover:text-white/80 transition-colors duration-200">

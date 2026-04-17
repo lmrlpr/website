@@ -1,20 +1,22 @@
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 
-// Pre-computed to avoid Math.random() on every render
 const DURATIONS = [22, 28, 24, 31, 19, 26, 33, 21, 27, 29, 23, 25, 30, 20, 32, 18, 24, 27, 22, 29,
   31, 20, 26, 23, 28, 25, 21, 30, 24, 27, 19, 22, 28, 31, 23, 26]
 
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth <= 768
+
 function FloatingPaths({ position, gradientId }: { position: number; gradientId: string }) {
+  const count = IS_MOBILE ? 8 : 36
   const paths = useMemo(() =>
-    Array.from({ length: 36 }, (_, i) => ({
+    Array.from({ length: count }, (_, i) => ({
       id: i,
       d: `M-${380 - i * 5 * position} -${189 + i * 6}C-${380 - i * 5 * position} -${189 + i * 6} -${312 - i * 5 * position} ${216 - i * 6} ${152 - i * 5 * position} ${343 - i * 6}C${616 - i * 5 * position} ${470 - i * 6} ${684 - i * 5 * position} ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
       width: 0.5 + i * 0.03,
       opacity: 0.04 + i * 0.012,
       duration: DURATIONS[i],
     })),
-  [position])
+  [position, count])
 
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -31,7 +33,15 @@ function FloatingPaths({ position, gradientId }: { position: number; gradientId:
             <stop offset="100%" stopColor="#00D4FF" />
           </linearGradient>
         </defs>
-        {paths.map((path) => (
+        {paths.map((path) => IS_MOBILE ? (
+          <path
+            key={path.id}
+            d={path.d}
+            stroke={`url(#${gradientId})`}
+            strokeWidth={path.width}
+            strokeOpacity={path.opacity * 1.5}
+          />
+        ) : (
           <motion.path
             key={path.id}
             d={path.d}

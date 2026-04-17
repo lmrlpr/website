@@ -84,6 +84,8 @@ export function GlowCard({ children, className = '', glowColor = 'blue', customS
   }, [])
 
   useEffect(() => {
+    // Glow tracks cursor — pointless on touch, and fires too often on mobile
+    if (window.innerWidth <= 768) return
     const sync = (e: PointerEvent) => {
       cardRef.current?.style.setProperty('--x', e.clientX.toFixed(2))
       cardRef.current?.style.setProperty('--xp', (e.clientX / window.innerWidth).toFixed(2))
@@ -120,7 +122,7 @@ export function GlowCard({ children, className = '', glowColor = 'blue', customS
     backgroundAttachment: 'fixed',
     border: 'var(--border-size) solid var(--backup-border)',
     position: 'relative',
-    touchAction: 'none',
+    touchAction: 'auto',
   }
 
   if (width !== undefined) inlineStyle.width = typeof width === 'number' ? `${width}px` : width
