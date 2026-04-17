@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Product, ProductColor, ProductSize } from '../../types/product'
-import { COLOR_MAP, PRODUCT_SIZES, getProductImages, getPreviewImage, hasAnyPreview } from '../../utils/constants'
+import { COLOR_MAP, PRODUCT_SIZES, getAllModelPhotos, getDesignImage, getPreviewImage, hasAnyPreview } from '../../utils/constants'
 import { formatCurrency } from '../../utils/formatCurrency'
 import { useCart } from '../../context/CartContext'
 import { useScrollLock } from '../../hooks/useScrollLock'
@@ -25,6 +25,14 @@ interface ProductViewProps {
   product: Product
   open: boolean
   onClose: () => void
+}
+
+function extractModelName(path: string): string {
+  const filename = (path.split('/').pop() ?? '').toLowerCase()
+  if (filename.startsWith('lou'))   return 'Lou'
+  if (filename.startsWith('tabea')) return 'Tabea'
+  if (filename.startsWith('zoe'))   return 'Zoé'
+  return 'Photo'
 }
 
 // Build a flat list of (garment, motif) pairs from a product's motifColors map.
@@ -62,20 +70,30 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
   const hasDesigns = product.designs && product.designs.length > 1
   const needsDesignChoice = !!hasDesigns
 
-  // --- Preview resolution: photoshoot → design artwork → null ---
+  // --- Preview resolution ---
+  // No design selected (Photo active): show model photos only, never artwork.
+  // Design selected: show design artwork only, never model photos.
   const designNum = selectedDesign ?? 1
-  const exactPhotos = getProductImages(product.id, selectedColor, designNum, selectedSide)
-  const hasPhotoshoot = exactPhotos.length > 0
 
-  const previewUrl = getPreviewImage(product.id, selectedColor, selectedMotifColor, designNum, selectedSide)
-  const visiblePhotos = hasPhotoshoot ? exactPhotos : (previewUrl ? [previewUrl] : [])
+  const modelPhotos = selectedDesign === null
+    ? getAllModelPhotos(product.id, selectedColor, selectedSide)
+    : []
+
+  const artworkUrl = selectedDesign !== null
+    ? getDesignImage(selectedColor, selectedMotifColor, designNum, selectedSide)
+    : null
+
+  const visiblePhotos = modelPhotos.length > 0
+    ? modelPhotos
+    : artworkUrl ? [artworkUrl] : []
+
   const currentPhoto = visiblePhotos[photoIdx] ?? null
   const hasPhoto = !!currentPhoto
-  const showingArtworkFallback = !hasPhotoshoot && !!previewUrl
+  const showingArtworkFallback = selectedDesign !== null && modelPhotos.length === 0 && !!artworkUrl
 
-  // Front/back toggle is meaningful when either side has any visual (photoshoot OR artwork)
-  const hasFrontVisual = hasAnyPreview(product.id, selectedColor, selectedMotifColor, designNum, 'front')
-  const hasBackVisual  = hasAnyPreview(product.id, selectedColor, selectedMotifColor, designNum, 'back')
+  // Front/back toggle: only when a design is explicitly selected
+  const hasFrontVisual = selectedDesign !== null && hasAnyPreview(product.id, selectedColor, selectedMotifColor, designNum, 'front')
+  const hasBackVisual  = selectedDesign !== null && hasAnyPreview(product.id, selectedColor, selectedMotifColor, designNum, 'back')
   const showSideToggle = selectedDesign !== null && (hasFrontVisual || hasBackVisual)
 
   const selectPair = (garment: ProductColor, motif: ProductColor) => {
@@ -359,52 +377,85 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
                   </div>
                 </div>
 
-                {/* Design — three visible thumbnails */}
+                {/* Design — three design thumbnails + optional model photo button */}
                 {hasDesigns && (
                   <div>
                     <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ink/50 mb-3">
-                      Design{selectedDesign
-                        ? <> — <span className="normal-case tracking-normal text-ink/80">{product.designs![selectedDesign - 1]}</span></>
-                        : ''}
+                      {selectedDesign
+                        ? <>Design — <span className="normal-case tracking-normal text-ink/80">{product.designs![selectedDesign - 1]}</span></>
+                        : 'Design'}
                     </p>
-                    <div className="grid grid-cols-3 gap-2.5">
-                      {product.designs!.map((label, idx) => {
-                        const num = idx + 1
-                        const thumbUrl = getPreviewImage(product.id, selectedColor, selectedMotifColor, num, 'front')
-                        const isSelected = selectedDesign === num
-                        return (
-                          <button
-                            key={label}
-                            onClick={() => { setSelectedDesign(num); setSelectedSide('front'); setPhotoIdx(0) }}
-                            className={`group relative aspect-[3/4] rounded-xl overflow-hidden border-2 transition-all duration-200 bg-[#F0E8D8] ${
-                              isSelected
-                                ? 'border-ink ring-2 ring-ink/10'
-                                : 'border-[#E5D5BF] hover:border-ink/60'
-                            }`}
-                          >
-                            {thumbUrl ? (
+                    {(() => {
+                      const modelThumb = getAllModelPhotos(product.id, selectedColor, 'front')[0] ?? null
+                      const modelName  = modelThumb ? extractModelName(modelThumb) : null
+                      const cols = modelThumb ? 'grid-cols-4' : 'grid-cols-3'
+                      return (
+                        <div className={`grid ${cols} gap-2.5`}>
+                          {product.designs!.map((label, idx) => {
+                            const num = idx + 1
+                            const thumbUrl = getPreviewImage(product.id, selectedColor, selectedMotifColor, num, 'front')
+                            const isSelected = selectedDesign === num
+                            return (
+                              <button
+                                key={label}
+                                onClick={() => { setSelectedDesign(num); setSelectedSide('front'); setPhotoIdx(0) }}
+                                className={`group relative aspect-[3/4] rounded-xl overflow-hidden border-2 transition-all duration-200 bg-[#F0E8D8] ${
+                                  isSelected
+                                    ? 'border-ink ring-2 ring-ink/10'
+                                    : 'border-[#E5D5BF] hover:border-ink/60'
+                                }`}
+                              >
+                                {thumbUrl ? (
+                                  <img
+                                    src={toUrl(thumbUrl)}
+                                    alt={`${product.name} ${label}`}
+                                    loading="lazy"
+                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity ${
+                                      isSelected ? 'opacity-100' : 'opacity-80 group-hover:opacity-100'
+                                    }`}
+                                  />
+                                ) : (
+                                  <div className="absolute inset-0 flex items-center justify-center text-ink/30 text-xs">
+                                    {label}
+                                  </div>
+                                )}
+                                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-2 py-1.5">
+                                  <p className="text-[0.6rem] font-medium text-white tracking-[0.15em] uppercase">
+                                    {label}
+                                  </p>
+                                </div>
+                              </button>
+                            )
+                          })}
+
+                          {/* Photo with model — reset to no-design state */}
+                          {modelThumb && (
+                            <button
+                              onClick={() => { setSelectedDesign(null); setSelectedSide('front'); setPhotoIdx(0) }}
+                              className={`group relative aspect-[3/4] rounded-xl overflow-hidden border-2 transition-all duration-200 bg-[#F0E8D8] ${
+                                selectedDesign === null
+                                  ? 'border-ink ring-2 ring-ink/10'
+                                  : 'border-[#E5D5BF] hover:border-ink/60'
+                              }`}
+                            >
                               <img
-                                src={toUrl(thumbUrl)}
-                                alt={`${product.name} ${label}`}
+                                src={toUrl(modelThumb)}
+                                alt={`${product.name} — photo ${modelName}`}
                                 loading="lazy"
                                 className={`absolute inset-0 w-full h-full object-cover transition-opacity ${
-                                  isSelected ? 'opacity-100' : 'opacity-80 group-hover:opacity-100'
+                                  selectedDesign === null ? 'opacity-100' : 'opacity-80 group-hover:opacity-100'
                                 }`}
                               />
-                            ) : (
-                              <div className="absolute inset-0 flex items-center justify-center text-ink/30 text-xs">
-                                {label}
+                              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-2 py-1.5">
+                                <p className="text-[0.6rem] font-medium text-white tracking-[0.15em] uppercase">
+                                  {modelName}
+                                </p>
                               </div>
-                            )}
-                            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent px-2 py-1.5">
-                              <p className="text-[0.6rem] font-medium text-white tracking-[0.15em] uppercase">
-                                {label}
-                              </p>
-                            </div>
-                          </button>
-                        )
-                      })}
-                    </div>
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })()}
                   </div>
                 )}
 

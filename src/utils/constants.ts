@@ -14,21 +14,12 @@ export const PRODUCT_IMAGES: Record<
         front: ['/merch/Zoe_tshirt_black_open_1.webp'],
         back:  ['/merch/Zoe_tshirt_black_back_1.webp', '/merch/Lou_black_tshirt_back_1.webp'],
       },
-      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
-      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
     Blanc: {
-      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
       2: {
         front: ['/merch/Lou_white_tshirt_2.webp', '/merch/Tabea_white_tshirt_2.webp'],
         back:  ['/merch/Lou_white_tshirt_back_2.webp', '/merch/Tabea_tshirt_white_back_2.webp'],
       },
-      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
-    },
-    Gris: {
-      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
-      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
-      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
     },
   },
   crewneck: {
@@ -37,83 +28,43 @@ export const PRODUCT_IMAGES: Record<
         front: ['/merch/Lou_grey_crewneck_1.webp', '/merch/Tabea_grey_crewneck-1.webp'],
         back:  ['/merch/Lou_grey_cewneck_back_1.webp', '/merch/Tabe_grey_crewneck_back_1.webp'],
       },
-      2: {
-        front: ['/merch/design_front_2.webp'],
-        back:  ['/merch/design_2_back.webp'],
-      },
-      3: {
-        front: ['/merch/design_3_front.webp'],
-        back:  ['/merch/design_3_back.webp'],
-      },
     },
     Noir: {
-      1: {
-        front: ['/merch/design_1_front.webp'],
-        back:  ['/merch/design_1_back.webp'],
-      },
       2: {
         front: ['/merch/Zoe_crewneck_black_2.webp', '/merch/Lou_cewneck_black_2.webp', '/merch/Lou_crewneck_black_2.webp'],
         back:  ['/merch/Lou_black_crewneck_back_2.webp'],
       },
     },
   },
-  // Hoodie and Zip Hoodie share the same design flat-lay shots as Crewneck, for all colors
-  hoodie: {
-    Gris:  {
-      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
-      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
-      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
-    },
-    Noir:  {
-      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
-      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
-      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
-    },
-    Blanc: {
-      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
-      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
-      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
-    },
-  },
-  'zip-hoodie': {
-    Gris:  {
-      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
-      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
-      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
-    },
-    Noir:  {
-      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
-      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
-      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
-    },
-    Blanc: {
-      1: { front: ['/merch/design_1_front.webp'], back: ['/merch/design_1_back.webp'] },
-      2: { front: ['/merch/design_front_2.webp'], back: ['/merch/design_2_back.webp'] },
-      3: { front: ['/merch/design_3_front.webp'], back: ['/merch/design_3_back.webp'] },
-    },
-  },
   'tote-bag': {
-    Vert:  { 1: { front: ['/merch/Tabea_totebag.webp'] }, 2: { front: ['/merch/Tabea_totebag_second_version.webp'] } },
-    Bleu:  { 1: { front: ['/merch/Tabea_totebag.webp'] }, 2: { front: ['/merch/Tabea_totebag_second_version.webp'] } },
-    Noir:  { 1: { front: ['/merch/Tabea_totebag.webp'] }, 2: { front: ['/merch/Tabea_totebag_second_version.webp'] } },
-    Rose:  { 1: { front: ['/merch/Tabea_totebag.webp'] }, 2: { front: ['/merch/Tabea_totebag_second_version.webp'] } },
+    Beige: {
+      1: { front: ['/merch/Tabea_totebag.webp'] },
+      2: { front: ['/merch/Tabea_totebag_second_version.webp'] },
+    },
   },
 }
 
-/** All photos for a given product/color/design/side.
- *  Falls back to design 1 of the same color when the exact design has no photos. */
+/** Exact model photos for a given product/color/design/side. No fallback. */
 export function getProductImages(
   productId: string,
   color: ProductColor,
   design: number,
   side: 'front' | 'back',
 ): string[] {
-  const exact = PRODUCT_IMAGES[productId]?.[color]?.[design]?.[side] ?? []
-  if (exact.length > 0) return exact
-  // Fall back to design 1 of the same color
-  if (design !== 1) {
-    const d1 = PRODUCT_IMAGES[productId]?.[color]?.[1]?.[side] ?? []
-    if (d1.length > 0) return d1
+  return PRODUCT_IMAGES[productId]?.[color]?.[design]?.[side] ?? []
+}
+
+/** First available model photos across all designs for a color+side, or []. */
+export function getAllModelPhotos(
+  productId: string,
+  color: ProductColor,
+  side: 'front' | 'back',
+): string[] {
+  const colorMap = PRODUCT_IMAGES[productId]?.[color]
+  if (!colorMap) return []
+  for (const photos of Object.values(colorMap)) {
+    const arr = photos[side] ?? []
+    if (arr.length > 0) return arr
   }
   return []
 }
@@ -128,21 +79,14 @@ export function getProductImage(
   return getProductImages(productId, color, design, side)[0] ?? null
 }
 
-/** Returns true if any photo exists for the given product/color/design.
- *  Falls back to design 1 of the same color so all 3 designs appear available. */
+/** Returns true if any photo exists for the given product/color/design (exact match). */
 export function hasProductImages(
   productId: string,
   color: ProductColor,
   design: number,
 ): boolean {
   const entry = PRODUCT_IMAGES[productId]?.[color]?.[design]
-  if ((entry?.front?.length ?? 0) > 0 || (entry?.back?.length ?? 0) > 0) return true
-  // Fall back to design 1 of the same color
-  if (design !== 1) {
-    const d1 = PRODUCT_IMAGES[productId]?.[color]?.[1]
-    return !!((d1?.front?.length ?? 0) > 0 || (d1?.back?.length ?? 0) > 0)
-  }
-  return false
+  return (entry?.front?.length ?? 0) > 0 || (entry?.back?.length ?? 0) > 0
 }
 
 /** Returns the first available front photo for a product (used as hero/card image). */
@@ -176,10 +120,9 @@ export const COLOR_MAP: Record<ProductColor, string> = {
   Beige: '#EDE0C8',
 }
 
-// ─── /public/design artwork fallback ─────────────────────────────────────────
-// Files live in /public/design and follow the pattern:
-//   Design_{garmentToken}_{N}_{motifToken}_{front|back}.jpeg
-// A few filenames deviate (extra spaces or suffixes) — we list overrides below.
+// ─── /public/design artwork ───────────────────────────────────────────────────
+// Files live in /public/design as WebP:
+//   Design_{garmentToken}_{N}_{motifToken}_{front|back}.webp
 
 const DESIGN_GARMENT_TOKEN: Record<ProductColor, string> = {
   Noir: 'black',
@@ -207,18 +150,8 @@ const DESIGN_MOTIF_TOKEN: Record<ProductColor, string> = {
   Beige: 'beige',
 }
 
-// Filenames that deviate from the canonical pattern (directory listing quirks).
-// Key = canonical path; value = actual filename on disk.
-const DESIGN_FILENAME_OVERRIDES: Record<string, string> = {
-  '/design/Design_black_3_orange_front.jpeg': '/design/Design_black_3_orange _front.jpeg',
-  '/design/Design_white_1_blue_front.jpeg':   '/design/Design_white_1_blue _front.jpeg',
-  '/design/Design_white_2_blue_front.jpeg':   '/design/Design_white_2_blue _front.jpeg',
-  '/design/Design_white_3_blue_front.jpeg':   '/design/Design_white_3_blue _front.jpeg',
-}
-
-// Known missing files (no artwork exists on disk).
 const DESIGN_MISSING = new Set<string>([
-  '/design/Design_green_3_white_back.jpeg',
+  '/design/Design_green_3_white_back.webp',
 ])
 
 /** Resolve an artwork image from /public/design for a (garment, motif, design, side) tuple.
@@ -233,28 +166,24 @@ export function getDesignImage(
   const g = DESIGN_GARMENT_TOKEN[garment]
   const m = DESIGN_MOTIF_TOKEN[motif]
   if (!g || !m) return null
-  const canonical = `/design/Design_${g}_${design}_${m}_${side}.jpeg`
-  if (DESIGN_MISSING.has(canonical)) return null
-  return DESIGN_FILENAME_OVERRIDES[canonical] ?? canonical
+  const path = `/design/Design_${g}_${design}_${m}_${side}.webp`
+  if (DESIGN_MISSING.has(path)) return null
+  return path
 }
 
-/** Resolve the best preview URL for a combination:
- *  1) photoshoot photo (exact match)
- *  2) /public/design artwork
- *  3) null */
+/** Resolve the design artwork URL for a combination (used for design thumbnails and previews).
+ *  Does not include model photos — those are accessed via getAllModelPhotos. */
 export function getPreviewImage(
-  productId: string,
+  _productId: string,
   garment: ProductColor,
   motif: ProductColor | null | undefined,
   design: number,
   side: 'front' | 'back',
 ): string | null {
-  const photos = PRODUCT_IMAGES[productId]?.[garment]?.[design]?.[side] ?? []
-  if (photos.length > 0) return photos[0]
   return getDesignImage(garment, motif, design, side)
 }
 
-/** True if either a photoshoot or /public/design artwork exists for this tuple. */
+/** True if design artwork exists for this tuple. */
 export function hasAnyPreview(
   productId: string,
   garment: ProductColor,
