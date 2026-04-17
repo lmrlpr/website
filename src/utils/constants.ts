@@ -208,17 +208,6 @@ const APPAREL_MOTIFS: Partial<Record<ProductColor, ProductColor[]>> = {
 
 export const PRODUCTS: Product[] = [
   {
-    id: 'hoodie',
-    name: 'Hoodie',
-    category: 'hoodie',
-    price: 50,
-    colors: APPAREL_COLORS,
-    motifColors: APPAREL_MOTIFS,
-    designs: ['Design 1', 'Design 2', 'Design 3'],
-    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    description: 'Pullover avec capuche — LMRL Primaner',
-  },
-  {
     id: 'crewneck',
     name: 'Crewneck',
     category: 'crewneck',
@@ -230,15 +219,28 @@ export const PRODUCTS: Product[] = [
     description: 'Pullover sans capuche — LMRL Primaner',
   },
   {
+    id: 'hoodie',
+    name: 'Hoodie',
+    category: 'hoodie',
+    price: 50,
+    colors: APPAREL_COLORS,
+    motifColors: APPAREL_MOTIFS,
+    designs: ['Design 1', 'Design 2', 'Design 3'],
+    sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    description: 'Pullover avec capuche — LMRL Primaner',
+    heroImage: '/design/Hoodie_front.png',
+  },
+  {
     id: 'zip-hoodie',
-    name: 'Zip Hoodie',
+    name: 'Zipper',
     category: 'zip-hoodie',
     price: 55,
     colors: APPAREL_COLORS,
     motifColors: APPAREL_MOTIFS,
     designs: ['Design 1', 'Design 2', 'Design 3'],
     sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    description: 'Zipper — LMRL Primaner',
+    description: 'Zipper avec capuche — LMRL Primaner',
+    heroImage: '/design/Zipper_front.png',
   },
   {
     id: 't-shirt',

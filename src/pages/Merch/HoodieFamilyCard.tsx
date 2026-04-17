@@ -1,24 +1,17 @@
 import { useState } from 'react'
 import { PRODUCTS, COLOR_MAP, getHeroImage } from '../../utils/constants'
+// Crewneck-only card — Hoodie and Zipper have their own ProductCard entries
 import { formatCurrency } from '../../utils/formatCurrency'
 import { SILHOUETTE_MAP } from './Silhouettes'
 import { ProductView } from './ProductView'
 
 const BASE = import.meta.env.BASE_URL
 
-const FAMILY_IDS = ['crewneck', 'hoodie', 'zip-hoodie'] as const
-const FAMILY_LABELS: Record<string, string> = {
-  crewneck:    'Crewneck',
-  hoodie:      'Hoodie',
-  'zip-hoodie': 'Zip',
-}
-
 export function HoodieFamilyCard() {
-  const [selectedId, setSelectedId] = useState<string>('crewneck')
   const [modalOpen, setModalOpen] = useState(false)
 
-  const product = PRODUCTS.find(p => p.id === selectedId)!
-  const heroImage = getHeroImage(selectedId)
+  const product = PRODUCTS.find(p => p.id === 'crewneck')!
+  const heroImage = getHeroImage('crewneck')
   const Silhouette = SILHOUETTE_MAP[product.category] ?? SILHOUETTE_MAP['t-shirt']
 
   return (
@@ -57,23 +50,6 @@ export function HoodieFamilyCard() {
                 className="w-2.5 h-2.5 rounded-full border border-white/60 shadow-sm"
                 style={{ backgroundColor: COLOR_MAP[color] }}
               />
-            ))}
-          </div>
-
-          {/* Sub-type tab selector */}
-          <div className="absolute bottom-0 inset-x-0 flex" onClick={e => e.stopPropagation()}>
-            {FAMILY_IDS.map(id => (
-              <button
-                key={id}
-                onClick={() => setSelectedId(id)}
-                className={`flex-1 py-2 text-[0.55rem] tracking-[0.25em] uppercase font-medium transition-all duration-200 ${
-                  selectedId === id
-                    ? 'bg-white/90 text-black'
-                    : 'bg-black/25 text-white/80 hover:bg-black/40'
-                }`}
-              >
-                {FAMILY_LABELS[id]}
-              </button>
             ))}
           </div>
 

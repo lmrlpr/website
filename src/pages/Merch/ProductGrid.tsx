@@ -3,10 +3,10 @@ import { PRODUCTS } from '../../utils/constants'
 import { ProductCard } from './ProductCard'
 import { HoodieFamilyCard } from './HoodieFamilyCard'
 
-// IDs grouped into the hoodie family card
-const HOODIE_FAMILY = new Set(['crewneck', 'hoodie', 'zip-hoodie'])
+// Crewneck gets the grouped family card (has photoshoot photos); others are individual
+const HOODIE_FAMILY = new Set(['crewneck'])
 
-// Remaining products shown as individual cards
+// All other products shown as individual cards
 const SOLO_PRODUCTS = PRODUCTS.filter(p => !HOODIE_FAMILY.has(p.id))
 
 export function ProductGrid() {

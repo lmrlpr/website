@@ -13,7 +13,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [modalOpen, setModalOpen] = useState(false)
-  const heroImage = getHeroImage(product.id)
+  const heroImage = product.heroImage ?? getHeroImage(product.id)
   const Silhouette = SILHOUETTE_MAP[product.category] ?? SILHOUETTE_MAP['t-shirt']
 
   return (

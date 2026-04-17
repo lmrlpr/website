@@ -14,6 +14,8 @@ export interface Product {
   designs?: string[]
   sizes?: ProductSize[]
   description?: string
+  /** Override image shown on the product card (path relative to public/, e.g. '/design/Hoodie_front.png') */
+  heroImage?: string
 }
 
 export interface CartItem {
