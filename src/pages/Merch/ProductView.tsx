@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Product, ProductColor, ProductSize } from '../../types/product'
 import { COLOR_MAP, PRODUCT_SIZES, getAllModelPhotos, getDesignImage, getPreviewImage, hasAnyPreview } from '../../utils/constants'
@@ -62,7 +62,7 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
   const [selectedSize, setSelectedSize] = useState<ProductSize | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
-  const [entretienOpen, setEntretienOpen] = useState(false)
+  const touchStartX = useRef<number | null>(null)
   const { addToCart, openCart } = useCart()
 
   useScrollLock(open)
@@ -176,6 +176,14 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
             <div
               className="relative h-[38vh] md:h-full md:w-[58%] shrink-0 flex items-center justify-center overflow-hidden"
               style={{ background: 'linear-gradient(145deg, #F2E8D5 0%, #EAD9C0 100%)' }}
+              onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX }}
+              onTouchEnd={(e) => {
+                if (touchStartX.current === null) return
+                const dx = e.changedTouches[0].clientX - touchStartX.current
+                touchStartX.current = null
+                if (dx < -40) setPhotoIdx(i => Math.min(i + 1, visiblePhotos.length - 1))
+                else if (dx > 40) setPhotoIdx(i => Math.max(i - 1, 0))
+              }}
             >
               <AnimatePresence mode="wait">
                 {hasPhoto ? (
@@ -524,39 +532,6 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
                   </div>
                 )}
 
-                {/* Entretien */}
-                <div className="border-t border-[#E5D5BF]">
-                  <button
-                    onClick={() => setEntretienOpen(o => !o)}
-                    className="w-full flex items-center justify-between py-5 text-left group"
-                  >
-                    <span className="text-[0.65rem] tracking-[0.35em] uppercase text-ink/50 group-hover:text-ink/70 transition-colors">
-                      Composition & entretien
-                    </span>
-                    <svg
-                      width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"
-                      className="text-ink/30 transition-transform duration-200 shrink-0"
-                      style={{ transform: entretienOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  <AnimatePresence>
-                    {entretienOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
-                        <p className="text-sm text-ink/55 leading-relaxed pb-5">
-                          100% coton biologique. Lavage à 30°C. Ne pas sécher au sèche-linge. Repassage à basse température.
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
 
               </div>
             </div>
