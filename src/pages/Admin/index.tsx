@@ -1,28 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { STARTERS, MAINS, DESSERTS, COLOR_MAP } from '../../utils/constants'
 import type { ProductColor } from '../../types/product'
 
 // ── PDF export helpers ────────────────────────────────────────────────────────
 
-const PRINT_STYLE = `
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#111;margin:0;padding:24px}
-  h1{font-size:18px;font-weight:700;margin:0 0 4px}
-  .meta{font-size:10px;color:#666;margin-bottom:18px}
-  table{width:100%;border-collapse:collapse}
-  th{background:#f4f4f4;text-align:left;padding:6px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid #ddd;white-space:nowrap}
-  td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:top}
-  tr:nth-child(even) td{background:#fafafa}
-  @media print{body{padding:0}}
+const PRINT_CSS = `
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#111;margin:0;padding:24px}
+    h1{font-size:18px;font-weight:700;margin:0 0 4px}
+    p.meta{font-size:10px;color:#666;margin:0 0 18px}
+    table{width:100%;border-collapse:collapse}
+    th{background:#f4f4f4;text-align:left;padding:6px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid #ddd;white-space:nowrap}
+    td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:top;line-height:1.5}
+    tr:nth-child(even) td{background:#fafafa}
+  </style>
 `
-
-function openPrintWindow(title: string, html: string) {
-  const win = window.open('', '_blank')
-  if (!win) return
-  win.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${title}</title><style>${PRINT_STYLE}</style></head><body>${html}</body></html>`)
-  win.document.close()
-  win.focus()
-  setTimeout(() => { win.print() }, 400)
-}
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -115,7 +107,7 @@ function lookup(id: string, list: { id: string; label: string }[]) {
 
 const exportedAt = () => new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
-function exportGothamPDF(rows: GothamRegistration[]) {
+function buildGothamHtml(rows: GothamRegistration[]) {
   const trs = rows.map(r => `<tr>
     <td>${r.first_name} ${r.last_name}</td>
     <td>${r.email}</td>
@@ -124,13 +116,12 @@ function exportGothamPDF(rows: GothamRegistration[]) {
     <td>${r.payment_status === 'paid' ? 'Payé' : '—'}</td>
     <td>${r.created_at ? formatDate(r.created_at) : '—'}</td>
   </tr>`).join('')
-  const html = `<h1>Gotham — Inscriptions</h1>
+  return `${PRINT_CSS}<h1>Gotham — Inscriptions</h1>
 <p class="meta">${rows.length} inscription${rows.length !== 1 ? 's' : ''} · Exporté le ${exportedAt()}</p>
 <table><thead><tr><th>Nom</th><th>Email</th><th>Type</th><th>Prix</th><th>Paiement</th><th>Date</th></tr></thead><tbody>${trs}</tbody></table>`
-  openPrintWindow('Gotham — Inscriptions', html)
 }
 
-function exportMerchPDF(rows: MerchOrder[]) {
+function buildMerchHtml(rows: MerchOrder[]) {
   const trs = rows.map(o => {
     const articles = o.items.map(item =>
       `${item.quantity}× ${item.productName} — ${item.color}${item.motifColor && item.motifColor !== item.color ? ` + motif ${item.motifColor}` : ''}${item.design ? ` · ${item.design}` : ''}${item.size ? ` · ${item.size}` : ''} · €${item.price}`
@@ -144,13 +135,12 @@ function exportMerchPDF(rows: MerchOrder[]) {
   </tr>`
   }).join('')
   const totalItems = rows.reduce((s, o) => s + o.items.reduce((ss, i) => ss + i.quantity, 0), 0)
-  const html = `<h1>Merch — Commandes</h1>
+  return `${PRINT_CSS}<h1>Merch — Commandes</h1>
 <p class="meta">${rows.length} commande${rows.length !== 1 ? 's' : ''} · ${totalItems} articles · Exporté le ${exportedAt()}</p>
 <table><thead><tr><th>Nom</th><th>Email</th><th>Articles</th><th>Promo</th><th>Date</th></tr></thead><tbody>${trs}</tbody></table>`
-  openPrintWindow('Merch — Commandes', html)
 }
 
-function exportRestaurantPDF(rows: RestaurantReservation[]) {
+function buildRestaurantHtml(rows: RestaurantReservation[]) {
   const trs = rows.map(r => `<tr>
     <td>${r.first_name} ${r.last_name}</td>
     <td>${r.class_group}</td>
@@ -161,10 +151,9 @@ function exportRestaurantPDF(rows: RestaurantReservation[]) {
     <td>${r.menu_selection?.drinks === 'alcoholic' ? 'Mat Alcool' : 'Ouni Alcool'}</td>
     <td>${r.total_surcharge > 0 ? `+€${r.total_surcharge}` : '—'}</td>
   </tr>`).join('')
-  const html = `<h1>Restaurant — Réservations</h1>
+  return `${PRINT_CSS}<h1>Restaurant — Réservations</h1>
 <p class="meta">${rows.length} réservation${rows.length !== 1 ? 's' : ''} · Exporté le ${exportedAt()}</p>
 <table><thead><tr><th>Nom</th><th>Classe</th><th>Email</th><th>Entrée</th><th>Plat</th><th>Dessert</th><th>Boissons</th><th>Supplément</th></tr></thead><tbody>${trs}</tbody></table>`
-  openPrintWindow('Restaurant — Réservations', html)
 }
 
 export default function Admin() {
@@ -172,6 +161,17 @@ export default function Admin() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [data, setData] = useState<AdminData | null>(null)
+  const [printHtml, setPrintHtml] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (printHtml === null) return
+    const frame = requestAnimationFrame(() => {
+      window.print()
+      const clear = () => setPrintHtml(null)
+      window.addEventListener('afterprint', clear, { once: true })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [printHtml])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -273,7 +273,7 @@ export default function Admin() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-semibold text-gray-900">Gotham — Inscriptions</h2>
             <button
-              onClick={() => exportGothamPDF(gotham_registrations)}
+              onClick={() => setPrintHtml(buildGothamHtml(gotham_registrations))}
               disabled={gotham_registrations.length === 0}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
@@ -329,7 +329,7 @@ export default function Admin() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-semibold text-gray-900">Merch — Commandes</h2>
             <button
-              onClick={() => exportMerchPDF(merch_orders)}
+              onClick={() => setPrintHtml(buildMerchHtml(merch_orders))}
               disabled={merch_orders.length === 0}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
@@ -385,7 +385,7 @@ export default function Admin() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-semibold text-gray-900">Restaurant — Réservations</h2>
             <button
-              onClick={() => exportRestaurantPDF(restaurant_reservations)}
+              onClick={() => setPrintHtml(buildRestaurantHtml(restaurant_reservations))}
               disabled={restaurant_reservations.length === 0}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
@@ -440,6 +440,16 @@ export default function Admin() {
         </section>
 
       </div>
+
+      {/* Hidden print area — shown only during window.print() via @media print */}
+      <style>{`@media print { body > * { display: none !important; } #admin-print-area { display: block !important; } }`}</style>
+      {printHtml !== null && (
+        <div
+          id="admin-print-area"
+          style={{ display: 'none' }}
+          dangerouslySetInnerHTML={{ __html: printHtml }}
+        />
+      )}
     </div>
   )
 }
