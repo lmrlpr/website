@@ -2,6 +2,28 @@ import { useState } from 'react'
 import { STARTERS, MAINS, DESSERTS, COLOR_MAP } from '../../utils/constants'
 import type { ProductColor } from '../../types/product'
 
+// ── PDF export helpers ────────────────────────────────────────────────────────
+
+const PRINT_STYLE = `
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#111;margin:0;padding:24px}
+  h1{font-size:18px;font-weight:700;margin:0 0 4px}
+  .meta{font-size:10px;color:#666;margin-bottom:18px}
+  table{width:100%;border-collapse:collapse}
+  th{background:#f4f4f4;text-align:left;padding:6px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid #ddd;white-space:nowrap}
+  td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:top}
+  tr:nth-child(even) td{background:#fafafa}
+  @media print{body{padding:0}}
+`
+
+function openPrintWindow(title: string, html: string) {
+  const win = window.open('', '_blank')
+  if (!win) return
+  win.document.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>${title}</title><style>${PRINT_STYLE}</style></head><body>${html}</body></html>`)
+  win.document.close()
+  win.focus()
+  setTimeout(() => { win.print() }, 400)
+}
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
@@ -89,6 +111,60 @@ function formatDate(iso: string) {
 
 function lookup(id: string, list: { id: string; label: string }[]) {
   return list.find(i => i.id === id)?.label ?? id
+}
+
+const exportedAt = () => new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+function exportGothamPDF(rows: GothamRegistration[]) {
+  const trs = rows.map(r => `<tr>
+    <td>${r.first_name} ${r.last_name}</td>
+    <td>${r.email}</td>
+    <td>${r.ticket_type === 'external' ? 'Externe' : 'Primaner'}</td>
+    <td>${r.price > 0 ? `€${r.price}` : 'Gratuit'}</td>
+    <td>${r.payment_status === 'paid' ? 'Payé' : '—'}</td>
+    <td>${r.created_at ? formatDate(r.created_at) : '—'}</td>
+  </tr>`).join('')
+  const html = `<h1>Gotham — Inscriptions</h1>
+<p class="meta">${rows.length} inscription${rows.length !== 1 ? 's' : ''} · Exporté le ${exportedAt()}</p>
+<table><thead><tr><th>Nom</th><th>Email</th><th>Type</th><th>Prix</th><th>Paiement</th><th>Date</th></tr></thead><tbody>${trs}</tbody></table>`
+  openPrintWindow('Gotham — Inscriptions', html)
+}
+
+function exportMerchPDF(rows: MerchOrder[]) {
+  const trs = rows.map(o => {
+    const articles = o.items.map(item =>
+      `${item.quantity}× ${item.productName} — ${item.color}${item.motifColor && item.motifColor !== item.color ? ` + motif ${item.motifColor}` : ''}${item.design ? ` · ${item.design}` : ''}${item.size ? ` · ${item.size}` : ''} · €${item.price}`
+    ).join('<br>')
+    return `<tr>
+    <td>${o.name ?? '—'}</td>
+    <td>${o.email ?? '—'}</td>
+    <td>${articles}</td>
+    <td>${o.promo_code ?? '—'}</td>
+    <td>${o.created_at ? formatDate(o.created_at) : '—'}</td>
+  </tr>`
+  }).join('')
+  const totalItems = rows.reduce((s, o) => s + o.items.reduce((ss, i) => ss + i.quantity, 0), 0)
+  const html = `<h1>Merch — Commandes</h1>
+<p class="meta">${rows.length} commande${rows.length !== 1 ? 's' : ''} · ${totalItems} articles · Exporté le ${exportedAt()}</p>
+<table><thead><tr><th>Nom</th><th>Email</th><th>Articles</th><th>Promo</th><th>Date</th></tr></thead><tbody>${trs}</tbody></table>`
+  openPrintWindow('Merch — Commandes', html)
+}
+
+function exportRestaurantPDF(rows: RestaurantReservation[]) {
+  const trs = rows.map(r => `<tr>
+    <td>${r.first_name} ${r.last_name}</td>
+    <td>${r.class_group}</td>
+    <td>${r.email}</td>
+    <td>${r.menu_selection ? lookup(r.menu_selection.starter, STARTERS) : '—'}</td>
+    <td>${r.menu_selection ? lookup(r.menu_selection.main, MAINS) : '—'}</td>
+    <td>${r.menu_selection ? lookup(r.menu_selection.dessert, DESSERTS) : '—'}</td>
+    <td>${r.menu_selection?.drinks === 'alcoholic' ? 'Mat Alcool' : 'Ouni Alcool'}</td>
+    <td>${r.total_surcharge > 0 ? `+€${r.total_surcharge}` : '—'}</td>
+  </tr>`).join('')
+  const html = `<h1>Restaurant — Réservations</h1>
+<p class="meta">${rows.length} réservation${rows.length !== 1 ? 's' : ''} · Exporté le ${exportedAt()}</p>
+<table><thead><tr><th>Nom</th><th>Classe</th><th>Email</th><th>Entrée</th><th>Plat</th><th>Dessert</th><th>Boissons</th><th>Supplément</th></tr></thead><tbody>${trs}</tbody></table>`
+  openPrintWindow('Restaurant — Réservations', html)
 }
 
 export default function Admin() {
@@ -194,7 +270,17 @@ export default function Admin() {
 
         {/* Gotham */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-3">Gotham — Inscriptions</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-semibold text-gray-900">Gotham — Inscriptions</h2>
+            <button
+              onClick={() => exportGothamPDF(gotham_registrations)}
+              disabled={gotham_registrations.length === 0}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Exporter PDF
+            </button>
+          </div>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -240,7 +326,17 @@ export default function Admin() {
 
         {/* Merch */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-3">Merch — Commandes</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-semibold text-gray-900">Merch — Commandes</h2>
+            <button
+              onClick={() => exportMerchPDF(merch_orders)}
+              disabled={merch_orders.length === 0}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Exporter PDF
+            </button>
+          </div>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -286,7 +382,17 @@ export default function Admin() {
 
         {/* Restaurant */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-3">Restaurant — Réservations</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-semibold text-gray-900">Restaurant — Réservations</h2>
+            <button
+              onClick={() => exportRestaurantPDF(restaurant_reservations)}
+              disabled={restaurant_reservations.length === 0}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Exporter PDF
+            </button>
+          </div>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
