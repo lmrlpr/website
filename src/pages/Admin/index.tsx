@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { STARTERS, MAINS, DESSERTS, COLOR_MAP } from '../../utils/constants'
 import type { ProductColor } from '../../types/product'
 
@@ -441,22 +442,21 @@ export default function Admin() {
 
       </div>
 
-      {/* Hidden print area — shown only during window.print() via @media print.
-          Uses visibility (not display) so descendants can override the ancestors'
-          hidden state; absolute positioning lifts it out of the dashboard layout. */}
+      {/* Print area is portaled to <body> so it's a direct child, letting
+          `body > *:not(...)` cleanly hide everything else during @media print. */}
       <style>{`
-        #admin-print-area { position: absolute; left: -10000px; top: 0; }
+        #admin-print-area { display: none; }
         @media print {
-          body * { visibility: hidden !important; }
-          #admin-print-area, #admin-print-area * { visibility: visible !important; }
-          #admin-print-area { left: 0 !important; top: 0 !important; width: 100% !important; }
+          body > *:not(#admin-print-area) { display: none !important; }
+          #admin-print-area { display: block !important; }
         }
       `}</style>
-      {printHtml !== null && (
+      {printHtml !== null && createPortal(
         <div
           id="admin-print-area"
           dangerouslySetInnerHTML={{ __html: printHtml }}
-        />
+        />,
+        document.body
       )}
     </div>
   )
