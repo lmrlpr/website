@@ -441,12 +441,20 @@ export default function Admin() {
 
       </div>
 
-      {/* Hidden print area — shown only during window.print() via @media print */}
-      <style>{`@media print { body > * { display: none !important; } #admin-print-area { display: block !important; } }`}</style>
+      {/* Hidden print area — shown only during window.print() via @media print.
+          Uses visibility (not display) so descendants can override the ancestors'
+          hidden state; absolute positioning lifts it out of the dashboard layout. */}
+      <style>{`
+        #admin-print-area { position: absolute; left: -10000px; top: 0; }
+        @media print {
+          body * { visibility: hidden !important; }
+          #admin-print-area, #admin-print-area * { visibility: visible !important; }
+          #admin-print-area { left: 0 !important; top: 0 !important; width: 100% !important; }
+        }
+      `}</style>
       {printHtml !== null && (
         <div
           id="admin-print-area"
-          style={{ display: 'none' }}
           dangerouslySetInnerHTML={{ __html: printHtml }}
         />
       )}
