@@ -67,6 +67,29 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
 const initialState: CartState = { items: [], promoCode: null, discount: 0, discountType: null, discountLabel: '', isOpen: false }
 
+// Read persisted cart synchronously during the very first render, so any effect
+// (including those in deeper components) sees the hydrated state immediately —
+// prevents a race where a child's clearCart() runs before a later hydrate effect
+// restores the stale items.
+function initFromStorage(): CartState {
+  if (typeof window === 'undefined') return initialState
+  try {
+    const stored = window.localStorage.getItem('lmrl-cart')
+    if (!stored) return initialState
+    const parsed = JSON.parse(stored)
+    return {
+      ...initialState,
+      items: parsed.items ?? [],
+      promoCode: parsed.promoCode ?? null,
+      discount: parsed.discount ?? 0,
+      discountType: parsed.discountType ?? null,
+      discountLabel: parsed.discountLabel ?? '',
+    }
+  } catch {
+    return initialState
+  }
+}
+
 interface CartContextValue extends CartState {
   totalItems: number
   subtotal: number
@@ -86,17 +109,7 @@ interface CartContextValue extends CartState {
 const CartContext = createContext<CartContextValue | null>(null)
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(cartReducer, initialState)
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('lmrl-cart')
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        dispatch({ type: 'HYDRATE', payload: { items: parsed.items ?? [], promoCode: parsed.promoCode, discount: parsed.discount ?? 0, discountType: parsed.discountType ?? null, discountLabel: parsed.discountLabel ?? '' } })
-      }
-    } catch { /* ignore */ }
-  }, [])
+  const [state, dispatch] = useReducer(cartReducer, undefined, initFromStorage)
 
   useEffect(() => {
     localStorage.setItem('lmrl-cart', JSON.stringify({ items: state.items, promoCode: state.promoCode, discount: state.discount, discountType: state.discountType, discountLabel: state.discountLabel }))

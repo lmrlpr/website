@@ -34,7 +34,10 @@ function MerchInner() {
 
   useEffect(() => {
     if (searchParams.get('success') === '1') {
-      setBanner({ type: 'success', message: 'Commande confirmée ! Merci pour votre achat.' })
+      setBanner({
+        type: 'success',
+        message: 'Merci fir Ären Akaf. Är Bestellung gëtt de Moment un de Première-Komitee vum Lycée Michel Rodange weidergeleet.',
+      })
       clearCart()
       setSearchParams({}, { replace: true })
     } else if (searchParams.get('cancelled') === '1') {
@@ -55,15 +58,20 @@ function MerchInner() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-20 left-1/2 -translate-x-1/2 z-40 px-6 py-3 rounded-xl shadow-lg text-sm font-medium ${
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-40 w-[min(92vw,34rem)] px-5 py-4 rounded-xl shadow-lg text-sm ${
               banner.type === 'success'
-                ? 'bg-green-50 border border-green-200 text-green-700'
+                ? 'bg-green-50 border border-green-200 text-green-800'
                 : 'bg-amber-50 border border-amber-200 text-amber-700'
             }`}
           >
-            <div className="flex items-center gap-3">
-              <span>{banner.message}</span>
-              <button onClick={() => setBanner(null)} className="text-current opacity-50 hover:opacity-100">
+            <div className="flex items-start gap-3">
+              {banner.type === 'success' && (
+                <svg className="w-5 h-5 shrink-0 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+              <p className="flex-1 leading-relaxed font-medium">{banner.message}</p>
+              <button onClick={() => setBanner(null)} className="text-current opacity-40 hover:opacity-80 shrink-0 mt-0.5">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
