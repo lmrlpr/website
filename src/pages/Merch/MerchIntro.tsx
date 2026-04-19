@@ -22,6 +22,7 @@ function useMobile() {
 function MobileHero({ onVisit }: { onVisit: () => void }) {
   const { scrollY } = useScroll()
   const REVEAL = 400
+  const IMAGE_VH = 62
 
   const clip1 = useTransform(scrollY, [0, REVEAL], [12, 0])
   const clip2 = useTransform(scrollY, [0, REVEAL], [88, 100])
@@ -29,18 +30,32 @@ function MobileHero({ onVisit }: { onVisit: () => void }) {
 
   return (
     <div style={{ backgroundColor: '#EADFCC' }}>
-      {/* Image — clip-path reveals on scroll, cropped to faces */}
-      <motion.div
-        style={{
-          clipPath,
-          backgroundImage: `url(${MOBILE_IMAGE})`,
-          backgroundPosition: 'center 18%',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-          willChange: 'clip-path',
-        }}
-        className="w-full h-[62vh]"
-      />
+      {/* Pinned reveal section — image sticks to the top of the viewport while
+          the user scrolls through REVEAL px, so the clip-path expansion happens
+          in place (not simultaneously with the page scrolling). Once the outer
+          container scrolls past, the image unpins and the rest of the page
+          (MERCH title, button) scrolls into view normally. */}
+      <div
+        className="relative w-full"
+        style={{ height: `calc(${IMAGE_VH}vh + ${REVEAL}px)` }}
+      >
+        <div
+          className="sticky top-0 w-full overflow-hidden"
+          style={{ height: `${IMAGE_VH}vh` }}
+        >
+          <motion.div
+            style={{
+              clipPath,
+              backgroundImage: `url(${MOBILE_IMAGE})`,
+              backgroundPosition: 'center 18%',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'cover',
+              willChange: 'clip-path',
+            }}
+            className="absolute inset-0"
+          />
+        </div>
+      </div>
 
       {/* Text below the image */}
       <div className="flex flex-col items-center pt-8 pb-12 px-6">

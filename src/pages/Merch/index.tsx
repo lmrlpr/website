@@ -58,19 +58,21 @@ function MerchInner() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`fixed top-20 left-1/2 -translate-x-1/2 z-40 w-[min(92vw,34rem)] px-5 py-4 rounded-xl shadow-lg text-sm ${
+            className={`fixed top-20 left-1/2 -translate-x-1/2 z-40 w-[min(92vw,34rem)] max-w-[calc(100vw-1rem)] px-4 sm:px-5 py-4 rounded-xl shadow-lg text-[0.8rem] sm:text-sm ${
               banner.type === 'success'
                 ? 'bg-green-50 border border-green-200 text-green-800'
                 : 'bg-amber-50 border border-amber-200 text-amber-700'
             }`}
           >
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-2 sm:gap-3">
               {banner.type === 'success' && (
                 <svg className="w-5 h-5 shrink-0 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               )}
-              <p className="flex-1 leading-relaxed font-medium">{banner.message}</p>
+              <p className="flex-1 min-w-0 leading-relaxed font-medium break-words hyphens-auto" lang="lb">
+                {banner.message}
+              </p>
               <button onClick={() => setBanner(null)} className="text-current opacity-40 hover:opacity-80 shrink-0 mt-0.5">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
