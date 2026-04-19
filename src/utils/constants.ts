@@ -150,9 +150,7 @@ const DESIGN_MOTIF_TOKEN: Record<ProductColor, string> = {
   Beige: 'beige',
 }
 
-const DESIGN_MISSING = new Set<string>([
-  '/design/Design_green_3_white_back.webp',
-])
+const DESIGN_MISSING = new Set<string>([])
 
 /** Resolve an artwork image from /public/design for a (garment, motif, design, side) tuple.
  *  Returns null when the file is known to be missing. */
