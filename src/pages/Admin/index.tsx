@@ -1,21 +1,6 @@
-import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
+import { useState } from 'react'
 import { STARTERS, MAINS, DESSERTS, COLOR_MAP } from '../../utils/constants'
 import type { ProductColor } from '../../types/product'
-
-// ── PDF export helpers ────────────────────────────────────────────────────────
-
-const PRINT_CSS = `
-  <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#111;margin:0;padding:24px}
-    h1{font-size:18px;font-weight:700;margin:0 0 4px}
-    p.meta{font-size:10px;color:#666;margin:0 0 18px}
-    table{width:100%;border-collapse:collapse}
-    th{background:#f4f4f4;text-align:left;padding:6px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid #ddd;white-space:nowrap}
-    td{padding:6px 10px;border-bottom:1px solid #eee;vertical-align:top;line-height:1.5}
-    tr:nth-child(even) td{background:#fafafa}
-  </style>
-`
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -108,53 +93,112 @@ function lookup(id: string, list: { id: string; label: string }[]) {
 
 const exportedAt = () => new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
-function buildGothamHtml(rows: GothamRegistration[]) {
-  const trs = rows.map(r => `<tr>
-    <td>${r.first_name} ${r.last_name}</td>
-    <td>${r.email}</td>
-    <td>${r.ticket_type === 'external' ? 'Externe' : 'Primaner'}</td>
-    <td>${r.price > 0 ? `€${r.price}` : 'Gratuit'}</td>
-    <td>${r.payment_status === 'paid' ? 'Payé' : '—'}</td>
-    <td>${r.created_at ? formatDate(r.created_at) : '—'}</td>
-  </tr>`).join('')
-  return `${PRINT_CSS}<h1>Gotham — Inscriptions</h1>
-<p class="meta">${rows.length} inscription${rows.length !== 1 ? 's' : ''} · Exporté le ${exportedAt()}</p>
-<table><thead><tr><th>Nom</th><th>Email</th><th>Type</th><th>Prix</th><th>Paiement</th><th>Date</th></tr></thead><tbody>${trs}</tbody></table>`
+const fileStamp = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function buildMerchHtml(rows: MerchOrder[]) {
-  const trs = rows.map(o => {
-    const articles = o.items.map(item =>
-      `${item.quantity}× ${item.productName} — ${item.color}${item.motifColor && item.motifColor !== item.color ? ` + motif ${item.motifColor}` : ''}${item.design ? ` · ${item.design}` : ''}${item.size ? ` · ${item.size}` : ''} · €${item.price}`
-    ).join('<br>')
-    return `<tr>
-    <td>${o.name ?? '—'}</td>
-    <td>${o.email ?? '—'}</td>
-    <td>${articles}</td>
-    <td>${o.promo_code ?? '—'}</td>
-    <td>${o.created_at ? formatDate(o.created_at) : '—'}</td>
-  </tr>`
-  }).join('')
+// Dynamic-imported so the ~350KB library only loads when export is clicked.
+async function loadJsPdf() {
+  const [{ jsPDF }, autoTable] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable'),
+  ])
+  return { jsPDF, autoTable: autoTable.default }
+}
+
+type AutoTablePlugin = Awaited<ReturnType<typeof loadJsPdf>>['autoTable']
+type JsPDFCtor = Awaited<ReturnType<typeof loadJsPdf>>['jsPDF']
+type JsPDFInstance = InstanceType<JsPDFCtor>
+
+function writeHeader(doc: JsPDFInstance, title: string, subtitle: string) {
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(16)
+  doc.setTextColor(17)
+  doc.text(title, 40, 48)
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(9)
+  doc.setTextColor(110)
+  doc.text(subtitle, 40, 64)
+}
+
+async function exportGothamPdf(rows: GothamRegistration[]) {
+  const { jsPDF, autoTable } = await loadJsPdf()
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' })
+  writeHeader(doc, 'Gotham — Inscriptions',
+    `${rows.length} inscription${rows.length !== 1 ? 's' : ''} · Exporté le ${exportedAt()}`)
+  runTable(doc, autoTable, {
+    head: [['Nom', 'Email', 'Type', 'Prix', 'Paiement', 'Date']],
+    body: rows.map(r => [
+      `${r.first_name} ${r.last_name}`,
+      r.email,
+      r.ticket_type === 'external' ? 'Externe' : 'Primaner',
+      r.price > 0 ? `€${r.price}` : 'Gratuit',
+      r.payment_status === 'paid' ? 'Payé' : '—',
+      r.created_at ? formatDate(r.created_at) : '—',
+    ]),
+  })
+  doc.save(`gotham-inscriptions-${fileStamp()}.pdf`)
+}
+
+async function exportMerchPdf(rows: MerchOrder[]) {
+  const { jsPDF, autoTable } = await loadJsPdf()
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' })
   const totalItems = rows.reduce((s, o) => s + o.items.reduce((ss, i) => ss + i.quantity, 0), 0)
-  return `${PRINT_CSS}<h1>Merch — Commandes</h1>
-<p class="meta">${rows.length} commande${rows.length !== 1 ? 's' : ''} · ${totalItems} articles · Exporté le ${exportedAt()}</p>
-<table><thead><tr><th>Nom</th><th>Email</th><th>Articles</th><th>Promo</th><th>Date</th></tr></thead><tbody>${trs}</tbody></table>`
+  writeHeader(doc, 'Merch — Commandes',
+    `${rows.length} commande${rows.length !== 1 ? 's' : ''} · ${totalItems} articles · Exporté le ${exportedAt()}`)
+  runTable(doc, autoTable, {
+    head: [['Nom', 'Email', 'Articles', 'Promo', 'Date']],
+    body: rows.map(o => [
+      o.name ?? '—',
+      o.email ?? '—',
+      o.items.map(item =>
+        `${item.quantity}× ${item.productName} — ${item.color}${item.motifColor && item.motifColor !== item.color ? ` + motif ${item.motifColor}` : ''}${item.design ? ` · ${item.design}` : ''}${item.size ? ` · ${item.size}` : ''} · €${item.price}`
+      ).join('\n'),
+      o.promo_code ?? '—',
+      o.created_at ? formatDate(o.created_at) : '—',
+    ]),
+    columnStyles: { 2: { cellWidth: 240 } },
+  })
+  doc.save(`merch-commandes-${fileStamp()}.pdf`)
 }
 
-function buildRestaurantHtml(rows: RestaurantReservation[]) {
-  const trs = rows.map(r => `<tr>
-    <td>${r.first_name} ${r.last_name}</td>
-    <td>${r.class_group}</td>
-    <td>${r.email}</td>
-    <td>${r.menu_selection ? lookup(r.menu_selection.starter, STARTERS) : '—'}</td>
-    <td>${r.menu_selection ? lookup(r.menu_selection.main, MAINS) : '—'}</td>
-    <td>${r.menu_selection ? lookup(r.menu_selection.dessert, DESSERTS) : '—'}</td>
-    <td>${r.menu_selection?.drinks === 'alcoholic' ? 'Mat Alcool' : 'Ouni Alcool'}</td>
-    <td>${r.total_surcharge > 0 ? `+€${r.total_surcharge}` : '—'}</td>
-  </tr>`).join('')
-  return `${PRINT_CSS}<h1>Restaurant — Réservations</h1>
-<p class="meta">${rows.length} réservation${rows.length !== 1 ? 's' : ''} · Exporté le ${exportedAt()}</p>
-<table><thead><tr><th>Nom</th><th>Classe</th><th>Email</th><th>Entrée</th><th>Plat</th><th>Dessert</th><th>Boissons</th><th>Supplément</th></tr></thead><tbody>${trs}</tbody></table>`
+async function exportRestaurantPdf(rows: RestaurantReservation[]) {
+  const { jsPDF, autoTable } = await loadJsPdf()
+  const doc = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'landscape' })
+  writeHeader(doc, 'Restaurant — Réservations',
+    `${rows.length} réservation${rows.length !== 1 ? 's' : ''} · Exporté le ${exportedAt()}`)
+  runTable(doc, autoTable, {
+    head: [['Nom', 'Classe', 'Email', 'Entrée', 'Plat', 'Dessert', 'Boissons', 'Supplément']],
+    body: rows.map(r => [
+      `${r.first_name} ${r.last_name}`,
+      r.class_group,
+      r.email,
+      r.menu_selection ? lookup(r.menu_selection.starter, STARTERS) : '—',
+      r.menu_selection ? lookup(r.menu_selection.main, MAINS) : '—',
+      r.menu_selection ? lookup(r.menu_selection.dessert, DESSERTS) : '—',
+      r.menu_selection?.drinks === 'alcoholic' ? 'Mat Alcool' : 'Ouni Alcool',
+      r.total_surcharge > 0 ? `+€${r.total_surcharge}` : '—',
+    ]),
+  })
+  doc.save(`restaurant-reservations-${fileStamp()}.pdf`)
+}
+
+function runTable(
+  doc: JsPDFInstance,
+  autoTable: AutoTablePlugin,
+  opts: { head: string[][]; body: (string | number)[][]; columnStyles?: Record<number, { cellWidth?: number }> },
+) {
+  autoTable(doc, {
+    startY: 80,
+    head: opts.head,
+    body: opts.body,
+    styles: { fontSize: 9, cellPadding: 6, overflow: 'linebreak', valign: 'top' },
+    headStyles: { fillColor: [244, 244, 244], textColor: 40, fontStyle: 'bold', fontSize: 8 },
+    alternateRowStyles: { fillColor: [250, 250, 250] },
+    columnStyles: opts.columnStyles,
+    margin: { left: 40, right: 40 },
+  })
 }
 
 export default function Admin() {
@@ -162,17 +206,12 @@ export default function Admin() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [data, setData] = useState<AdminData | null>(null)
-  const [printHtml, setPrintHtml] = useState<string | null>(null)
+  const [exporting, setExporting] = useState<'gotham' | 'merch' | 'restaurant' | null>(null)
 
-  useEffect(() => {
-    if (printHtml === null) return
-    const frame = requestAnimationFrame(() => {
-      window.print()
-      const clear = () => setPrintHtml(null)
-      window.addEventListener('afterprint', clear, { once: true })
-    })
-    return () => cancelAnimationFrame(frame)
-  }, [printHtml])
+  async function runExport(kind: 'gotham' | 'merch' | 'restaurant', fn: () => Promise<void>) {
+    setExporting(kind)
+    try { await fn() } finally { setExporting(null) }
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -274,12 +313,12 @@ export default function Admin() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-semibold text-gray-900">Gotham — Inscriptions</h2>
             <button
-              onClick={() => setPrintHtml(buildGothamHtml(gotham_registrations))}
-              disabled={gotham_registrations.length === 0}
+              onClick={() => runExport('gotham', () => exportGothamPdf(gotham_registrations))}
+              disabled={gotham_registrations.length === 0 || exporting === 'gotham'}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Exporter PDF
+              {exporting === 'gotham' ? 'Export…' : 'Télécharger PDF'}
             </button>
           </div>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-x-auto">
@@ -330,12 +369,12 @@ export default function Admin() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-semibold text-gray-900">Merch — Commandes</h2>
             <button
-              onClick={() => setPrintHtml(buildMerchHtml(merch_orders))}
-              disabled={merch_orders.length === 0}
+              onClick={() => runExport('merch', () => exportMerchPdf(merch_orders))}
+              disabled={merch_orders.length === 0 || exporting === 'merch'}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Exporter PDF
+              {exporting === 'merch' ? 'Export…' : 'Télécharger PDF'}
             </button>
           </div>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-x-auto">
@@ -386,12 +425,12 @@ export default function Admin() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-semibold text-gray-900">Restaurant — Réservations</h2>
             <button
-              onClick={() => setPrintHtml(buildRestaurantHtml(restaurant_reservations))}
-              disabled={restaurant_reservations.length === 0}
+              onClick={() => runExport('restaurant', () => exportRestaurantPdf(restaurant_reservations))}
+              disabled={restaurant_reservations.length === 0 || exporting === 'restaurant'}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Exporter PDF
+              {exporting === 'restaurant' ? 'Export…' : 'Télécharger PDF'}
             </button>
           </div>
           <div className="bg-white rounded-2xl border border-gray-200 overflow-x-auto">
@@ -441,23 +480,6 @@ export default function Admin() {
         </section>
 
       </div>
-
-      {/* Print area is portaled to <body> so it's a direct child, letting
-          `body > *:not(...)` cleanly hide everything else during @media print. */}
-      <style>{`
-        #admin-print-area { display: none; }
-        @media print {
-          body > *:not(#admin-print-area) { display: none !important; }
-          #admin-print-area { display: block !important; }
-        }
-      `}</style>
-      {printHtml !== null && createPortal(
-        <div
-          id="admin-print-area"
-          dangerouslySetInnerHTML={{ __html: printHtml }}
-        />,
-        document.body
-      )}
     </div>
   )
 }
