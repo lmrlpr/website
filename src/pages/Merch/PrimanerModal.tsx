@@ -11,7 +11,7 @@ const GATE_KEY = 'primaner_access'
 const ACCESS_CODE = 'PROM2026'
 
 const PHOTOS = [
-  '/merch/Tabea_zoe_main_PRIMANER.webp',
+  '/merch/Tabea_Zoe_main_PRIMANER.webp',
   '/merch/Trio_2_PRIMANER.jpg',
 ]
 

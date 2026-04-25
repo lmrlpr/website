@@ -20,7 +20,7 @@ export function PrimanerCard({ onClick }: PrimanerCardProps) {
       >
         {/* Blurred background photo */}
         <img
-          src={`${BASE}merch/Tabea_zoe_main_PRIMANER.webp`}
+          src={`${BASE}merch/Tabea_Zoe_main_PRIMANER.webp`}
           alt="Collection exclusive Primaner"
           className="absolute inset-0 w-full h-full object-cover"
           style={{
