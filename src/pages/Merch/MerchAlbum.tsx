@@ -16,7 +16,7 @@ const PHOTOS: AlbumPhoto[] = [
   { src: img('Trio.webp'),                                         alt: 'La team LMRL'                },
   { src: img('Lou_grey_crewneck_1.webp'),                          alt: 'Lou — Crewneck gris'         },
   { src: img('Zoe_tshirt_black_open_1.webp'),                      alt: 'Zoé — T-shirt noir'          },
-  { src: img('Tabea_Zoe_main.webp'),                               alt: 'Tabea & Zoé'                 },
+  { src: img('Tabea_Zoe_main_PRIMANER.webp'),                       alt: 'Tabea & Zoé'                 },
   { src: img('Tabea_grey_crewneck-1.webp'),                        alt: 'Tabea — Crewneck gris'       },
   { src: img('Zoe_crewneck_black_2.webp'),                         alt: 'Zoé — Crewneck noir'         },
   { src: img('Lou_white_tshirt_2.webp'),                           alt: 'Lou — T-shirt blanc'         },

@@ -269,6 +269,13 @@ export const PRODUCTS: Product[] = [
   },
 ]
 
+export const PRIMANER_PRODUCTS = [
+  { id: 'primaner-tshirt',    name: 'T-Shirt Primaner',   price: 25 },
+  { id: 'primaner-crewneck',  name: 'Crewneck Primaner',  price: 50 },
+] as const
+
+export const PRIMANER_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const
+
 export const DRINK_SURCHARGE = 7
 
 export const STARTERS = [

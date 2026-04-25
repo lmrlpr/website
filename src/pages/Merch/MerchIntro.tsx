@@ -4,7 +4,7 @@ import { motion, useMotionTemplate, useScroll, useTransform } from 'framer-motio
 import { SmoothScrollHero } from '../../components/ui/modern-hero'
 
 const BASE = import.meta.env.BASE_URL
-const CENTER_IMAGE = `${BASE}merch/Tabea_Zoe_main.webp`
+const CENTER_IMAGE = `${BASE}merch/Tabea_Zoe_main_PRIMANER.webp`
 const MOBILE_IMAGE = `${BASE}merch/Trio.webp`
 
 function useMobile() {
