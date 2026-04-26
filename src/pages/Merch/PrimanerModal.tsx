@@ -8,7 +8,7 @@ import { useScrollLock } from '../../hooks/useScrollLock'
 
 const BASE = import.meta.env.BASE_URL
 const GATE_KEY = 'primaner_access'
-const ACCESS_CODE = 'PROM2026'
+const ACCESS_CODE = 'MERCH26'
 
 const PHOTOS = [
   '/merch/Tabea_Zoe_main_PRIMANER.webp',
@@ -110,89 +110,86 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
             className="fixed inset-0 z-[60] flex flex-col md:flex-row overflow-hidden"
             onClick={e => e.stopPropagation()}
           >
-            {/* ── Left panel: photo ─────────────────────────────────────────── */}
-            <div
-              className="relative h-[38vh] md:h-full md:w-[58%] shrink-0 overflow-hidden"
-              style={{ background: '#0A0808' }}
-              onTouchStart={e => { touchStartX.current = e.touches[0].clientX }}
-              onTouchEnd={e => {
-                if (touchStartX.current === null) return
-                const dx = e.changedTouches[0].clientX - touchStartX.current
-                touchStartX.current = null
-                if (dx < -40) setPhotoIdx(i => Math.min(i + 1, PHOTOS.length - 1))
-                else if (dx > 40) setPhotoIdx(i => Math.max(i - 1, 0))
-              }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={photoIdx}
-                  src={toUrl(PHOTOS[photoIdx])}
-                  alt="Collection Primaner"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </AnimatePresence>
 
-              {/* Gradient overlay for legibility */}
+            {/* ── Left panel: photo — only shown when unlocked ─────────────── */}
+            {unlocked && (
               <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background:
-                    'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.35) 100%)',
+                className="relative h-[45vh] md:h-full md:w-[58%] shrink-0 overflow-hidden"
+                style={{ background: '#0A0808' }}
+                onTouchStart={e => { touchStartX.current = e.touches[0].clientX }}
+                onTouchEnd={e => {
+                  if (touchStartX.current === null) return
+                  const dx = e.changedTouches[0].clientX - touchStartX.current
+                  touchStartX.current = null
+                  if (dx < -40) setPhotoIdx(i => Math.min(i + 1, PHOTOS.length - 1))
+                  else if (dx > 40) setPhotoIdx(i => Math.max(i - 1, 0))
                 }}
-              />
-
-              {/* Exclusive badge */}
-              <div className="absolute top-4 left-4">
-                <span
-                  className="text-[0.55rem] tracking-[0.35em] uppercase text-white/80 bg-black/30 backdrop-blur-sm border border-white/15 px-3 py-1.5 rounded-full"
-                >
-                  Édition Exclusive
-                </span>
-              </div>
-
-              {/* Photo nav dots */}
-              {PHOTOS.length > 1 && (
-                <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
-                  {PHOTOS.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setPhotoIdx(i)}
-                      className={`rounded-full transition-all duration-300 ${
-                        i === photoIdx
-                          ? 'w-5 h-1.5 bg-white'
-                          : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/70'
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* Mobile close */}
-              <button
-                onClick={handleClose}
-                className="md:hidden absolute top-4 right-4 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
               >
-                <svg width="14" height="14" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={photoIdx}
+                    src={toUrl(PHOTOS[photoIdx])}
+                    alt="Collection Primaner"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                  />
+                </AnimatePresence>
+
+                {/* Gradient overlay */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background:
+                      'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, transparent 25%, transparent 70%, rgba(0,0,0,0.3) 100%)',
+                  }}
+                />
+
+                {/* Photo nav dots */}
+                {PHOTOS.length > 1 && (
+                  <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+                    {PHOTOS.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setPhotoIdx(i)}
+                        className={`rounded-full transition-all duration-300 ${
+                          i === photoIdx
+                            ? 'w-5 h-1.5 bg-white'
+                            : 'w-1.5 h-1.5 bg-white/40 hover:bg-white/70'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Mobile close */}
+                <button
+                  onClick={handleClose}
+                  className="md:hidden absolute top-4 right-4 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
+                >
+                  <svg width="14" height="14" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            )}
 
             {/* ── Right panel: gate or product selection ────────────────────── */}
             <div
-              className="relative flex-1 overflow-y-auto border-l border-[#E5D5BF] flex flex-col"
-              style={{ background: unlocked ? '#FAF6EE' : '#0A0A0F' }}
+              className="relative flex-1 overflow-y-auto flex flex-col"
+              style={{
+                background: unlocked ? '#FAF6EE' : '#0A0A0F',
+                borderLeft: unlocked ? '1px solid #E5D5BF' : 'none',
+              }}
             >
-              {/* Desktop close */}
+              {/* Close button (always visible) */}
               <button
                 onClick={handleClose}
-                className="hidden md:flex absolute top-6 right-6 w-9 h-9 rounded-full items-center justify-center transition-colors z-10"
+                className="absolute top-4 right-4 md:top-6 md:right-6 w-9 h-9 rounded-full flex items-center justify-center transition-colors z-10"
                 style={{
-                  background: unlocked ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.06)',
+                  background: unlocked ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.08)',
                   color: unlocked ? 'inherit' : 'white',
                 }}
               >
@@ -213,7 +210,7 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                     transition={{ duration: 0.4 }}
                     className="flex-1 flex items-center justify-center px-8 py-12 relative overflow-hidden"
                   >
-                    {/* Ambient glow behind card */}
+                    {/* Ambient glow */}
                     <div
                       aria-hidden
                       className="pointer-events-none absolute inset-0"
@@ -235,7 +232,6 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
 
                         {/* Animated lock icon */}
                         <div className="relative mb-6">
-                          {/* Outer glow pulse */}
                           <motion.div
                             animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
                             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
@@ -246,7 +242,6 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                               background: 'radial-gradient(circle, rgba(99,102,241,0.5) 0%, transparent 70%)',
                             }}
                           />
-                          {/* Icon circle */}
                           <motion.div
                             animate={{ rotate: [0, -12, 12, -7, 0] }}
                             transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
@@ -263,7 +258,6 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                               <path d="M8 11V7a4 4 0 118 0v4" />
                             </svg>
                           </motion.div>
-                          {/* Rotating ring */}
                           <motion.div
                             animate={{ rotate: 360 }}
                             transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
@@ -342,7 +336,6 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                           </button>
                         </form>
 
-                        {/* Divider */}
                         <div className="mt-8 flex items-center gap-3 w-full">
                           <span className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                           <span className="text-zinc-600 text-[0.55rem] tracking-[0.3em] uppercase">Comité Primaner</span>
@@ -361,7 +354,7 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    className="px-8 md:px-10 pt-10 pb-10 flex flex-col gap-7"
+                    className="px-8 md:px-10 pt-10 flex flex-col gap-7"
                     style={{ paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom))' }}
                   >
                     {/* Header */}
@@ -390,9 +383,7 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
 
                     {/* Product type selector */}
                     <div>
-                      <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ink/50 mb-3">
-                        Modèle
-                      </p>
+                      <p className="text-[0.65rem] tracking-[0.35em] uppercase text-ink/50 mb-3">Modèle</p>
                       <div className="grid grid-cols-2 gap-3">
                         {PRIMANER_PRODUCTS.map((product, idx) => {
                           const isSelected = selectedProductIdx === idx
@@ -406,7 +397,6 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                                   : 'border-[#E5D5BF] bg-white/60 text-ink hover:border-ink/40'
                               }`}
                             >
-                              {/* Garment icon */}
                               <svg
                                 width="28" height="28" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" strokeWidth="1.3"
@@ -414,10 +404,8 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                                 className={isSelected ? 'text-white/80' : 'text-ink/50'}
                               >
                                 {idx === 0 ? (
-                                  /* T-shirt icon */
                                   <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 001 .83H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 001-.83l.58-3.57a2 2 0 00-1.35-2.14z" />
                                 ) : (
-                                  /* Crewneck / sweatshirt icon */
                                   <>
                                     <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 001 .83H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 001-.83l.58-3.57a2 2 0 00-1.35-2.14z" />
                                     <path d="M9 10h6" />
@@ -493,14 +481,6 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                         </motion.span>
                       </AnimatePresence>
                     </button>
-
-                    {/* Note about exclusivity */}
-                    <p
-                      className="text-center text-[0.7rem] text-ink/35 italic leading-relaxed"
-                      style={{ fontFamily: '"Cormorant Garamond", Georgia, serif' }}
-                    >
-                      Collection réservée aux élèves Primaner du Lycée Michel Rodange Luxembourg
-                    </p>
                   </motion.div>
                 )}
 

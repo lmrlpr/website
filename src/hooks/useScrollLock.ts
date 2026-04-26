@@ -1,20 +1,19 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export function useScrollLock(locked: boolean) {
+  const savedScrollY = useRef(0)
+
   useEffect(() => {
     if (locked) {
-      const scrollY = window.scrollY
+      savedScrollY.current = window.scrollY
       document.body.style.position = 'fixed'
-      document.body.style.top = `-${scrollY}px`
+      document.body.style.top = `-${savedScrollY.current}px`
       document.body.style.width = '100%'
     } else {
-      const top = document.body.style.top
       document.body.style.position = ''
       document.body.style.top = ''
       document.body.style.width = ''
-      if (top) {
-        window.scrollTo(0, -parseInt(top, 10))
-      }
+      window.scrollTo(0, savedScrollY.current)
     }
     return () => {
       document.body.style.position = ''
