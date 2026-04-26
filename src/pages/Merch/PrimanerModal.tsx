@@ -64,7 +64,7 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
       productId: selectedProduct.id,
       productName: selectedProduct.name,
       price: selectedProduct.price,
-      color: 'Blanc',
+      color: 'Noir',
       motifColor: undefined,
       design: undefined,
       size: selectedSize,
@@ -114,7 +114,7 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
             {/* ── Left panel: photo — only shown when unlocked ─────────────── */}
             {unlocked && (
               <div
-                className="relative h-[45vh] md:h-full md:w-[58%] shrink-0 overflow-hidden"
+                className="relative h-[54vh] md:h-full md:w-[58%] shrink-0 overflow-hidden"
                 style={{ background: '#0A0808' }}
                 onTouchStart={e => { touchStartX.current = e.touches[0].clientX }}
                 onTouchEnd={e => {
@@ -134,7 +134,8 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
-                    className="absolute inset-0 w-full h-full object-cover object-top"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  style={{ objectPosition: '50% 18%' }}
                   />
                 </AnimatePresence>
 
@@ -416,7 +417,7 @@ export function PrimanerModal({ isOpen, onClose }: PrimanerModalProps) {
                                 className="text-xs font-medium tracking-wide"
                                 style={{ fontFamily: '"Space Grotesk", system-ui, sans-serif' }}
                               >
-                                {idx === 0 ? 'T-Shirt' : 'Crewneck'}
+                                {idx === 0 ? 'T-Shirt' : 'Hoodie'}
                               </span>
                               <span className={`text-[0.7rem] ${isSelected ? 'text-white/70' : 'text-ink/50'}`}>
                                 {formatCurrency(product.price)}

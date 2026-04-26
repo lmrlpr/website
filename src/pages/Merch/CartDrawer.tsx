@@ -76,21 +76,26 @@ export function CartDrawer() {
                         {/* Mini half-circle chip (garment + motif) */}
                         <div
                           className="w-16 h-16 rounded-xl shrink-0 flex items-center justify-center"
-                          style={{ backgroundColor: `${COLOR_MAP[item.color]}22` }}
+                          style={{ backgroundColor: item.productId.startsWith('primaner-') ? 'rgba(0,0,0,0.07)' : `${COLOR_MAP[item.color]}22` }}
                         >
                           <div
                             className="w-6 h-6 rounded-full border border-black/10"
                             style={{
-                              background: item.motifColor && item.motifColor !== item.color
-                                ? `linear-gradient(90deg, ${COLOR_MAP[item.color]} 0%, ${COLOR_MAP[item.color]} 50%, ${COLOR_MAP[item.motifColor]} 50%, ${COLOR_MAP[item.motifColor]} 100%)`
-                                : COLOR_MAP[item.color],
+                              background: item.productId.startsWith('primaner-')
+                                ? '#1a1a1a'
+                                : item.motifColor && item.motifColor !== item.color
+                                  ? `linear-gradient(90deg, ${COLOR_MAP[item.color]} 0%, ${COLOR_MAP[item.color]} 50%, ${COLOR_MAP[item.motifColor]} 50%, ${COLOR_MAP[item.motifColor]} 100%)`
+                                  : COLOR_MAP[item.color],
                             }}
                           />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-ink truncate">{item.productName}</p>
                           <p className="text-xs text-gray-400 mt-0.5">
-                            {item.color}{item.design ? ` · ${item.design}` : ''}{item.motifColor ? ` · motif ${item.motifColor}` : ''}{item.size ? ` · ${item.size}` : ''}
+                            {item.productId.startsWith('primaner-')
+                              ? (item.size ?? '')
+                              : `${item.color}${item.design ? ` · ${item.design}` : ''}${item.motifColor ? ` · motif ${item.motifColor}` : ''}${item.size ? ` · ${item.size}` : ''}`
+                            }
                           </p>
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
