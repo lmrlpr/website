@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SlideButton } from './SlideButton'
+import { FlipVerifyButton } from './FlipButton'
 
 // ── Math helpers ──────────────────────────────────────────────
 
@@ -578,25 +578,10 @@ export function SpiralEntry({ onVerified }: SpiralEntryProps) {
                     e.target.style.background = 'rgba(255,255,255,0.07)'
                   }}
                 />
-                <div style={{ minHeight: '1.1rem' }}>
-                  <AnimatePresence>
-                    {error && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -3 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="text-[#F87171] text-xs font-sans text-center"
-                      >
-                        {error}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </div>
               </div>
 
-              {/* Slide button */}
-              <SlideButton label="Confirmer" onSlide={handleVerify} />
+              {/* Flip verify button */}
+              <FlipVerifyButton onSubmit={handleVerify} />
             </div>
           </motion.div>
         )}
