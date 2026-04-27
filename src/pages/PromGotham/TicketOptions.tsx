@@ -159,9 +159,8 @@ export function TicketOptions() {
               <motion.button
                 key={ticket.id}
                 initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + i * 0.12, duration: 0.5 }}
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
                 onClick={() => handleTicketSelect(ticket.id)}
                 className="text-left rounded-2xl p-7 cursor-pointer transition-all duration-200 relative overflow-hidden group"

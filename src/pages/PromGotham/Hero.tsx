@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { ParticleTextEffect } from '../../components/ui/particle-text-effect'
 
 const EVENT_DATE = new Date('2026-07-03T00:00:00')
 
@@ -50,16 +51,9 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
   )
 }
 
-const LETTERS = ['G', 'O', 'T', 'H', 'A', 'M']
 
 export function GothamHero() {
   const { days, hours, minutes, seconds } = useCountdown(EVENT_DATE)
-
-  const letterVariants = useMemo(() => LETTERS.map((_, i) => ({
-    initial: { y: 100, opacity: 0, skewX: -8 },
-    animate: { y: 0, opacity: 1, skewX: 0 },
-    transition: { delay: 0.15 + i * 0.07, type: 'spring' as const, stiffness: 90, damping: 18 },
-  })), [])
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center"
@@ -144,28 +138,23 @@ export function GothamHero() {
           <div className="h-px w-12 bg-gradient-to-l from-transparent to-gotham-blue/60" />
         </motion.div>
 
-        {/* ── GOTHAM — per-letter hover levitation with Bebas Neue ── */}
-        <h1
-          className="font-gotham leading-none tracking-wider select-none mb-2"
-          style={{ fontSize: 'clamp(5rem, 20vw, 16rem)' }}
+        {/* ── GOTHAM — particle text, cyan+purple on dark bg ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.15 }}
+          className="w-full mb-2"
         >
-          {LETTERS.map((letter, i) => (
-            <motion.span
-              key={i}
-              initial={letterVariants[i].initial}
-              animate={letterVariants[i].animate}
-              transition={letterVariants[i].transition}
-              whileHover={IS_MOBILE ? undefined : {
-                y: -18,
-                filter: 'drop-shadow(0 0 12px rgba(0,212,255,0.55))',
-                transition: { type: 'spring', stiffness: 400, damping: 14 },
-              }}
-              className="inline-block cursor-default text-gradient-gotham"
-            >
-              {letter}
-            </motion.span>
-          ))}
-        </h1>
+          <ParticleTextEffect
+            words={['GOTHAM']}
+            colorThemes={[[
+              { r: 0,   g: 212, b: 255 },
+              { r: 139, g: 92,  b: 246 },
+              { r: 0,   g: 180, b: 255 },
+            ]]}
+            bgColor="rgba(15,11,32,0.12)"
+          />
+        </motion.div>
 
         {/* Horizontal neon accent line */}
         <motion.div

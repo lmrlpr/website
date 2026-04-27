@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { AccessCodeGate } from './AccessCodeGate'
 import { MenuForm } from './MenuForm'
 import { Footer } from '../../components/layout/Footer'
+import { SpiralEntry } from '../../components/ui/SpiralEntry'
+import { GridPixelateWipe } from '../../components/ui/GridPixelateWipe'
 
 // Pre-computed particle positions for deterministic rendering
 const PARTICLES = [
@@ -26,6 +27,8 @@ const WAVE_A = 'M0 40 C240 0 480 80 720 40 C960 0 1200 80 1440 40 L1440 80 L0 80
 const WAVE_B = 'M0 60 C240 20 480 80 720 30 C960 -10 1200 60 1440 50 L1440 80 L0 80 Z'
 const WAVE_C = 'M0 20 C240 60 480 10 720 50 C960 80 1200 20 1440 60 L1440 80 L0 80 Z'
 
+type Phase = 'spiral' | 'wipe' | 'menu'
+
 function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
@@ -42,7 +45,7 @@ function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; del
 }
 
 export default function PromRestaurant() {
-  const [hasAccess, setHasAccess] = useState(false)
+  const [phase, setPhase] = useState<Phase>('spiral')
   const [searchParams, setSearchParams] = useSearchParams()
 
   const success = searchParams.get('success') === '1'
@@ -50,7 +53,7 @@ export default function PromRestaurant() {
 
   useEffect(() => {
     if (sessionStorage.getItem('restaurant_access') === 'true') {
-      setHasAccess(true)
+      setPhase('menu')
     }
   }, [])
 
@@ -60,12 +63,25 @@ export default function PromRestaurant() {
     }
   }, [success, cancelled, setSearchParams])
 
-  if (!hasAccess) {
-    return <AccessCodeGate onSuccess={() => setHasAccess(true)} />
+  // ── Phase: spiral entry (handles password inline) ────────────
+  if (phase === 'spiral') {
+    return <SpiralEntry onVerified={() => setPhase('wipe')} />
   }
 
+  // ── Phase: menu page (+ optional wipe overlay) ───────────────
   return (
-    <div className="min-h-screen text-resto-text" style={{ background: '#FFFFFF' }}>
+    <>
+    {phase === 'wipe' && (
+      <GridPixelateWipe onComplete={() => setPhase('menu')} />
+    )}
+    <motion.div
+      key="menu"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="min-h-screen text-resto-text"
+      style={{ background: '#FFFFFF' }}
+    >
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <div
@@ -289,6 +305,7 @@ export default function PromRestaurant() {
       <div className="border-t border-resto-border bg-white">
         <Footer />
       </div>
-    </div>
+    </motion.div>
+    </>
   )
 }

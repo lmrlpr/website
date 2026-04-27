@@ -1,76 +1,145 @@
-import { useState, useRef } from 'react'
-import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { CourseSelector } from './CourseSelector'
 import { DrinkSelector } from './DrinkSelector'
 import { ReservationForm } from './ReservationForm'
 import { STARTERS, MAINS, DESSERTS, DRINK_SURCHARGE } from '../../utils/constants'
 import type { MenuSelection } from '../../types/menuSelection'
 
-const BASE_PRICE = 20
+const STEP_LABELS = ['Entrée', 'Plat', 'Dessert', 'Gedrénks', 'Informations']
 
-function AnimatedSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-40px' })
+const slideVariants = {
+  enter: (d: number) => ({ x: d > 0 ? 48 : -48, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (d: number) => ({ x: d > 0 ? -48 : 48, opacity: 0 }),
+}
+
+function StepIndicator({ step, total }: { step: number; total: number }) {
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
+    <div className="w-full">
+      {/* Dots + connecting lines */}
+      <div className="flex items-center justify-between mb-3">
+        {Array.from({ length: total }, (_, i) => (
+          <div key={i} className="flex items-center flex-1 last:flex-none">
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold font-sans shrink-0 transition-all duration-300"
+              style={
+                i < step
+                  ? { background: 'linear-gradient(135deg, #1B2D52, #2558C9)', color: 'white', boxShadow: '0 2px 8px rgba(37,88,201,0.35)' }
+                  : i === step
+                  ? { background: '#2558C9', color: 'white', boxShadow: '0 2px 12px rgba(37,88,201,0.45)', outline: '3px solid rgba(37,88,201,0.18)', outlineOffset: '2px' }
+                  : { background: '#EBF0FA', color: '#9AAACF', border: '1.5px solid #C3D1EC' }
+              }
+            >
+              {i < step ? (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <span>{String(i + 1).padStart(2, '0')}</span>
+              )}
+            </div>
+            {i < total - 1 && (
+              <div className="flex-1 h-px mx-1.5 transition-all duration-300"
+                style={{ background: i < step ? 'linear-gradient(90deg, #2558C9, #4B89E4)' : '#C3D1EC' }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+      {/* Step labels */}
+      <div className="flex justify-between">
+        {STEP_LABELS.map((label, i) => (
+          <span
+            key={i}
+            className="text-[10px] font-sans tracking-wide transition-all duration-300"
+            style={{
+              color: i === step ? '#2558C9' : i < step ? '#4B89E4' : '#9AAACF',
+              fontWeight: i === step ? 600 : 400,
+              minWidth: 0,
+              textAlign: i === 0 ? 'left' : i === total - 1 ? 'right' : 'center',
+              flex: 1,
+            }}
+          >
+            {label}
+          </span>
+        ))}
+      </div>
+    </div>
   )
 }
 
-function SectionDivider() {
+interface NavProps {
+  step: number
+  canContinue: boolean
+  onBack: () => void
+  onNext: () => void
+}
+
+function StepNav({ step, canContinue, onBack, onNext }: NavProps) {
   return (
-    <div className="flex items-center gap-3 my-1">
-      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, #C3D1EC 40%, #C3D1EC 60%, transparent)' }} />
-      <svg width="28" height="14" viewBox="0 0 28 14" fill="none">
-        <path d="M0 7 Q7 0 14 7 Q21 14 28 7" stroke="#4B89E4" strokeWidth="1" strokeOpacity="0.35" fill="none"/>
-        <circle cx="14" cy="7" r="2" fill="#F5C640" opacity="0.7"/>
-      </svg>
-      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, transparent, #C3D1EC 40%, #C3D1EC 60%, transparent)' }} />
+    <div className="flex items-center justify-between mt-8 pt-6 border-t" style={{ borderColor: '#E8EEFA' }}>
+      {step > 0 ? (
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-sm font-sans transition-colors duration-150 cursor-pointer"
+          style={{ color: '#7A91B8' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#2558C9' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#7A91B8' }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
+          Retour
+        </button>
+      ) : (
+        <div />
+      )}
+      <button
+        onClick={onNext}
+        disabled={!canContinue}
+        className="flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold font-sans transition-all duration-200 cursor-pointer"
+        style={canContinue ? {
+          background: 'linear-gradient(135deg, #1B2D52 0%, #2558C9 100%)',
+          color: 'white',
+          boxShadow: '0 4px 16px rgba(37,88,201,0.32)',
+        } : {
+          background: '#EBF0FA',
+          color: '#9AAACF',
+          cursor: 'not-allowed',
+        }}
+        onMouseEnter={e => {
+          if (canContinue) (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 24px rgba(37,88,201,0.48)'
+        }}
+        onMouseLeave={e => {
+          if (canContinue) (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px rgba(37,88,201,0.32)'
+        }}
+      >
+        Continuer
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
     </div>
   )
 }
 
 export function MenuForm() {
+  const [step, setStep] = useState(0)
+  const [dir, setDir] = useState(1)
   const [selection, setSelection] = useState<Partial<MenuSelection>>({})
-  const [showReservation, setShowReservation] = useState(false)
+
+  const goNext = () => { setDir(1); setStep(s => s + 1) }
+  const goBack = () => { setDir(-1); setStep(s => s - 1) }
 
   const surcharge = selection.drinks === 'alcoholic' ? DRINK_SURCHARGE : 0
-  const allSelected = Boolean(selection.starter && selection.main && selection.dessert && selection.drinks)
 
-  if (showReservation) {
-    return (
-      <div
-        className="min-h-screen"
-        style={{
-          backgroundImage: 'radial-gradient(circle, #C3D1EC 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-          backgroundColor: '#FAFCFF',
-        }}
-      >
-        <div className="max-w-xl mx-auto px-6 py-12">
-          <button
-            onClick={() => setShowReservation(false)}
-            className="mb-8 text-sm text-resto-text/50 hover:text-resto-accent transition-colors flex items-center gap-2 cursor-pointer font-sans"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 5l-7 7 7 7"/>
-            </svg>
-            Modifier mon menu
-          </button>
-          <ReservationForm
-            menuSelection={selection as MenuSelection}
-            surcharge={surcharge}
-          />
-        </div>
-      </div>
-    )
-  }
+  const canContinue = [
+    Boolean(selection.starter),
+    Boolean(selection.main),
+    Boolean(selection.dessert),
+    Boolean(selection.drinks),
+  ][step] ?? false
 
   return (
     <div
@@ -78,133 +147,91 @@ export function MenuForm() {
         backgroundImage: 'radial-gradient(circle, #C3D1EC 1px, transparent 1px)',
         backgroundSize: '28px 28px',
         backgroundColor: '#FAFCFF',
+        minHeight: '60vh',
       }}
     >
-      <div className="max-w-xl mx-auto px-6 py-10 space-y-8">
+      <div className="max-w-xl mx-auto px-6 py-10">
+        {/* Step indicator */}
+        <StepIndicator step={step} total={5} />
 
-        {/* Starters */}
-        <AnimatedSection delay={0}>
-          <CourseSelector
-            title="Entrée"
-            options={STARTERS}
-            selected={selection.starter ?? ''}
-            onChange={(id) => setSelection(s => ({ ...s, starter: id }))}
-            courseNumber="01"
-          />
-        </AnimatedSection>
-
-        <SectionDivider />
-
-        {/* Mains */}
-        <AnimatedSection delay={0.05}>
-          <CourseSelector
-            title="Plat"
-            options={MAINS}
-            selected={selection.main ?? ''}
-            onChange={(id) => setSelection(s => ({ ...s, main: id }))}
-            courseNumber="02"
-          />
-        </AnimatedSection>
-
-        <SectionDivider />
-
-        {/* Desserts */}
-        <AnimatedSection delay={0.1}>
-          <CourseSelector
-            title="Dessert"
-            options={DESSERTS}
-            selected={selection.dessert ?? ''}
-            onChange={(id) => setSelection(s => ({ ...s, dessert: id }))}
-            courseNumber="03"
-          />
-        </AnimatedSection>
-
-        <SectionDivider />
-
-        {/* Drinks */}
-        <AnimatedSection delay={0.15}>
-          <DrinkSelector
-            selected={selection.drinks ?? ''}
-            onChange={(pkg) => setSelection(s => ({ ...s, drinks: pkg }))}
-          />
-        </AnimatedSection>
-
-        {/* Price Summary */}
-        <AnimatedSection delay={0.2}>
-          <div
-            className="rounded-2xl overflow-hidden border"
-            style={{ borderColor: '#C3D1EC', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)', boxShadow: '0 4px 24px rgba(37,88,201,0.08)' }}
-          >
-            {/* Bold Mediterranean stripe */}
-            <div className="h-1.5" style={{ background: 'linear-gradient(90deg, #1B2D52, #2558C9 35%, #4B89E4 60%, #F5C640 80%, #4B89E4 90%, #2558C9)' }} />
-
-            <div className="px-6 py-4 flex justify-between items-center">
-              <span className="text-sm text-resto-text/55 font-sans">Porta Nova</span>
-              <span className="text-sm font-medium text-resto-text font-sans">{BASE_PRICE} €</span>
-            </div>
-
-            <AnimatePresence>
-              {selection.drinks === 'alcoholic' && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="px-6 flex justify-between items-center border-t overflow-hidden"
-                  style={{ borderColor: '#E8EEFA', paddingTop: '1rem', paddingBottom: '1rem' }}
-                >
-                  <span className="text-sm text-resto-text/55 font-sans">Supplément alcool</span>
-                  <span className="text-sm font-semibold font-sans" style={{ color: '#2558C9' }}>+{DRINK_SURCHARGE} €</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div
-              className="px-6 py-5 flex justify-between items-center border-t"
-              style={{ borderColor: '#E8EEFA', background: 'rgba(37,88,201,0.03)' }}
+        {/* Step content */}
+        <div className="mt-10 overflow-hidden">
+          <AnimatePresence mode="wait" custom={dir}>
+            <motion.div
+              key={step}
+              custom={dir}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div>
-                <span className="text-sm font-semibold text-resto-text font-sans">Total</span>
-                {!allSelected && (
-                  <p className="text-xs text-resto-text/35 font-sans mt-0.5">Fëllt Äre Menü aus, fir weiderzemaachen.</p>
-                )}
-              </div>
-              <span className="font-resto text-2xl" style={{ color: '#1B2D52' }}>{BASE_PRICE + surcharge} €</span>
-            </div>
-          </div>
-        </AnimatedSection>
+              {step === 0 && (
+                <CourseSelector
+                  title="Entrée"
+                  options={STARTERS}
+                  selected={selection.starter ?? ''}
+                  onChange={(id) => setSelection(s => ({ ...s, starter: id }))}
+                  courseNumber="01"
+                />
+              )}
+              {step === 1 && (
+                <CourseSelector
+                  title="Plat"
+                  options={MAINS}
+                  selected={selection.main ?? ''}
+                  onChange={(id) => setSelection(s => ({ ...s, main: id }))}
+                  courseNumber="02"
+                />
+              )}
+              {step === 2 && (
+                <CourseSelector
+                  title="Dessert"
+                  options={DESSERTS}
+                  selected={selection.dessert ?? ''}
+                  onChange={(id) => setSelection(s => ({ ...s, dessert: id }))}
+                  courseNumber="03"
+                />
+              )}
+              {step === 3 && (
+                <DrinkSelector
+                  selected={selection.drinks ?? ''}
+                  onChange={(pkg) => setSelection(s => ({ ...s, drinks: pkg }))}
+                />
+              )}
+              {step === 4 && (
+                <div>
+                  <button
+                    onClick={goBack}
+                    className="mb-8 flex items-center gap-2 text-sm font-sans transition-colors duration-150 cursor-pointer"
+                    style={{ color: '#7A91B8' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#2558C9' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#7A91B8' }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19 12H5M12 5l-7 7 7 7"/>
+                    </svg>
+                    Modifier mon menu
+                  </button>
+                  <ReservationForm
+                    menuSelection={selection as MenuSelection}
+                    surcharge={surcharge}
+                  />
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-        {/* CTA */}
-        <AnimatedSection delay={0.25}>
-          <button
-            onClick={() => setShowReservation(true)}
-            disabled={!allSelected}
-            className="w-full py-4 text-sm font-semibold rounded-xl transition-all duration-200 font-sans cursor-pointer relative overflow-hidden"
-            style={allSelected ? {
-              background: 'linear-gradient(135deg, #1B2D52 0%, #2558C9 100%)',
-              color: 'white',
-              boxShadow: '0 4px 24px rgba(37,88,201,0.35)',
-            } : {
-              background: '#E5EAF5',
-              color: '#9AAACF',
-              cursor: 'not-allowed',
-            }}
-            onMouseEnter={e => {
-              if (allSelected) {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 32px rgba(37,88,201,0.5)'
-                ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'
-              }
-            }}
-            onMouseLeave={e => {
-              if (allSelected) {
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 24px rgba(37,88,201,0.35)'
-                ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
-              }
-            }}
-          >
-            {allSelected ? 'Mes informations →' : 'Sélectionnez votre menu'}
-          </button>
-        </AnimatedSection>
-
+        {/* Navigation (steps 0–3 only) */}
+        {step < 4 && (
+          <StepNav
+            step={step}
+            canContinue={canContinue}
+            onBack={goBack}
+            onNext={goNext}
+          />
+        )}
       </div>
     </div>
   )
