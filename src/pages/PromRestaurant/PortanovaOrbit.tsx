@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Utensils, ChefHat, Cake, User, Info, Check, X, Loader2 } from 'lucide-react'
+import { Utensils, ChefHat, Cake, User, Info, X, Loader2 } from 'lucide-react'
 import { CourseSelector } from './CourseSelector'
 import { DrinkSelector } from './DrinkSelector'
 import { STARTERS, MAINS, DESSERTS } from '../../utils/constants'
@@ -31,6 +31,58 @@ interface FD {
 }
 
 const BLANK: FD = { starter: '', main: '', dessert: '', drinks: '', firstName: '', lastName: '', classGroup: '', email: '', phone: '' }
+
+const SECTION_STYLE: Record<SectionId, { bg: string; accent: string }> = {
+  entree:    { bg: 'rgba(235,243,255,0.86)', accent: '#2558C9' },
+  hauptplat: { bg: 'rgba(255,252,238,0.86)', accent: '#C49A2A' },
+  dessert:   { bg: 'rgba(255,238,248,0.86)', accent: '#C44E8A' },
+  personal:  { bg: 'rgba(232,238,252,0.88)', accent: '#1B2D52' },
+  info:      { bg: 'rgba(255,251,228,0.86)', accent: '#B8860B' },
+}
+
+const COMP_PARTICLES = [
+  { angle: 0,   dist: 32, color: '#22c55e' },
+  { angle: 60,  dist: 36, color: '#F5C640' },
+  { angle: 120, dist: 28, color: '#22c55e' },
+  { angle: 180, dist: 34, color: '#F5C640' },
+  { angle: 240, dist: 30, color: '#22c55e' },
+  { angle: 300, dist: 38, color: '#F5C640' },
+]
+
+// ── animation variants ────────────────────────────────────────────────────────
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
+
+const orbitVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.14, delayChildren: 0.75 } },
+}
+
+const nodeVariants = {
+  hidden: { opacity: 0, scale: 0.3 },
+  visible: (isDimmed: boolean) => ({
+    opacity: isDimmed ? 0.35 : 1,
+    scale: 1,
+    transition: {
+      opacity: { duration: 0.35 },
+      scale: { duration: 0.7, ease: EASE },
+    },
+  }),
+}
+
+function AnimatedCheck({ size }: { size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <motion.path
+        d="M5 13l4 4L19 7"
+        stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.45, ease: EASE }}
+      />
+    </svg>
+  )
+}
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -91,9 +143,9 @@ function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersona
               <p className="font-resto text-xl" style={{ color: '#1B2D52', letterSpacing: '0.06em' }}>Porta Nova</p>
             </div>
             {([
-              { e: '🕗', l: 'Zäit',   v: '20h – 00h' },
-              { e: '📍', l: 'Adress',  v: '14 Av. de la Faïencerie\n1510 Limpertsberg, Luxembourg' },
-              { e: '💰', l: 'Präis',   v: '20 € · +7 € mat Alkohol' },
+              { e: '🕗', l: 'Zäit',    v: '20h – 00h' },
+              { e: '📍', l: 'Adress',   v: '14 Av. de la Faïencerie\n1510 Limpertsberg, Luxembourg' },
+              { e: '💰', l: 'Präis',    v: '20 € · +7 € mat Alkohol' },
               { e: '🍽️', l: 'Inklusiv', v: 'Entrée · Hauptplat · Dessert · Gedrénks' },
             ] as { e: string; l: string; v: string }[]).map(row => (
               <div key={row.l} className="flex gap-3 items-start">
@@ -118,8 +170,8 @@ function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersona
           <Field label="Prénom"  value={fd.firstName}  onChange={set('firstName')}  placeholder="Jean"   error={errs.firstName} />
           <Field label="Nom"     value={fd.lastName}   onChange={set('lastName')}   placeholder="Dupont" error={errs.lastName} />
         </div>
-        <Field label="Classe" value={fd.classGroup} onChange={set('classGroup')} placeholder="1CM2"           error={errs.classGroup} />
-        <Field label="Email"  value={fd.email}      onChange={set('email')}      placeholder="jean@lycee.lu"  error={errs.email} type="email" />
+        <Field label="Classe" value={fd.classGroup} onChange={set('classGroup')} placeholder="1CM2"            error={errs.classGroup} />
+        <Field label="Email"  value={fd.email}      onChange={set('email')}      placeholder="jean@lycee.lu"   error={errs.email} type="email" />
         <Field label="Téléphone" value={fd.phone}   onChange={set('phone')}      placeholder="+352 621 000 000" optional type="tel" />
         <div className="mt-1">
           <p className="text-[10px] uppercase tracking-[0.25em] font-semibold font-sans mb-3" style={{ color: '#2558C9' }}>Gedrénks</p>
@@ -131,7 +183,6 @@ function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersona
     )
   }
 
-  // food sections
   const { options, field, num } = FOOD_MAP[id as FoodId]
   return (
     <div>
@@ -146,7 +197,7 @@ function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersona
   )
 }
 
-// ── panel shell (header + scrollable body) ────────────────────────────────────
+// ── panel shell ───────────────────────────────────────────────────────────────
 
 function PanelShell({ id, fd, setFd, errs, setErrs, completed, onClose, onFood, onPersonal, scrollH }: {
   id: SectionId; fd: FD; setFd: React.Dispatch<React.SetStateAction<FD>>
@@ -155,8 +206,10 @@ function PanelShell({ id, fd, setFd, errs, setErrs, completed, onClose, onFood, 
   onFood: (id: FoodId) => void; onPersonal: () => void; scrollH: string
 }) {
   const sec = SECTIONS.find(s => s.id === id)!
+  const { accent } = SECTION_STYLE[id]
   return (
     <>
+      <div style={{ height: 3, background: accent, flexShrink: 0, borderRadius: '0 0 2px 2px' }} />
       <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid #EEF3FA', flexShrink: 0 }}>
         <div>
           <h2 className="font-resto" style={{ fontSize: 20, color: '#1B2D52', letterSpacing: '0.05em' }}>
@@ -185,13 +238,16 @@ function PanelShell({ id, fd, setFd, errs, setErrs, completed, onClose, onFood, 
 // ── main component ────────────────────────────────────────────────────────────
 
 export function PortanovaOrbit() {
-  const [active, setActive]     = useState<SectionId | null>(null)
-  const [done, setDone]         = useState<Set<SectionId>>(new Set())
-  const [fd, setFd]             = useState<FD>(BLANK)
-  const [errs, setErrs]         = useState<Record<string, string>>({})
-  const [loading, setLoading]   = useState(false)
-  const [orbitR, setOrbitR]     = useState(185)
-  const [isMobile, setIsMobile] = useState(false)
+  const [active, setActive]               = useState<SectionId | null>(null)
+  const [done, setDone]                   = useState<Set<SectionId>>(new Set())
+  const [fd, setFd]                       = useState<FD>(BLANK)
+  const [errs, setErrs]                   = useState<Record<string, string>>({})
+  const [loading, setLoading]             = useState(false)
+  const [orbitR, setOrbitR]               = useState(185)
+  const [isMobile, setIsMobile]           = useState(false)
+  const [ringReady, setRingReady]         = useState(false)
+  const [centerVisible, setCenterVisible] = useState(false)
+  const [justDone, setJustDone]           = useState<SectionId | null>(null)
 
   useEffect(() => {
     const upd = () => {
@@ -204,11 +260,30 @@ export function PortanovaOrbit() {
     return () => window.removeEventListener('resize', upd)
   }, [])
 
+  useEffect(() => {
+    const t1 = setTimeout(() => setRingReady(true), 150)
+    const t2 = setTimeout(() => setCenterVisible(true), 1500)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [])
+
   const NODE      = isMobile ? 44 : 56
   const allDone   = SECTIONS.every(s => !s.required || done.has(s.id))
   const doneCount = SECTIONS.filter(s => s.required && done.has(s.id)).length
   const hasAlc    = fd.drinks === 'alcoholic'
   const total     = 20 + (hasAlc ? 7 : 0)
+
+  // Required node angles in clockwise order (-90° = 12 o'clock start)
+  const REQUIRED_ANGLES = [-90, -18, 54, 126]
+
+  const circumference = 2 * Math.PI * orbitR
+  // Arc tip: the angle of the NEXT required node (points toward what to do next)
+  const arcEndAngleDeg = doneCount === 0 ? -90 : doneCount < 4 ? REQUIRED_ANGLES[doneCount] : -90
+  const arcSpanDeg     = doneCount === 0 ? 0 : doneCount === 4 ? 360 : ((arcEndAngleDeg - (-90)) + 360) % 360
+  const progressOffset = circumference * (1 - arcSpanDeg / 360)
+  const tipRad         = (arcEndAngleDeg * Math.PI) / 180
+  const ringColor      = doneCount === 4 ? '#F5C640' : '#2558C9'
+  const cx = orbitR + 2
+  const cy = orbitR + 2
 
   const pos = (deg: number) => {
     const r = (deg * Math.PI) / 180
@@ -217,23 +292,28 @@ export function PortanovaOrbit() {
 
   const close = () => { setActive(null); setErrs({}) }
 
+  const markDone = (id: SectionId) => {
+    setDone(p => new Set([...p, id]))
+    setJustDone(id)
+    setTimeout(() => setJustDone(null), 750)
+    close()
+  }
+
   const onFood = (id: FoodId) => {
     const val = id === 'entree' ? fd.starter : id === 'hauptplat' ? fd.main : fd.dessert
     if (!val) return
-    setDone(p => new Set([...p, id]))
-    close()
+    markDone(id)
   }
 
   const onPersonal = () => {
     const e: Record<string, string> = {}
-    if (!fd.firstName.trim())    e.firstName   = 'Requis'
-    if (!fd.lastName.trim())     e.lastName    = 'Requis'
-    if (!fd.classGroup.trim())   e.classGroup  = 'Requis'
-    if (!fd.email.includes('@')) e.email       = 'Email invalide'
-    if (!fd.drinks)              e.drinks      = 'Bitte eng Boisson auswielen'
+    if (!fd.firstName.trim())    e.firstName  = 'Requis'
+    if (!fd.lastName.trim())     e.lastName   = 'Requis'
+    if (!fd.classGroup.trim())   e.classGroup = 'Requis'
+    if (!fd.email.includes('@')) e.email      = 'Email invalide'
+    if (!fd.drinks)              e.drinks     = 'Bitte eng Boisson auswielen'
     if (Object.keys(e).length)   { setErrs(e); return }
-    setDone(p => new Set([...p, 'personal']))
-    close()
+    markDone('personal')
   }
 
   const handleSubmit = async () => {
@@ -255,34 +335,131 @@ export function PortanovaOrbit() {
       className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
       style={{ background: 'linear-gradient(160deg, #E6F3FF 0%, #F0F8FF 30%, #FFFFFF 58%, #EEF6FF 85%, #F5FBFF 100%)' }}
     >
-      {/* decorative rings behind orbit */}
+      {/* ── background blobs ──────────────────────────────────────────────────── */}
+      <motion.div
+        className="absolute pointer-events-none"
+        style={{
+          width: '50vw', height: '50vw', maxWidth: 420, maxHeight: 420, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(37,88,201,0.08) 0%, transparent 70%)',
+          top: '-8%', left: '-6%',
+        }}
+        animate={{ x: [0, 22, -12, 0], y: [0, -18, 22, 0], scale: [1, 1.12, 0.94, 1] }}
+        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut', repeatType: 'mirror' }}
+      />
+      <motion.div
+        className="absolute pointer-events-none"
+        style={{
+          width: '42vw', height: '42vw', maxWidth: 360, maxHeight: 360, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(245,198,64,0.07) 0%, transparent 65%)',
+          bottom: '-4%', right: '-4%',
+        }}
+        animate={{ x: [0, -28, 12, 0], y: [0, 22, -12, 0], scale: [1, 0.91, 1.09, 1] }}
+        transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 3, repeatType: 'mirror' }}
+      />
+      <motion.div
+        className="absolute pointer-events-none"
+        style={{
+          width: '32vw', height: '32vw', maxWidth: 300, maxHeight: 300, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(37,88,201,0.05) 0%, transparent 70%)',
+          top: '18%', right: '12%',
+        }}
+        animate={{ x: [0, 16, -10, 0], y: [0, 14, -20, 0] }}
+        transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 1.5, repeatType: 'mirror' }}
+      />
+
+      {/* ── grain texture ─────────────────────────────────────────────────────── */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")`,
+          opacity: 0.025,
+          mixBlendMode: 'multiply',
+        }}
+      />
+
+      {/* ── decorative outer rings ────────────────────────────────────────────── */}
       <svg
         className="absolute pointer-events-none"
         style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
         width={(orbitR + 140) * 2} height={(orbitR + 140) * 2} overflow="visible"
       >
         <circle cx={orbitR + 140} cy={orbitR + 140} r={orbitR + 55}
-          stroke="#2558C9" strokeWidth="1" strokeDasharray="3 10" fill="none" opacity="0.09" />
+          stroke="#2558C9" strokeWidth="1" strokeDasharray="3 10" fill="none"
+          style={{ opacity: ringReady ? 0.09 : 0, transition: 'opacity 1s 0.4s' }} />
         <circle cx={orbitR + 140} cy={orbitR + 140} r={orbitR + 115}
-          stroke="#2558C9" strokeWidth="0.5" fill="none" opacity="0.05" />
+          stroke="#2558C9" strokeWidth="0.5" fill="none"
+          style={{ opacity: ringReady ? 0.05 : 0, transition: 'opacity 1.4s 0.7s' }} />
       </svg>
 
-      {/* orbit origin — everything positioned from (0,0) center */}
-      <div style={{ position: 'relative', width: 0, height: 0 }}>
-
-        {/* orbit ring */}
+      {/* ── orbit origin ──────────────────────────────────────────────────────── */}
+      <motion.div
+        variants={orbitVariants}
+        initial="hidden"
+        animate="visible"
+        style={{ position: 'relative', width: 0, height: 0 }}
+      >
+        {/* Orbit ring: track + progress arc + tip dot */}
         <svg
           className="absolute pointer-events-none"
-          style={{ left: 0, top: 0, transform: `translate(${-(orbitR + 2)}px, ${-(orbitR + 2)}px)` }}
-          width={orbitR * 2 + 4} height={orbitR * 2 + 4}
+          style={{ left: 0, top: 0, transform: `translate(${-cx}px, ${-cy}px)` }}
+          width={cx * 2} height={cy * 2}
         >
-          <circle cx={orbitR + 2} cy={orbitR + 2} r={orbitR}
+          <defs>
+            <filter id="ring-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+
+          {/* Track — draws in clockwise on mount */}
+          <circle
+            cx={cx} cy={cy} r={orbitR}
             stroke="#C3D1EC" strokeWidth="1" fill="none"
-            style={{ opacity: active ? 0.22 : 0.65, transition: 'opacity 0.35s' }}
+            strokeDasharray={circumference}
+            strokeDashoffset={ringReady ? 0 : circumference}
+            transform={`rotate(-90, ${cx}, ${cy})`}
+            style={{
+              opacity: active ? 0.22 : 0.65,
+              transition: `stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1) 0.1s, opacity 0.35s`,
+            }}
           />
+
+          {/* Progress arc */}
+          {doneCount > 0 && (
+            <circle
+              cx={cx} cy={cy} r={orbitR}
+              stroke={ringColor}
+              strokeWidth="2.5"
+              fill="none"
+              strokeDasharray={circumference}
+              strokeDashoffset={progressOffset}
+              strokeLinecap="round"
+              transform={`rotate(-90, ${cx}, ${cy})`}
+              filter="url(#ring-glow)"
+              style={{
+                opacity: active ? 0.45 : 1,
+                transition: `stroke-dashoffset 0.75s cubic-bezier(0.22,1,0.36,1), stroke 0.5s ease, opacity 0.35s`,
+              }}
+            />
+          )}
+
+          {/* Tip dot — follows progress arc endpoint (hidden when full circle) */}
+          {doneCount > 0 && doneCount < 4 && (
+            <circle
+              cx={cx + orbitR * Math.cos(tipRad)}
+              cy={cy + orbitR * Math.sin(tipRad)}
+              r={4}
+              fill={ringColor}
+              filter="url(#ring-glow)"
+              style={{
+                opacity: active ? 0.45 : 1,
+                transition: `cx 0.75s cubic-bezier(0.22,1,0.36,1), cy 0.75s cubic-bezier(0.22,1,0.36,1), fill 0.5s ease, opacity 0.35s`,
+              }}
+            />
+          )}
         </svg>
 
-        {/* center: PORTANOVA label or BESTÄTEGEN submit button */}
+        {/* Center: PORTANOVA label or BESTÄTEGEN button */}
         <div style={{ position: 'absolute', left: 0, top: 0, transform: 'translate(-50%,-50%)', zIndex: 5 }}>
           <AnimatePresence mode="wait">
             {allDone ? (
@@ -314,19 +491,24 @@ export function PortanovaOrbit() {
             ) : (
               <motion.div
                 key="label"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: active ? 0.28 : 1, scale: 1 }}
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: centerVisible ? (active ? 0.28 : 1) : 0, scale: centerVisible ? 1 : 0.7 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="flex flex-col items-center pointer-events-none select-none text-center"
                 style={{ width: isMobile ? 80 : 100 }}
               >
                 <p className="font-sans uppercase" style={{ fontSize: 7, letterSpacing: '0.45em', color: '#7A91B8', marginBottom: 3 }}>
                   Prom Night · 20h
                 </p>
-                <p className="font-resto" style={{ fontSize: isMobile ? 13 : 16, color: '#1B2D52', letterSpacing: '0.2em', lineHeight: 1.2 }}>
+                <motion.p
+                  className="font-resto"
+                  style={{ fontSize: isMobile ? 13 : 16, color: '#1B2D52', lineHeight: 1.2 }}
+                  animate={{ letterSpacing: ['0.18em', '0.26em', '0.18em'] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                >
                   PORTANOVA
-                </p>
+                </motion.p>
                 <div style={{ height: 1, width: 38, margin: '5px auto', background: 'linear-gradient(90deg, transparent, #F5C640, transparent)' }} />
                 <div className="flex gap-1.5 mt-0.5">
                   {SECTIONS.filter(s => s.required).map(s => (
@@ -339,37 +521,73 @@ export function PortanovaOrbit() {
           </AnimatePresence>
         </div>
 
-        {/* nodes */}
+        {/* Nodes */}
         {SECTIONS.map(sec => {
           const { x, y } = pos(sec.angleDeg)
           const isDone   = done.has(sec.id)
           const isActive = active === sec.id
+          const isDimmed = !!(active && !isActive)
           const half     = NODE / 2
 
           return (
             <motion.div
               key={sec.id}
+              variants={nodeVariants}
+              custom={isDimmed}
               style={{ position: 'absolute', left: 0, top: 0, marginLeft: x - half, marginTop: y - half, zIndex: isActive ? 6 : 4 }}
-              animate={{ opacity: active && !isActive ? 0.35 : 1 }}
-              transition={{ duration: 0.25 }}
             >
-              <motion.button
-                onClick={() => setActive(sec.id)}
-                whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.91 }}
-                style={{
-                  width: NODE, height: NODE, borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  border: `2px solid ${isDone ? '#16a34a' : isActive ? '#2558C9' : '#C3D1EC'}`,
-                  background: isDone ? '#22c55e' : isActive ? '#2558C9' : 'white',
-                  boxShadow: isDone ? '0 4px 14px rgba(34,197,94,0.38)' : isActive ? '0 4px 14px rgba(37,88,201,0.38)' : '0 2px 8px rgba(37,88,201,0.09)',
-                  cursor: 'pointer', transition: 'background 0.3s, border-color 0.3s, box-shadow 0.3s',
-                }}
-              >
-                {isDone
-                  ? <Check style={{ color: 'white', width: NODE * 0.38, height: NODE * 0.38 }} strokeWidth={2.5} />
-                  : <sec.Icon style={{ color: isActive ? 'white' : '#2558C9', width: NODE * 0.38, height: NODE * 0.38 }} strokeWidth={1.8} />
-                }
-              </motion.button>
+              <div style={{ position: 'relative' }}>
+                <motion.button
+                  onClick={() => setActive(sec.id)}
+                  whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.91 }}
+                  style={{
+                    width: NODE, height: NODE, borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: `2px solid ${isDone ? '#16a34a' : isActive ? '#2558C9' : '#C3D1EC'}`,
+                    background: isDone ? '#22c55e' : isActive ? '#2558C9' : 'white',
+                    boxShadow: isDone ? '0 4px 14px rgba(34,197,94,0.38)' : isActive ? '0 4px 14px rgba(37,88,201,0.38)' : '0 2px 8px rgba(37,88,201,0.09)',
+                    cursor: 'pointer', transition: 'background 0.3s, border-color 0.3s, box-shadow 0.3s',
+                  }}
+                >
+                  {isDone
+                    ? <AnimatedCheck size={NODE * 0.42} />
+                    : <sec.Icon style={{ color: isActive ? 'white' : '#2558C9', width: NODE * 0.38, height: NODE * 0.38 }} strokeWidth={1.8} />
+                  }
+                </motion.button>
+
+                {/* Completion celebration: pulse ring + particles */}
+                <AnimatePresence>
+                  {justDone === sec.id && (
+                    <motion.div
+                      key="celebration"
+                      style={{ position: 'absolute', inset: -10, pointerEvents: 'none' }}
+                      exit={{ opacity: 0, transition: { duration: 0 } }}
+                    >
+                      <motion.div
+                        style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2.5px solid #22c55e' }}
+                        initial={{ opacity: 0.9, scale: 0.85 }}
+                        animate={{ opacity: 0, scale: 1.9 }}
+                        transition={{ duration: 0.65, ease: 'easeOut' }}
+                      />
+                      {COMP_PARTICLES.map(({ angle, dist, color }, pi) => {
+                        const rad = (angle * Math.PI) / 180
+                        const center = 10 + NODE / 2
+                        return (
+                          <motion.div
+                            key={pi}
+                            style={{ position: 'absolute', width: 5, height: 5, borderRadius: '50%', background: color, top: center - 2.5, left: center - 2.5 }}
+                            initial={{ x: 0, y: 0, opacity: 0.9, scale: 1 }}
+                            animate={{ x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, opacity: 0, scale: 0.3 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.5, delay: pi * 0.025, ease: 'easeOut' }}
+                          />
+                        )
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <div style={{
                 position: 'absolute', top: NODE + 6, left: '50%', transform: 'translateX(-50%)',
                 whiteSpace: isMobile ? 'nowrap' : 'pre-line', textAlign: 'center',
@@ -383,9 +601,9 @@ export function PortanovaOrbit() {
             </motion.div>
           )
         })}
-      </div>
+      </motion.div>
 
-      {/* ── overlay: backdrop ───────────────────────────────────────────── */}
+      {/* ── backdrop ──────────────────────────────────────────────────────────── */}
       <AnimatePresence>
         {active && (
           <motion.div
@@ -399,13 +617,19 @@ export function PortanovaOrbit() {
         )}
       </AnimatePresence>
 
-      {/* ── overlay: mobile bottom sheet ───────────────────────────────── */}
+      {/* ── mobile bottom sheet ───────────────────────────────────────────────── */}
       <AnimatePresence>
         {active && isMobile && (
           <motion.div
             key={`sheet-${active}`}
-            className="fixed left-0 right-0 bottom-0 bg-white overflow-hidden"
-            style={{ maxHeight: '88vh', borderTopLeftRadius: 24, borderTopRightRadius: 24, zIndex: 20, boxShadow: '0 -8px 48px rgba(37,88,201,0.17)' }}
+            className="fixed left-0 right-0 bottom-0 overflow-hidden"
+            style={{
+              maxHeight: '88vh', borderTopLeftRadius: 24, borderTopRightRadius: 24, zIndex: 20,
+              boxShadow: '0 -8px 48px rgba(37,88,201,0.17)',
+              background: SECTION_STYLE[active].bg,
+              backdropFilter: 'blur(20px) saturate(1.8)',
+              WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+            }}
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 320 }}
             onClick={e => e.stopPropagation()}
@@ -418,14 +642,21 @@ export function PortanovaOrbit() {
         )}
       </AnimatePresence>
 
-      {/* ── overlay: desktop centered card ─────────────────────────────── */}
+      {/* ── desktop centered card ─────────────────────────────────────────────── */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 20 }}>
         <AnimatePresence mode="wait">
           {active && !isMobile && (
             <motion.div
               key={`card-${active}`}
-              className="bg-white overflow-hidden pointer-events-auto"
-              style={{ width: 'min(468px, 92vw)', maxHeight: '82vh', borderRadius: 22, boxShadow: '0 28px 88px rgba(37,88,201,0.17)', border: '1.5px solid #DDE8F8' }}
+              className="overflow-hidden pointer-events-auto"
+              style={{
+                width: 'min(468px, 92vw)', maxHeight: '82vh', borderRadius: 22,
+                boxShadow: '0 28px 88px rgba(37,88,201,0.18)',
+                border: `1.5px solid ${SECTION_STYLE[active].accent}33`,
+                background: SECTION_STYLE[active].bg,
+                backdropFilter: 'blur(20px) saturate(1.8)',
+                WebkitBackdropFilter: 'blur(20px) saturate(1.8)',
+              }}
               initial={{ opacity: 0, y: 22, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.96 }}
