@@ -50,9 +50,9 @@ export default function PromRestaurant() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
           </motion.div>
-          <h3 className="font-resto text-3xl mb-3" style={{ color: '#1B2D52' }}>Réservation confirmée</h3>
+          <h3 className="font-resto text-3xl mb-3" style={{ color: '#1B2D52' }}>Ta place est réservée</h3>
           <p className="text-sm max-w-sm leading-relaxed font-sans" style={{ color: '#5A7AB0' }}>
-            Votre paiement a été accepté. Vous recevrez une confirmation par email.
+            Tu recevras un email de confirmation pour le Porta Nova.
           </p>
         </motion.div>
       </div>
@@ -76,7 +76,7 @@ export default function PromRestaurant() {
               className="px-5 py-3.5 rounded-xl border text-sm font-sans"
               style={{ background: 'rgba(245,198,64,0.08)', borderColor: 'rgba(245,198,64,0.3)', color: '#92700A' }}
             >
-              Paiement annulé. Vous pouvez réessayer ci-dessous.
+              Le paiement n'a pas abouti — réessaie ci-dessous.
             </div>
           </div>
         )}

@@ -14,7 +14,7 @@ const SECTIONS = [
   { id: 'entree' as SectionId,    label: 'Entrée',                    short: 'Entrée',      Icon: Utensils, required: true,  angleDeg: -90  },
   { id: 'hauptplat' as SectionId, label: 'Hauptplat',                 short: 'Hauptplat',   Icon: ChefHat,  required: true,  angleDeg: -18  },
   { id: 'dessert' as SectionId,   label: 'Dessert',                   short: 'Dessert',     Icon: Cake,     required: true,  angleDeg: 54   },
-  { id: 'personal' as SectionId,  label: 'Perseinlech\nDonnéeën',     short: 'Perséinlech', Icon: User,     required: true,  angleDeg: 126  },
+  { id: 'personal' as SectionId,  label: 'Perséinlech\nDonnéeën',     short: 'Perséinlech', Icon: User,     required: true,  angleDeg: 126  },
   { id: 'info' as SectionId,      label: 'Allgemeng\nInformatiounen', short: 'Infos',       Icon: Info,     required: false, angleDeg: 198  },
 ]
 
@@ -135,28 +135,21 @@ function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersona
   if (id === 'info') {
     return (
       <div className="flex flex-col gap-5">
-        <div className="rounded-2xl overflow-hidden border" style={{ borderColor: '#C3D1EC' }}>
-          <div className="h-1" style={{ background: 'linear-gradient(90deg, #1B2D52, #2558C9 40%, #F5C640 75%, #2558C9)' }} />
-          <div className="p-5 flex flex-col gap-4" style={{ background: 'linear-gradient(135deg, #EBF3FF 0%, #F8FBFF 100%)' }}>
-            <div>
-              <p className="font-sans text-[10px] tracking-[0.35em] uppercase mb-1" style={{ color: '#7A91B8' }}>Prom Night 2026</p>
-              <p className="font-resto text-xl" style={{ color: '#1B2D52', letterSpacing: '0.06em' }}>Porta Nova</p>
+        <div>
+          <p className="font-sans text-[10px] tracking-[0.35em] uppercase mb-1" style={{ color: '#7A91B8' }}>Prom Night 2026</p>
+          <p className="font-resto text-xl mb-5" style={{ color: '#1B2D52', letterSpacing: '0.06em' }}>Porta Nova</p>
+          {[
+            { l: 'Zäit',   v: '20h – 00h' },
+            { l: 'Adress', v: '14 Av. de la Faïencerie\n1510 Limpertsberg' },
+            { l: 'Präis',  v: '20 € · +7 € mat Alkohol' },
+            { l: 'Menu',   v: 'Entrée · Hauptplat · Dessert · Gedrénks' },
+          ].map((row, i) => (
+            <div key={row.l}>
+              {i > 0 && <div style={{ height: 1, background: '#DDE8F5', margin: '10px 0' }} />}
+              <p className="text-[10px] uppercase tracking-widest font-semibold font-sans mb-0.5" style={{ color: '#7A91B8' }}>{row.l}</p>
+              <p className="text-sm font-sans whitespace-pre-line" style={{ color: '#1B2D52' }}>{row.v}</p>
             </div>
-            {([
-              { e: '🕗', l: 'Zäit',    v: '20h – 00h' },
-              { e: '📍', l: 'Adress',   v: '14 Av. de la Faïencerie\n1510 Limpertsberg, Luxembourg' },
-              { e: '💰', l: 'Präis',    v: '20 € · +7 € mat Alkohol' },
-              { e: '🍽️', l: 'Inklusiv', v: 'Entrée · Hauptplat · Dessert · Gedrénks' },
-            ] as { e: string; l: string; v: string }[]).map(row => (
-              <div key={row.l} className="flex gap-3 items-start">
-                <span style={{ fontSize: 15, lineHeight: 1.5 }}>{row.e}</span>
-                <div>
-                  <p className="text-[10px] uppercase tracking-widest font-semibold font-sans mb-0.5" style={{ color: '#7A91B8' }}>{row.l}</p>
-                  <p className="text-sm font-sans whitespace-pre-line" style={{ color: '#1B2D52' }}>{row.v}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
         <ConfirmBtn onClick={onClose} label="Verstanen" />
       </div>
@@ -216,7 +209,7 @@ function PanelShell({ id, fd, setFd, errs, setErrs, completed, onClose, onFood, 
             {sec.label.replace('\n', ' ')}
           </h2>
           {completed.has(id) && (
-            <p className="text-xs font-sans mt-0.5" style={{ color: '#16a34a' }}>✓ Completéiert · Dir kënnt ären Choix änneren</p>
+            <p className="text-xs font-sans mt-0.5" style={{ color: '#16a34a' }}>Änner deng Wiel</p>
           )}
         </div>
         <button
@@ -311,7 +304,7 @@ export function PortanovaOrbit() {
     if (!fd.lastName.trim())     e.lastName   = 'Requis'
     if (!fd.classGroup.trim())   e.classGroup = 'Requis'
     if (!fd.email.includes('@')) e.email      = 'Email invalide'
-    if (!fd.drinks)              e.drinks     = 'Bitte eng Boisson auswielen'
+    if (!fd.drinks)              e.drinks     = 'Wielt deng Gedrénks'
     if (Object.keys(e).length)   { setErrs(e); return }
     markDone('personal')
   }
