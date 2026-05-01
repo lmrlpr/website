@@ -52,7 +52,7 @@ export default function PromRestaurant() {
           </motion.div>
           <h3 className="font-resto text-3xl mb-3" style={{ color: '#1B2D52' }}>Ta place est réservée</h3>
           <p className="text-sm max-w-sm leading-relaxed font-sans" style={{ color: '#5A7AB0' }}>
-            Tu recevras un email de confirmation pour le Porta Nova.
+            À bientôt au Porta Nova.
           </p>
         </motion.div>
       </div>
