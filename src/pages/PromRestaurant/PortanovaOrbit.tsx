@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Utensils, ChefHat, Cake, User, Info, X, Loader2 } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 import { CourseSelector } from './CourseSelector'
 import { DrinkSelector } from './DrinkSelector'
 import { STARTERS, MAINS, DESSERTS } from '../../utils/constants'
@@ -11,11 +11,11 @@ type SectionId = 'entree' | 'hauptplat' | 'dessert' | 'personal' | 'info'
 type FoodId = 'entree' | 'hauptplat' | 'dessert'
 
 const SECTIONS = [
-  { id: 'entree' as SectionId,    label: 'Entrée',                    short: 'Entrée',      Icon: Utensils, required: true,  angleDeg: -90  },
-  { id: 'hauptplat' as SectionId, label: 'Hauptplat',                 short: 'Hauptplat',   Icon: ChefHat,  required: true,  angleDeg: -18  },
-  { id: 'dessert' as SectionId,   label: 'Dessert',                   short: 'Dessert',     Icon: Cake,     required: true,  angleDeg: 54   },
-  { id: 'personal' as SectionId,  label: 'Perséinlech\nDonnéeën',     short: 'Perséinlech', Icon: User,     required: true,  angleDeg: 126  },
-  { id: 'info' as SectionId,      label: 'Allgemeng\nInformatiounen', short: 'Infos',       Icon: Info,     required: false, angleDeg: 198  },
+  { id: 'entree' as SectionId,    label: 'Entrée',                    short: 'Entrée',      required: true,  angleDeg: -90  },
+  { id: 'hauptplat' as SectionId, label: 'Hauptplat',                 short: 'Hauptplat',   required: true,  angleDeg: -18  },
+  { id: 'dessert' as SectionId,   label: 'Dessert',                   short: 'Dessert',     required: true,  angleDeg: 54   },
+  { id: 'personal' as SectionId,  label: 'Perséinlech\nDonnéeën',     short: 'Perséinlech', required: true,  angleDeg: 126  },
+  { id: 'info' as SectionId,      label: 'Allgemeng\nInformatiounen', short: 'Infos',       required: false, angleDeg: 198  },
 ]
 
 const FOOD_MAP: Record<FoodId, { options: typeof STARTERS; field: 'starter' | 'main' | 'dessert'; num: string }> = {
@@ -520,21 +520,21 @@ export function PortanovaOrbit() {
           const isDone   = done.has(sec.id)
           const isActive = active === sec.id
           const isDimmed = !!(active && !isActive)
-          const half     = NODE / 2
 
           return (
             <motion.div
               key={sec.id}
               variants={nodeVariants}
               custom={isDimmed}
-              style={{ position: 'absolute', left: 0, top: 0, marginLeft: x - half, marginTop: y - half, zIndex: isActive ? 6 : 4 }}
+              style={{ position: 'absolute', left: 0, top: 0, marginLeft: x, marginTop: y, transform: 'translate(-50%, -50%)', zIndex: isActive ? 6 : 4 }}
             >
-              <div style={{ position: 'relative' }}>
+              <div style={{ position: 'relative', display: 'inline-block' }}>
                 <motion.button
                   onClick={() => setActive(sec.id)}
                   whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.91 }}
                   style={{
-                    width: NODE, height: NODE, borderRadius: '50%',
+                    height: NODE, padding: `0 ${Math.round(NODE * 0.28)}px`, borderRadius: NODE / 2,
+                    whiteSpace: 'nowrap',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     border: `2px solid ${isDone ? '#16a34a' : isActive ? '#2558C9' : '#C3D1EC'}`,
                     background: isDone ? '#22c55e' : isActive ? '#2558C9' : 'white',
@@ -544,7 +544,15 @@ export function PortanovaOrbit() {
                 >
                   {isDone
                     ? <AnimatedCheck size={NODE * 0.42} />
-                    : <sec.Icon style={{ color: isActive ? 'white' : '#2558C9', width: NODE * 0.38, height: NODE * 0.38 }} strokeWidth={1.8} />
+                    : <span style={{
+                        color: isActive ? 'white' : '#2558C9',
+                        fontSize: isMobile ? 10 : 12,
+                        fontWeight: 600,
+                        fontFamily: 'var(--font-sans, system-ui)',
+                        letterSpacing: '0.02em',
+                      }}>
+                        {sec.short}
+                      </span>
                   }
                 </motion.button>
 
@@ -583,11 +591,11 @@ export function PortanovaOrbit() {
 
               <div style={{
                 position: 'absolute', top: NODE + 6, left: '50%', transform: 'translateX(-50%)',
-                whiteSpace: isMobile ? 'nowrap' : 'pre-line', textAlign: 'center',
+                whiteSpace: 'pre-line', textAlign: 'center',
                 fontFamily: 'var(--font-sans, system-ui)', fontSize: isMobile ? 9 : 10,
                 fontWeight: (isDone || isActive) ? 600 : 400,
                 color: isDone ? '#16a34a' : isActive ? '#2558C9' : '#5A7AB0',
-                lineHeight: 1.3, maxWidth: isMobile ? 58 : 76, pointerEvents: 'none', transition: 'color 0.25s',
+                lineHeight: 1.3, maxWidth: isMobile ? 68 : 90, pointerEvents: 'none', transition: 'color 0.25s',
               }}>
                 {isMobile ? sec.short : sec.label}
               </div>
