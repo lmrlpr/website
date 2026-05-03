@@ -496,7 +496,7 @@ export function PortanovaOrbit() {
                 </p>
                 <motion.p
                   className="font-resto"
-                  style={{ fontSize: isMobile ? 13 : 16, color: '#1B2D52', lineHeight: 1.2 }}
+                  style={{ fontSize: isMobile ? 17 : 22, color: '#1B2D52', lineHeight: 1.2 }}
                   animate={{ letterSpacing: ['0.18em', '0.26em', '0.18em'] }}
                   transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
                 >
@@ -526,8 +526,9 @@ export function PortanovaOrbit() {
               key={sec.id}
               variants={nodeVariants}
               custom={isDimmed}
-              style={{ position: 'absolute', left: 0, top: 0, marginLeft: x, marginTop: y, transform: 'translate(-50%, -50%)', zIndex: isActive ? 6 : 4 }}
+              style={{ position: 'absolute', left: x, top: y, zIndex: isActive ? 6 : 4 }}
             >
+              <div style={{ transform: 'translate(-50%, -50%)' }}>
               <div style={{ position: 'relative', display: 'inline-block' }}>
                 <motion.button
                   onClick={() => setActive(sec.id)}
@@ -598,6 +599,7 @@ export function PortanovaOrbit() {
                 lineHeight: 1.3, maxWidth: isMobile ? 68 : 90, pointerEvents: 'none', transition: 'color 0.25s',
               }}>
                 {isMobile ? sec.short : sec.label}
+              </div>
               </div>
             </motion.div>
           )
