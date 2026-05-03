@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { redirectToRestaurantCheckout } from '../../services/stripe'
 import type { MenuSelection } from '../../types/menuSelection'
+import { SlideButton } from '../../components/ui/SlideButton'
 
 const BASE_PRICE = 20
 const ALCOHOL_SURCHARGE = 7
@@ -68,10 +69,12 @@ export function ReservationForm({ menuSelection, surcharge }: ReservationFormPro
     return e
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handlePay = async () => {
     const errs = validate()
-    if (Object.keys(errs).length > 0) { setErrors(errs); return }
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      throw new Error('validation')
+    }
     setLoading(true)
     try {
       await redirectToRestaurantCheckout({
@@ -86,10 +89,9 @@ export function ReservationForm({ menuSelection, surcharge }: ReservationFormPro
         drinks: menuSelection.drinks,
         hasAlcohol,
       })
-    } catch {
-      alert('Une erreur est survenue. Veuillez réessayer.')
-    } finally {
+    } catch (err) {
       setLoading(false)
+      throw err
     }
   }
 
@@ -99,7 +101,7 @@ export function ReservationForm({ menuSelection, surcharge }: ReservationFormPro
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5">
       {/* Section header */}
       <div className="relative mb-1">
         <div
@@ -145,32 +147,17 @@ export function ReservationForm({ menuSelection, surcharge }: ReservationFormPro
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-4 text-white font-semibold text-sm rounded-xl transition-all duration-200 font-sans cursor-pointer mt-1"
-        style={loading ? {
-          background: '#9AAACF',
-          cursor: 'not-allowed',
-        } : {
-          background: 'linear-gradient(135deg, #1B2D52 0%, #2558C9 100%)',
-          boxShadow: '0 4px 24px rgba(37,88,201,0.35)',
-        }}
-        onMouseEnter={e => {
-          if (!loading) {
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 6px 32px rgba(37,88,201,0.5)'
-            ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'
-          }
-        }}
-        onMouseLeave={e => {
-          if (!loading) {
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 24px rgba(37,88,201,0.35)'
-            ;(e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'
-          }
-        }}
-      >
-        {loading ? 'Redirection vers le paiement...' : `Payer ${total} € →`}
-      </button>
-    </form>
+      {/* Slide-to-pay button */}
+      <div className="pt-1">
+        <p className="text-center text-xs text-resto-text/35 font-sans mb-3 tracking-wide">
+          Glisser pour confirmer la réservation
+        </p>
+        <SlideButton
+          label={`Payer ${total} €`}
+          onSlide={handlePay}
+          disabled={loading}
+        />
+      </div>
+    </div>
   )
 }
