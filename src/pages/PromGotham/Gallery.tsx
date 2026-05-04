@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion'
 
 const CELLS = [
-  { col: 'col-span-2', h: 'h-64', hue: '#00D4FF', angle: 135, delay: 0 },
-  { col: 'col-span-1', h: 'h-64', hue: '#8B5CF6', angle: 45,  delay: 0.06 },
-  { col: 'col-span-1', h: 'h-48', hue: '#8B5CF6', angle: 225, delay: 0.12 },
-  { col: 'col-span-1', h: 'h-48', hue: '#00D4FF', angle: 315, delay: 0.18 },
-  { col: 'col-span-1', h: 'h-48', hue: '#8B5CF6', angle: 90,  delay: 0.24 },
+  { col: 'col-span-2',    h: 'h-40 sm:h-64', hue: '#00D4FF', angle: 135, delay: 0 },
+  { col: 'col-span-1',    h: 'h-40 sm:h-64', hue: '#8B5CF6', angle: 45,  delay: 0.06 },
+  { col: 'col-span-1',    h: 'h-32 sm:h-48', hue: '#8B5CF6', angle: 225, delay: 0.12 },
+  { col: 'col-span-1',    h: 'h-32 sm:h-48', hue: '#00D4FF', angle: 315, delay: 0.18 },
+  { col: 'col-span-1',    h: 'h-32 sm:h-48', hue: '#8B5CF6', angle: 90,  delay: 0.24 },
 ]
 
 // Abstract noise-like patterns per cell
@@ -39,7 +39,7 @@ function CellPattern({ hue, index }: { hue: string; index: number }) {
 
 export function Gallery() {
   return (
-    <section className="py-24 px-6 md:px-10 relative">
+    <section className="py-16 md:py-24 px-6 md:px-10 relative">
 
       <div className="max-w-4xl mx-auto">
         <motion.div
@@ -49,12 +49,12 @@ export function Gallery() {
           className="mb-14"
         >
           <p className="text-gotham-rose/70 text-xs tracking-[0.5em] uppercase mb-3 font-medium">Galerie</p>
-          <h2 className="font-display text-3xl md:text-5xl text-white" style={{ fontWeight: 800, letterSpacing: '-0.01em' }}>Photos & Vidéos</h2>
+          <h2 className="font-display text-3xl md:text-5xl text-white" style={{ fontWeight: 800, letterSpacing: '-0.01em' }}>Fotoen & Videoen</h2>
           <div className="mt-3 w-16 h-px bg-gradient-to-r from-gotham-rose/60 to-transparent" />
-          <p className="text-white/30 text-sm mt-3">Teaser à venir</p>
+          <p className="text-white/30 text-sm mt-3">Teaser geschwënn</p>
         </motion.div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {CELLS.map((cell, i) => (
             <motion.div
               key={i}
@@ -89,7 +89,7 @@ export function Gallery() {
                   className="text-xs uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                   style={{ color: cell.hue }}
                 >
-                  Bientôt
+                  Geschwënn
                 </p>
                 <p
                   className="absolute text-xs uppercase tracking-[0.3em] opacity-20 group-hover:opacity-0 transition-opacity duration-200"

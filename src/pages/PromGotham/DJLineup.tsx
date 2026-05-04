@@ -2,9 +2,9 @@ import { motion } from 'framer-motion'
 import { GlowCard } from '../../components/ui/spotlight-card'
 
 const DJS = [
-  { name: 'DJ 1', label: 'Annoncé bientôt', color: 'blue' as const,   accent: '#00D4FF', index: 0 },
-  { name: 'DJ 2', label: 'Annoncé bientôt', color: 'purple' as const, accent: '#8B5CF6', index: 1 },
-  { name: 'DJ 3', label: 'Annoncé bientôt', color: 'blue' as const,   accent: '#00D4FF', index: 2 },
+  { name: 'DJ 1', label: 'Geschwënn bekannt', color: 'blue' as const,   accent: '#00D4FF', index: 0 },
+  { name: 'DJ 2', label: 'Geschwënn bekannt', color: 'purple' as const, accent: '#8B5CF6', index: 1 },
+  { name: 'DJ 3', label: 'Geschwënn bekannt', color: 'blue' as const,   accent: '#00D4FF', index: 2 },
 ]
 
 function DJPlaceholder({ accent }: { accent: string }) {
@@ -26,7 +26,7 @@ function DJPlaceholder({ accent }: { accent: string }) {
 
 export function DJLineup() {
   return (
-    <section className="py-24 px-6 md:px-10 relative">
+    <section className="py-16 md:py-24 px-6 md:px-10 relative">
       {/* Section divider */}
 
       <div className="max-w-4xl mx-auto">
@@ -37,10 +37,10 @@ export function DJLineup() {
           transition={{ duration: 0.6 }}
           className="mb-14"
         >
-          <p className="text-gotham-purple/80 text-xs tracking-[0.5em] uppercase mb-3 font-medium">Musique</p>
+          <p className="text-gotham-purple/80 text-xs tracking-[0.5em] uppercase mb-3 font-medium">Musek</p>
           <h2 className="font-display text-3xl md:text-5xl text-white" style={{ fontWeight: 800, letterSpacing: '-0.01em' }}>DJ Lineup</h2>
           <div className="mt-3 w-16 h-px bg-gradient-to-r from-gotham-purple/60 to-transparent" />
-          <p className="text-white/30 text-sm mt-3">Line-up à confirmer prochainement</p>
+          <p className="text-white/30 text-sm mt-3">Line-up geschwënn bekannt</p>
         </motion.div>
 
         <div className="flex gap-5 overflow-x-auto scrollbar-hide pb-2">

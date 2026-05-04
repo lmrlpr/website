@@ -11,6 +11,8 @@ import { MerchAlbum } from './MerchAlbum'
 import { MerchLoader } from './MerchLoader'
 import { PRODUCTS } from '../../utils/constants'
 
+const MERCH_CLOSED = Date.now() >= new Date(2026, 4, 5).getTime()
+
 export default function Merch() {
   return (
     <ReactLenis root>
@@ -88,39 +90,80 @@ function MerchInner() {
 
       {/* Product grid section — warm gradient */}
       <div ref={gridRef} style={{ background: 'linear-gradient(to bottom, #EADFCC 0%, #F5CAA0 24%, #FFF0A8 54%, #FFFFFF 100%)' }}>
-        {/* Header */}
-        <div className="pt-20 pb-12 px-6 md:px-10 max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <p className="text-[0.6rem] tracking-[0.5em] uppercase text-ink/40 mb-6">Collection</p>
-            <div className="flex items-end justify-between">
-              <h1
-                className="font-merch font-light text-ink leading-none"
-                style={{ fontSize: 'clamp(2.5rem, 7vw, 5rem)', letterSpacing: '0.06em' }}
+
+        {MERCH_CLOSED ? (
+          /* ── Closed state ── */
+          <>
+            <div className="pt-20 pb-10 px-6 md:px-10 max-w-6xl mx-auto text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7 }}
               >
-                LMRL Merch
-              </h1>
-              <p className="text-xs text-ink/40 hidden md:block tracking-[0.15em]">
-                Primaner vum Michel Rodange
-              </p>
+                <div
+                  className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full mb-8"
+                  style={{ background: 'rgba(139,80,20,0.09)', border: '1px solid rgba(139,80,20,0.22)' }}
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-700/55" />
+                  <span className="text-[0.6rem] tracking-[0.45em] uppercase font-semibold text-ink/45">Purchase Closed</span>
+                </div>
+                <h1
+                  className="font-merch font-light text-ink leading-none"
+                  style={{ fontSize: 'clamp(2.5rem, 7vw, 5rem)', letterSpacing: '0.06em' }}
+                >
+                  LMRL Merch
+                </h1>
+                <p className="mt-3 text-sm text-ink/40 tracking-[0.18em]">
+                  D'Kollektioun — 2025/2026
+                </p>
+                <div className="h-px bg-ink/10 mt-8 max-w-xs mx-auto" />
+                <p className="mt-6 text-xs text-ink/30 tracking-[0.12em]">
+                  Bestellunge sinn zou. Merci fir är Ënnerstëtzung.
+                </p>
+              </motion.div>
             </div>
-            <div className="h-px bg-ink/10 mt-8" />
-          </motion.div>
-        </div>
+            <ProductGrid />
+            <MerchAlbum />
+            <Footer />
+          </>
+        ) : (
+          /* ── Open state ── */
+          <>
+            {/* Header */}
+            <div className="pt-20 pb-12 px-6 md:px-10 max-w-6xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <p className="text-[0.6rem] tracking-[0.5em] uppercase text-ink/40 mb-6">Collection</p>
+                <div className="flex items-end justify-between">
+                  <h1
+                    className="font-merch font-light text-ink leading-none"
+                    style={{ fontSize: 'clamp(2.5rem, 7vw, 5rem)', letterSpacing: '0.06em' }}
+                  >
+                    LMRL Merch
+                  </h1>
+                  <p className="text-xs text-ink/40 hidden md:block tracking-[0.15em]">
+                    Primaner vum Michel Rodange
+                  </p>
+                </div>
+                <div className="h-px bg-ink/10 mt-8" />
+              </motion.div>
+            </div>
 
-        {/* Filter bar */}
-        <div className="px-6 md:px-10 max-w-6xl mx-auto mb-6">
-          <p className="text-[0.65rem] tracking-[0.2em] uppercase text-ink/40">{PRODUCTS.length} produits</p>
-        </div>
+            {/* Filter bar */}
+            <div className="px-6 md:px-10 max-w-6xl mx-auto mb-6">
+              <p className="text-[0.65rem] tracking-[0.2em] uppercase text-ink/40">{PRODUCTS.length} produits</p>
+            </div>
 
-        <ProductGrid />
-        <MerchAlbum />
-        <CartDrawer />
-        <Footer />
+            <ProductGrid />
+            <MerchAlbum />
+            <CartDrawer />
+            <Footer />
+          </>
+        )}
       </div>
     </div>
   )

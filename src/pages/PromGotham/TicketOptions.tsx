@@ -8,12 +8,12 @@ const ACCESS_CODE = 'GOTHAM2026'
 const tickets = [
   {
     id: 'eleve' as const,
-    label: 'Élève de Première',
+    label: 'Primaner',
     badge: '1ÈRE',
     price: 10,
     priceLabel: '10 €',
     description: 'Accès + all you can drink',
-    highlight: "Carte d'identité obligatoire",
+    highlight: 'Personalausweis obligatoresch',
     accentColor: '#00D4FF',
     glowVar: 'rgba(0,212,255,0.15)',
     borderFrom: 'rgba(0,212,255,0.2)',
@@ -21,12 +21,12 @@ const tickets = [
   },
   {
     id: 'prof' as const,
-    label: 'Professeur',
+    label: 'Professer',
     badge: 'STAFF',
     price: 55,
     priceLabel: '55 €',
     description: 'Accès + all you can drink',
-    highlight: "Carte d'identité obligatoire",
+    highlight: 'Personalausweis obligatoresch',
     accentColor: '#8B5CF6',
     glowVar: 'rgba(139,92,246,0.15)',
     borderFrom: 'rgba(139,92,246,0.2)',
@@ -34,12 +34,12 @@ const tickets = [
   },
   {
     id: 'plus_un' as const,
-    label: '+1 / Invité',
+    label: '+1 / Gast',
     badge: '+1',
     price: 55,
     priceLabel: '55 €',
     description: 'Accès + all you can drink',
-    highlight: "Carte d'identité obligatoire",
+    highlight: 'Personalausweis obligatoresch',
     accentColor: '#8B5CF6',
     glowVar: 'rgba(139,92,246,0.15)',
     borderFrom: 'rgba(139,92,246,0.2)',
@@ -81,7 +81,7 @@ export function TicketOptions() {
       setStep('form')
       setCodeError('')
     } else {
-      setCodeError('Code incorrect. Veuillez réessayer.')
+      setCodeError('Falschen Code. Probéier nach eng Kéier.')
       setShake(true)
       setTimeout(() => setShake(false), 500)
       setCode('')
@@ -96,7 +96,7 @@ export function TicketOptions() {
     try {
       await redirectToGothamCheckout({ firstName: form.firstName, lastName: form.lastName, email: form.email, ticketType: selected })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur. Veuillez réessayer.')
+      setError(err instanceof Error ? err.message : 'Feeler. Probéier nach eng Kéier.')
     } finally {
       setLoading(false)
     }
@@ -115,14 +115,14 @@ export function TicketOptions() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
           </svg>
         </motion.div>
-        <h3 className="text-xl font-bold text-white mb-2 tracking-wide">Inscription confirmée</h3>
-        <p className="text-white/40 text-sm">Tu es sur la liste. N'oublie pas ta carte d'identité.</p>
+        <h3 className="text-xl font-bold text-white mb-2 tracking-wide">Aschreiwung bestätegt</h3>
+        <p className="text-white/40 text-sm">Du bass op der Lëscht. Vergiess deng Personalausweis net.</p>
       </div>
     )
   }
 
   return (
-    <section id="tickets" className="py-24 px-6 md:px-10 relative">
+    <section id="tickets" className="py-16 md:py-24 px-6 md:px-10 relative">
       {/* Section top border with glow */}
 
       <div className="max-w-4xl mx-auto">
@@ -133,9 +133,9 @@ export function TicketOptions() {
           transition={{ duration: 0.6 }}
           className="mb-14"
         >
-          <p className="text-gotham-rose/70 text-xs tracking-[0.5em] uppercase mb-3 font-medium">Billets</p>
+          <p className="text-gotham-rose/70 text-xs tracking-[0.5em] uppercase mb-3 font-medium">Billeten</p>
           <h2 className="font-display font-800 text-3xl md:text-5xl text-white" style={{ fontWeight: 800, letterSpacing: '-0.01em' }}>
-            Choisissez votre option
+            Wielt är Optioun
           </h2>
           <div className="mt-3 w-16 h-px bg-gradient-to-r from-gotham-rose/60 to-transparent" />
         </motion.div>
@@ -147,7 +147,7 @@ export function TicketOptions() {
             className="mb-6 px-5 py-3 rounded-xl text-amber-300 text-sm"
             style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}
           >
-            Paiement annulé. Vous pouvez réessayer ci-dessous.
+            Bezuelung ofgebrach. Dir kënnt hei drënner nach eng Kéier probéieren.
           </motion.div>
         )}
 
@@ -239,9 +239,9 @@ export function TicketOptions() {
               style={{ background: 'rgba(10,10,15,0.8)', border: '1px solid rgba(0,212,255,0.12)', boxShadow: '0 0 40px rgba(0,212,255,0.05)' }}
             >
               <div>
-                <p className="text-gotham-blue/60 text-xs tracking-[0.4em] uppercase mb-1">// Code d'accès requis</p>
+                <p className="text-gotham-blue/60 text-xs tracking-[0.4em] uppercase mb-1">// Zougangscode erfuerderlech</p>
                 <p className="text-white/60 text-sm leading-relaxed">
-                  Réservé aux élèves de Première, à leurs +1, et aux professeurs.
+                  Reservéiert fir Primaneren, hiren +1, an d'Professeren.
                 </p>
               </div>
               <form onSubmit={handleCodeSubmit} className="flex flex-col gap-3">
@@ -281,7 +281,7 @@ export function TicketOptions() {
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)' }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.35)' }}
                   >
-                    ← Retour
+                    ← Zréck
                   </button>
                   <button
                     type="submit"
@@ -290,7 +290,7 @@ export function TicketOptions() {
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(0,212,255,0.25)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,212,255,0.8)' }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = ''; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,212,255,0.4)' }}
                   >
-                    Valider →
+                    Bestätegen →
                   </button>
                 </div>
               </form>
@@ -308,13 +308,13 @@ export function TicketOptions() {
               style={{ background: 'rgba(10,10,15,0.8)', border: '1px solid rgba(0,212,255,0.12)', boxShadow: '0 0 40px rgba(0,212,255,0.05)' }}
             >
               <div className="flex items-center justify-between">
-                <p className="text-white/40 text-xs tracking-[0.4em] uppercase">// Vos informations</p>
+                <p className="text-white/40 text-xs tracking-[0.4em] uppercase">// Är Informatioune</p>
                 <span className="text-xs font-medium" style={{ color: selectedTicket.accentColor }}>{selectedTicket.label} — {selectedTicket.priceLabel}</span>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
-                  { label: 'Prénom', field: 'firstName', placeholder: 'Jean' },
-                  { label: 'Nom', field: 'lastName', placeholder: 'Dupont' },
+                  { label: 'Virnumm', field: 'firstName', placeholder: 'Jean' },
+                  { label: 'Familljenumm', field: 'lastName', placeholder: 'Dupont' },
                 ].map(({ label, field, placeholder }) => (
                   <div key={field}>
                     <label className="text-xs text-white/35 uppercase tracking-wider block mb-1.5">{label}</label>
@@ -362,7 +362,7 @@ export function TicketOptions() {
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.6)' }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.35)' }}
                 >
-                  ← Retour
+                  ← Zréck
                 </button>
                 <button
                   type="submit"
@@ -372,7 +372,7 @@ export function TicketOptions() {
                   onMouseEnter={e => { if (!loading) { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 16px rgba(0,212,255,0.25)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,212,255,0.8)' } }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = ''; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,212,255,0.4)' }}
                 >
-                  {loading ? 'Redirection...' : `Payer ${selectedTicket.price} € →`}
+                  {loading ? 'Weiderleeden...' : `Bezuelen ${selectedTicket.price} € →`}
                 </button>
               </div>
             </motion.form>

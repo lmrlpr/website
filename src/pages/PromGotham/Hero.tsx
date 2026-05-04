@@ -183,13 +183,13 @@ export function GothamHero() {
           transition={{ duration: 0.7, delay: 0.6 }}
           className="flex items-center justify-center gap-4 md:gap-8 mb-3"
         >
-          <CountdownUnit value={days}    label="Jours"  />
+          <CountdownUnit value={days}    label="Deeg"    />
           <span className="text-gotham-blue/20 font-light mb-4" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)' }}>:</span>
-          <CountdownUnit value={hours}   label="Heures" />
+          <CountdownUnit value={hours}   label="Stonnen" />
           <span className="text-gotham-blue/20 font-light mb-4" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)' }}>:</span>
-          <CountdownUnit value={minutes} label="Min"    />
+          <CountdownUnit value={minutes} label="Min"     />
           <span className="text-gotham-blue/20 font-light mb-4" style={{ fontSize: 'clamp(1.2rem, 3vw, 2rem)' }}>:</span>
-          <CountdownUnit value={seconds} label="Sec"    />
+          <CountdownUnit value={seconds} label="Sek"     />
         </motion.div>
 
         <motion.p
@@ -198,7 +198,7 @@ export function GothamHero() {
           transition={{ delay: 0.8 }}
           className="text-white/20 text-xs tracking-[0.5em] uppercase mb-10"
         >
-          3 Juillet 2026
+          3. Juli 2026
         </motion.p>
 
         {/* ── CTA Buttons ── */}
@@ -226,7 +226,7 @@ export function GothamHero() {
             }}
           >
             <span className="relative text-gotham-blue group-hover:text-white transition-colors duration-200">
-              Prendre un billet
+              Billet kafen
             </span>
           </a>
 
@@ -243,7 +243,7 @@ export function GothamHero() {
             }}
           >
             <span className="text-white/45 group-hover:text-white/80 transition-colors duration-200">
-              Informations pratiques
+              Praktesch Infoen
             </span>
           </a>
         </motion.div>

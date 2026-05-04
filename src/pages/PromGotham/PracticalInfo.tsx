@@ -5,14 +5,14 @@ function PinIcon()     { return <svg width="16" height="16" fill="none" stroke="
 function IdCardIcon()  { return <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h2"/></svg> }
 
 const items = [
-  { icon: <ClockIcon />,   label: 'Horaires',       value: '00h – 06h',                                  accent: '#00D4FF' },
-  { icon: <PinIcon />,     label: 'Adresse',        value: '14 Av. de la Faïencerie, 1510 Limpertsberg', accent: '#8B5CF6', link: 'https://maps.google.com/?q=14+Avenue+de+la+Faiencerie+1510+Luxembourg' },
-  { icon: <IdCardIcon />,  label: 'Identification', value: "Carte d'identité obligatoire à l'entrée",    accent: '#00D4FF' },
+  { icon: <ClockIcon />,   label: 'Zäiten',          value: '00h – 06h',                                  accent: '#00D4FF' },
+  { icon: <PinIcon />,     label: 'Adress',          value: '14 Av. de la Faïencerie, 1510 Limpertsberg', accent: '#8B5CF6', link: 'https://maps.google.com/?q=14+Avenue+de+la+Faiencerie+1510+Luxembourg' },
+  { icon: <IdCardIcon />,  label: 'Identifikatioun', value: 'Personalausweis obligatoresch um Agang',     accent: '#00D4FF' },
 ]
 
 export function PracticalInfo() {
   return (
-    <section id="info" className="py-24 px-6 md:px-10 relative">
+    <section id="info" className="py-16 md:py-24 px-6 md:px-10 relative">
 
       <div className="max-w-4xl mx-auto">
         <motion.div
@@ -21,8 +21,8 @@ export function PracticalInfo() {
           viewport={{ once: true }}
           className="mb-14"
         >
-          <p className="text-gotham-blue/70 text-xs tracking-[0.5em] uppercase mb-3 font-medium">À savoir</p>
-          <h2 className="font-display text-3xl md:text-5xl text-white" style={{ fontWeight: 800, letterSpacing: '-0.01em' }}>Infos pratiques</h2>
+          <p className="text-gotham-blue/70 text-xs tracking-[0.5em] uppercase mb-3 font-medium">Ze wëssen</p>
+          <h2 className="font-display text-3xl md:text-5xl text-white" style={{ fontWeight: 800, letterSpacing: '-0.01em' }}>Praktesch Infoen</h2>
           <div className="mt-3 w-16 h-px bg-gradient-to-r from-gotham-blue/60 to-transparent" />
         </motion.div>
 
