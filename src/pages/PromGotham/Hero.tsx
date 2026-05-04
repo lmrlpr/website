@@ -5,17 +5,6 @@ const EVENT_DATE = new Date('2026-07-03T00:00:00')
 
 const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth <= 768
 
-// Pre-computed rain streaks — no Math.random() on render
-const RAIN_STREAKS = Array.from({ length: 24 }, (_, i) => ({
-  left: `${2 + i * 4.1}%`,
-  height: `${28 + (i * 11) % 38}%`,
-  duration: 2.8 + (i * 0.35) % 3.5,
-  delay: (i * 0.42) % 5,
-  opacity: 0.12 + (i % 4) * 0.06,
-}))
-
-// Fewer streaks on mobile for performance
-const ACTIVE_STREAKS = IS_MOBILE ? RAIN_STREAKS.slice(0, 8) : RAIN_STREAKS
 
 function useCountdown(target: Date) {
   const [diff, setDiff] = useState(() => target.getTime() - Date.now())
@@ -67,7 +56,7 @@ export function GothamHero() {
     >
 
       {/* ── Atmospheric orbs — static on mobile, animated on desktop ── */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {IS_MOBILE ? (
           <>
             <div
@@ -103,28 +92,6 @@ export function GothamHero() {
         )}
       </div>
 
-      {/* ── Rain streaks ── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {ACTIVE_STREAKS.map((s, i) => (
-          <motion.div
-            key={i}
-            className="absolute top-0 w-px"
-            style={{
-              left: s.left,
-              height: s.height,
-              opacity: s.opacity,
-              background: 'linear-gradient(to bottom, transparent, rgba(0,212,255,0.6) 40%, rgba(0,212,255,0.8) 60%, transparent)',
-            }}
-            animate={{ y: ['-100%', '120vh'] }}
-            transition={{
-              duration: s.duration,
-              repeat: Infinity,
-              ease: 'linear',
-              delay: s.delay,
-            }}
-          />
-        ))}
-      </div>
 
 
       {/* ── Main content ── */}
@@ -137,11 +104,11 @@ export function GothamHero() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="flex items-center justify-center gap-3 mb-8"
         >
-          <div className="h-px w-12 bg-gradient-to-r from-transparent to-gotham-blue/60" />
-          <p className="text-gotham-blue/70 text-xs tracking-[0.6em] uppercase font-medium">
-            Prom Night &nbsp;·&nbsp; 00h – 06h
+          <div className="hidden sm:block h-px w-12 bg-gradient-to-r from-transparent to-gotham-blue/60" />
+          <p className="text-gotham-blue/70 text-xs tracking-[0.22em] sm:tracking-[0.6em] uppercase font-medium">
+            Prom &nbsp;·&nbsp; 00h – 06h
           </p>
-          <div className="h-px w-12 bg-gradient-to-l from-transparent to-gotham-blue/60" />
+          <div className="hidden sm:block h-px w-12 bg-gradient-to-l from-transparent to-gotham-blue/60" />
         </motion.div>
 
         {/* ── GOTHAM — per-letter hover levitation with Bebas Neue ── */}
