@@ -381,7 +381,7 @@ export function PortanovaOrbit() {
       {/* ── PORTA NOVA title ─────────────────────────────────────────────────── */}
       <div
         className="absolute left-0 right-0 text-center pointer-events-none"
-        style={{ top: 'max(5rem, 10vh)', zIndex: 3, opacity: active ? 0 : 1, transition: 'opacity 0.25s ease' }}
+        style={{ top: 'max(5rem, 10vh)', zIndex: 3, opacity: active ? 0 : 1, transition: 'opacity 0.25s ease', paddingRight: '4%' }}
       >
         <motion.p
           className="font-resto"
@@ -551,23 +551,14 @@ export function PortanovaOrbit() {
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 className="flex flex-col items-center pointer-events-none select-none text-center"
-                style={{ width: isMobile ? 80 : 100 }}
+                style={{ width: isMobile ? 90 : 120 }}
               >
-                <motion.p
-                  className="font-resto"
-                  style={{ fontSize: isMobile ? 17 : 22, color: '#1B2D52', lineHeight: 1.2 }}
-                  animate={{ letterSpacing: ['0.18em', '0.26em', '0.18em'] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  PORTANOVA
-                </motion.p>
-                <div style={{ height: 1, width: 38, margin: '5px auto', background: 'linear-gradient(90deg, transparent, #F5C640, transparent)' }} />
-                <div className="flex gap-1.5 mt-0.5">
+                <div className="flex gap-2.5 mt-0.5">
                   {SECTIONS.filter(s => s.required).map(s => (
-                    <div key={s.id} style={{ width: 5, height: 5, borderRadius: '50%', background: done.has(s.id) ? '#22c55e' : '#D1DDEF', transition: 'background 0.4s' }} />
+                    <div key={s.id} style={{ width: isMobile ? 8 : 10, height: isMobile ? 8 : 10, borderRadius: '50%', background: done.has(s.id) ? '#22c55e' : '#C3D1EC', transition: 'background 0.4s', boxShadow: done.has(s.id) ? '0 0 6px rgba(34,197,94,0.5)' : 'none' }} />
                   ))}
                 </div>
-                <p className="font-sans mt-1" style={{ fontSize: 8, color: '#9AAACF' }}>{doneCount}/5</p>
+                <p className="font-sans mt-2" style={{ fontSize: isMobile ? 13 : 15, fontWeight: 600, color: '#7A91B8', letterSpacing: '0.05em' }}>{doneCount}/5</p>
               </motion.div>
             )}
           </AnimatePresence>

@@ -455,6 +455,15 @@ export function SpiralEntry({ onVerified }: SpiralEntryProps) {
             className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6"
           >
             <motion.p
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="font-resto text-white text-center"
+              style={{ fontSize: 'clamp(2.4rem, 10vw, 5rem)', letterSpacing: '0.22em', lineHeight: 1 }}
+            >
+              PORTA NOVA
+            </motion.p>
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
