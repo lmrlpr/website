@@ -7,15 +7,16 @@ import { STARTERS, MAINS, DESSERTS } from '../../utils/constants'
 import { redirectToRestaurantCheckout } from '../../services/stripe'
 import type { DrinkPackage } from '../../types/menuSelection'
 
-type SectionId = 'entree' | 'hauptplat' | 'dessert' | 'personal' | 'info'
+type SectionId = 'entree' | 'hauptplat' | 'dessert' | 'gedrenks' | 'personal' | 'info'
 type FoodId = 'entree' | 'hauptplat' | 'dessert'
 
 const SECTIONS = [
   { id: 'entree' as SectionId,    label: 'Entrée',                    short: 'Entrée',    required: true,  angleDeg: -90  },
-  { id: 'hauptplat' as SectionId, label: 'Haaptplat',                 short: 'Haaptplat', required: true,  angleDeg: -18  },
-  { id: 'dessert' as SectionId,   label: 'Dessert',                   short: 'Dessert',   required: true,  angleDeg: 54   },
-  { id: 'personal' as SectionId,  label: 'Perséinlech\nDonnéeën',     short: 'Donnéen',   required: true,  angleDeg: 126  },
-  { id: 'info' as SectionId,      label: 'Allgemeng\nInformatiounen', short: 'Infos',     required: false, angleDeg: 198  },
+  { id: 'hauptplat' as SectionId, label: 'Haaptplat',                 short: 'Haaptplat', required: true,  angleDeg: -30  },
+  { id: 'dessert' as SectionId,   label: 'Dessert',                   short: 'Dessert',   required: true,  angleDeg: 30   },
+  { id: 'gedrenks' as SectionId,  label: 'Gedrénks',                  short: 'Gedrénks',  required: true,  angleDeg: 90   },
+  { id: 'personal' as SectionId,  label: 'Perséinlech\nDonnéeën',     short: 'Donnéen',   required: true,  angleDeg: 150  },
+  { id: 'info' as SectionId,      label: 'Allgemeng\nInformatiounen', short: 'Infos',     required: false, angleDeg: 210  },
 ]
 
 const FOOD_MAP: Record<FoodId, { options: typeof STARTERS; field: 'starter' | 'main' | 'dessert'; num: string }> = {
@@ -36,6 +37,7 @@ const SECTION_STYLE: Record<SectionId, { bg: string; accent: string }> = {
   entree:    { bg: 'rgba(235,243,255,0.86)', accent: '#2558C9' },
   hauptplat: { bg: 'rgba(235,243,255,0.86)', accent: '#2558C9' },
   dessert:   { bg: 'rgba(235,243,255,0.86)', accent: '#2558C9' },
+  gedrenks:  { bg: 'rgba(235,243,255,0.86)', accent: '#2558C9' },
   personal:  { bg: 'rgba(232,238,252,0.88)', accent: '#1B2D52' },
   info:      { bg: 'rgba(255,251,228,0.86)', accent: '#B8860B' },
 }
@@ -125,10 +127,10 @@ function ConfirmBtn({ onClick, disabled, label = 'Bestätegen' }: { onClick: () 
 
 // ── panel content ─────────────────────────────────────────────────────────────
 
-function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersonal }: {
+function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersonal, onDrinks }: {
   id: SectionId; fd: FD; setFd: React.Dispatch<React.SetStateAction<FD>>
   errs: Record<string, string>; setErrs: React.Dispatch<React.SetStateAction<Record<string, string>>>
-  onClose: () => void; onFood: (id: FoodId) => void; onPersonal: () => void
+  onClose: () => void; onFood: (id: FoodId) => void; onPersonal: () => void; onDrinks: () => void
 }) {
   const set = (f: keyof FD) => (v: string) => { setFd(d => ({ ...d, [f]: v })); setErrs(e => ({ ...e, [f]: '' })) }
 
@@ -156,6 +158,16 @@ function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersona
     )
   }
 
+  if (id === 'gedrenks') {
+    return (
+      <div className="flex flex-col gap-4">
+        {errs.drinks && <p className="text-xs font-sans" style={{ color: '#EF4444' }}>{errs.drinks}</p>}
+        <DrinkSelector selected={fd.drinks} onChange={pkg => { setFd(d => ({ ...d, drinks: pkg })); setErrs(e => ({ ...e, drinks: '' })) }} />
+        <div className="mt-2"><ConfirmBtn onClick={onDrinks} disabled={!fd.drinks} /></div>
+      </div>
+    )
+  }
+
   if (id === 'personal') {
     return (
       <div className="flex flex-col gap-4">
@@ -166,11 +178,6 @@ function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersona
         <Field label="Classe" value={fd.classGroup} onChange={set('classGroup')} placeholder="1CM2"            error={errs.classGroup} />
         <Field label="Email"  value={fd.email}      onChange={set('email')}      placeholder="jean@lycee.lu"   error={errs.email} type="email" />
         <Field label="Téléphone" value={fd.phone}   onChange={set('phone')}      placeholder="+352 621 000 000" optional type="tel" />
-        <div className="mt-1">
-          <p className="text-[10px] uppercase tracking-[0.25em] font-semibold font-sans mb-3" style={{ color: '#2558C9' }}>Gedrénks</p>
-          {errs.drinks && <p className="text-xs font-sans mb-2" style={{ color: '#EF4444' }}>{errs.drinks}</p>}
-          <DrinkSelector selected={fd.drinks} onChange={pkg => setFd(d => ({ ...d, drinks: pkg }))} />
-        </div>
         <div className="mt-2"><ConfirmBtn onClick={onPersonal} /></div>
       </div>
     )
@@ -192,11 +199,11 @@ function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersona
 
 // ── panel shell ───────────────────────────────────────────────────────────────
 
-function PanelShell({ id, fd, setFd, errs, setErrs, completed, onClose, onFood, onPersonal, scrollH }: {
+function PanelShell({ id, fd, setFd, errs, setErrs, completed, onClose, onFood, onPersonal, onDrinks, scrollH }: {
   id: SectionId; fd: FD; setFd: React.Dispatch<React.SetStateAction<FD>>
   errs: Record<string, string>; setErrs: React.Dispatch<React.SetStateAction<Record<string, string>>>
   completed: Set<SectionId>; onClose: () => void
-  onFood: (id: FoodId) => void; onPersonal: () => void; scrollH: string
+  onFood: (id: FoodId) => void; onPersonal: () => void; onDrinks: () => void; scrollH: string
 }) {
   const sec = SECTIONS.find(s => s.id === id)!
   const { accent } = SECTION_STYLE[id]
@@ -224,7 +231,7 @@ function PanelShell({ id, fd, setFd, errs, setErrs, completed, onClose, onFood, 
         </button>
       </div>
       <div className="overflow-y-auto px-6 py-5" style={{ maxHeight: scrollH }}>
-        <PanelContent id={id} fd={fd} setFd={setFd} errs={errs} setErrs={setErrs} onClose={onClose} onFood={onFood} onPersonal={onPersonal} />
+        <PanelContent id={id} fd={fd} setFd={setFd} errs={errs} setErrs={setErrs} onClose={onClose} onFood={onFood} onPersonal={onPersonal} onDrinks={onDrinks} />
       </div>
     </>
   )
@@ -268,12 +275,12 @@ export function PortanovaOrbit() {
   const total     = 20 + (hasAlc ? 7 : 0)
 
   // Required node angles in clockwise order (-90° = 12 o'clock start)
-  const REQUIRED_ANGLES = [-90, -18, 54, 126]
+  const REQUIRED_ANGLES = [-90, -30, 30, 90, 150]
 
   const circumference = 2 * Math.PI * orbitR
   // Arc tip: the angle of the NEXT required node (points toward what to do next)
-  const arcEndAngleDeg = doneCount === 0 ? -90 : doneCount < 4 ? REQUIRED_ANGLES[doneCount] : -90
-  const arcSpanDeg     = doneCount === 0 ? 0 : doneCount === 4 ? 360 : ((arcEndAngleDeg - (-90)) + 360) % 360
+  const arcEndAngleDeg = doneCount === 0 ? -90 : doneCount < 5 ? REQUIRED_ANGLES[doneCount] : -90
+  const arcSpanDeg     = doneCount === 0 ? 0 : doneCount === 5 ? 360 : ((arcEndAngleDeg - (-90)) + 360) % 360
   const progressOffset = circumference * (1 - arcSpanDeg / 360)
   const tipRad         = (arcEndAngleDeg * Math.PI) / 180
   const ringColor      = doneCount === 4 ? '#F5C640' : '#2558C9'
@@ -306,9 +313,13 @@ export function PortanovaOrbit() {
     if (!fd.lastName.trim())     e.lastName   = 'Requis'
     if (!fd.classGroup.trim())   e.classGroup = 'Requis'
     if (!fd.email.includes('@')) e.email      = 'Email invalide'
-    if (!fd.drinks)              e.drinks     = 'Wielt deng Gedrénks'
     if (Object.keys(e).length)   { setErrs(e); return }
     markDone('personal')
+  }
+
+  const onDrinks = () => {
+    if (!fd.drinks) { setErrs(e => ({ ...e, drinks: 'Wielt deng Gedrénks' })); return }
+    markDone('gedrenks')
   }
 
   const handleSubmit = async () => {
@@ -323,7 +334,7 @@ export function PortanovaOrbit() {
     } catch { setLoading(false) }
   }
 
-  const shellProps = { fd, setFd, errs, setErrs, completed: done, onClose: close, onFood, onPersonal }
+  const shellProps = { fd, setFd, errs, setErrs, completed: done, onClose: close, onFood, onPersonal, onDrinks }
 
   return (
     <div
@@ -439,7 +450,7 @@ export function PortanovaOrbit() {
           )}
 
           {/* Tip dot — follows progress arc endpoint (hidden when full circle) */}
-          {doneCount > 0 && doneCount < 4 && (
+          {doneCount > 0 && doneCount < 5 && (
             <circle
               cx={cx + orbitR * Math.cos(tipRad)}
               cy={cy + orbitR * Math.sin(tipRad)}
@@ -507,7 +518,7 @@ export function PortanovaOrbit() {
                     <div key={s.id} style={{ width: 5, height: 5, borderRadius: '50%', background: done.has(s.id) ? '#22c55e' : '#D1DDEF', transition: 'background 0.4s' }} />
                   ))}
                 </div>
-                <p className="font-sans mt-1" style={{ fontSize: 8, color: '#9AAACF' }}>{doneCount}/4</p>
+                <p className="font-sans mt-1" style={{ fontSize: 8, color: '#9AAACF' }}>{doneCount}/5</p>
               </motion.div>
             )}
           </AnimatePresence>
