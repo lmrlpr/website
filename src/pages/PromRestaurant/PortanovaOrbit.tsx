@@ -11,11 +11,11 @@ type SectionId = 'entree' | 'hauptplat' | 'dessert' | 'personal' | 'info'
 type FoodId = 'entree' | 'hauptplat' | 'dessert'
 
 const SECTIONS = [
-  { id: 'entree' as SectionId,    label: 'Entrée',                    short: 'Entrée',      required: true,  angleDeg: -90  },
-  { id: 'hauptplat' as SectionId, label: 'Hauptplat',                 short: 'Hauptplat',   required: true,  angleDeg: -18  },
-  { id: 'dessert' as SectionId,   label: 'Dessert',                   short: 'Dessert',     required: true,  angleDeg: 54   },
-  { id: 'personal' as SectionId,  label: 'Perséinlech\nDonnéeën',     short: 'Perséinlech', required: true,  angleDeg: 126  },
-  { id: 'info' as SectionId,      label: 'Allgemeng\nInformatiounen', short: 'Infos',       required: false, angleDeg: 198  },
+  { id: 'entree' as SectionId,    label: 'Entrée',                    short: 'Entrée',    required: true,  angleDeg: -90  },
+  { id: 'hauptplat' as SectionId, label: 'Haaptplat',                 short: 'Haaptplat', required: true,  angleDeg: -18  },
+  { id: 'dessert' as SectionId,   label: 'Dessert',                   short: 'Dessert',   required: true,  angleDeg: 54   },
+  { id: 'personal' as SectionId,  label: 'Perséinlech\nDonnéeën',     short: 'Donnéen',   required: true,  angleDeg: 126  },
+  { id: 'info' as SectionId,      label: 'Allgemeng\nInformatiounen', short: 'Infos',     required: false, angleDeg: 198  },
 ]
 
 const FOOD_MAP: Record<FoodId, { options: typeof STARTERS; field: 'starter' | 'main' | 'dessert'; num: string }> = {
@@ -34,8 +34,8 @@ const BLANK: FD = { starter: '', main: '', dessert: '', drinks: '', firstName: '
 
 const SECTION_STYLE: Record<SectionId, { bg: string; accent: string }> = {
   entree:    { bg: 'rgba(235,243,255,0.86)', accent: '#2558C9' },
-  hauptplat: { bg: 'rgba(255,252,238,0.86)', accent: '#C49A2A' },
-  dessert:   { bg: 'rgba(255,238,248,0.86)', accent: '#C44E8A' },
+  hauptplat: { bg: 'rgba(235,243,255,0.86)', accent: '#2558C9' },
+  dessert:   { bg: 'rgba(235,243,255,0.86)', accent: '#2558C9' },
   personal:  { bg: 'rgba(232,238,252,0.88)', accent: '#1B2D52' },
   info:      { bg: 'rgba(255,251,228,0.86)', accent: '#B8860B' },
 }
@@ -180,7 +180,7 @@ function PanelContent({ id, fd, setFd, errs, setErrs, onClose, onFood, onPersona
   return (
     <div>
       <CourseSelector
-        title={id === 'entree' ? 'Entrée' : id === 'hauptplat' ? 'Hauptplat' : 'Dessert'}
+        title={id === 'entree' ? 'Entrée' : id === 'hauptplat' ? 'Haaptplat' : 'Dessert'}
         options={options} selected={fd[field]}
         onChange={v => setFd(d => ({ ...d, [field]: v }))}
         courseNumber={num}
@@ -205,9 +205,11 @@ function PanelShell({ id, fd, setFd, errs, setErrs, completed, onClose, onFood, 
       <div style={{ height: 3, background: accent, flexShrink: 0, borderRadius: '0 0 2px 2px' }} />
       <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid #EEF3FA', flexShrink: 0 }}>
         <div>
-          <h2 className="font-resto" style={{ fontSize: 20, color: '#1B2D52', letterSpacing: '0.05em' }}>
-            {sec.label.replace('\n', ' ')}
-          </h2>
+          {id === 'info' && (
+            <h2 className="font-resto" style={{ fontSize: 20, color: '#1B2D52', letterSpacing: '0.05em' }}>
+              {sec.label.replace('\n', ' ')}
+            </h2>
+          )}
           {completed.has(id) && (
             <p className="text-xs font-sans mt-0.5" style={{ color: '#16a34a' }}>Änner deng Wiel</p>
           )}
@@ -491,9 +493,6 @@ export function PortanovaOrbit() {
                 className="flex flex-col items-center pointer-events-none select-none text-center"
                 style={{ width: isMobile ? 80 : 100 }}
               >
-                <p className="font-sans uppercase" style={{ fontSize: 7, letterSpacing: '0.45em', color: '#7A91B8', marginBottom: 3 }}>
-                  Prom Night · 20h
-                </p>
                 <motion.p
                   className="font-resto"
                   style={{ fontSize: isMobile ? 17 : 22, color: '#1B2D52', lineHeight: 1.2 }}
@@ -590,16 +589,6 @@ export function PortanovaOrbit() {
                 </AnimatePresence>
               </div>
 
-              <div style={{
-                position: 'absolute', top: NODE + 6, left: '50%', transform: 'translateX(-50%)',
-                whiteSpace: 'pre-line', textAlign: 'center',
-                fontFamily: 'var(--font-sans, system-ui)', fontSize: isMobile ? 9 : 10,
-                fontWeight: (isDone || isActive) ? 600 : 400,
-                color: isDone ? '#16a34a' : isActive ? '#2558C9' : '#5A7AB0',
-                lineHeight: 1.3, maxWidth: isMobile ? 68 : 90, pointerEvents: 'none', transition: 'color 0.25s',
-              }}>
-                {isMobile ? sec.short : sec.label}
-              </div>
               </div>
             </motion.div>
           )

@@ -383,7 +383,7 @@ export function SpiralEntry({ onVerified }: SpiralEntryProps) {
     stoppedRef.current = true
     textParticlesRef.current = []
     setShowText(false)
-    setStage('password')
+    setStage('menu')
   }
 
   const handleVerify = async () => {
@@ -458,19 +458,38 @@ export function SpiralEntry({ onVerified }: SpiralEntryProps) {
         </div>
       )}
 
-      {/* Subtle skip — visible only during the intro animation */}
+      {/* Skip button — visible during intro animation */}
       {stage === 'intro' && (
         <motion.button
           onClick={handleSkip}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.8 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[10px] tracking-[0.45em] uppercase font-sans cursor-pointer transition-colors duration-300"
-          style={{ color: 'rgba(255,255,255,0.22)' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.6)' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.22)' }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 font-sans cursor-pointer transition-all duration-300"
+          style={{
+            fontSize: 11,
+            letterSpacing: '0.35em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.65)',
+            padding: '8px 22px',
+            border: '1px solid rgba(255,255,255,0.22)',
+            borderRadius: 999,
+            background: 'rgba(255,255,255,0.05)',
+          }}
+          onMouseEnter={e => {
+            const el = e.currentTarget as HTMLButtonElement
+            el.style.color = 'rgba(255,255,255,0.95)'
+            el.style.borderColor = 'rgba(255,255,255,0.5)'
+            el.style.background = 'rgba(255,255,255,0.12)'
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget as HTMLButtonElement
+            el.style.color = 'rgba(255,255,255,0.65)'
+            el.style.borderColor = 'rgba(255,255,255,0.22)'
+            el.style.background = 'rgba(255,255,255,0.05)'
+          }}
         >
-          skip
+          Passer
         </motion.button>
       )}
 
@@ -489,7 +508,8 @@ export function SpiralEntry({ onVerified }: SpiralEntryProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-white/35 text-xs font-sans tracking-[0.45em] uppercase"
+              className="font-sans uppercase"
+              style={{ fontSize: 13, letterSpacing: '0.5em', color: 'rgba(255,255,255,0.6)', fontWeight: 300 }}
             >
               Prom Restaurant · 2026
             </motion.p>
