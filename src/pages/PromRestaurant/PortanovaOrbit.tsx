@@ -292,6 +292,11 @@ export function PortanovaOrbit() {
     return { x: Math.round(orbitR * Math.cos(r)), y: Math.round(orbitR * Math.sin(r)) }
   }
 
+  // Notify Nav to hide/show when a panel is open
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('restaurant-panel', { detail: { open: !!active } }))
+  }, [active])
+
   const close = () => { setActive(null); setErrs({}) }
 
   const markDone = (id: SectionId) => {
@@ -372,6 +377,50 @@ export function PortanovaOrbit() {
         animate={{ x: [0, 16, -10, 0], y: [0, 14, -20, 0] }}
         transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 1.5, repeatType: 'mirror' }}
       />
+
+      {/* ── PORTA NOVA title ─────────────────────────────────────────────────── */}
+      <div
+        className="absolute left-0 right-0 text-center pointer-events-none"
+        style={{ top: 'max(5rem, 10vh)', zIndex: 3, opacity: active ? 0 : 1, transition: 'opacity 0.25s ease' }}
+      >
+        <motion.p
+          className="font-resto"
+          style={{ fontSize: 'clamp(2rem, 7vw, 4.5rem)', color: '#1B2D52', letterSpacing: '0.22em' }}
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        >
+          PORTA NOVA
+        </motion.p>
+        <motion.div
+          style={{ height: 1, width: 80, margin: '6px auto 0', background: 'linear-gradient(90deg, transparent, #F5C640, transparent)' }}
+          initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
+          transition={{ duration: 0.6, delay: 1.1, ease: 'easeOut' }}
+        />
+        <motion.p
+          className="font-sans"
+          style={{ fontSize: 9, letterSpacing: '0.4em', textTransform: 'uppercase', color: '#7A91B8', marginTop: 6 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 1.3 }}
+        >
+          Prom Restaurant · 2026
+        </motion.p>
+      </div>
+
+      {/* ── bottom event info ─────────────────────────────────────────────────── */}
+      <div
+        className="absolute left-0 right-0 text-center pointer-events-none"
+        style={{ bottom: 'max(2rem, 4vh)', zIndex: 3, opacity: active ? 0 : 1, transition: 'opacity 0.25s ease' }}
+      >
+        <motion.p
+          className="font-sans"
+          style={{ fontSize: 10, letterSpacing: '0.3em', textTransform: 'uppercase', color: '#B8C9E0' }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 1.5 }}
+        >
+          20h – 00h &nbsp;·&nbsp; Porta Nova &nbsp;·&nbsp; Limpertsberg
+        </motion.p>
+      </div>
 
       {/* ── grain texture ─────────────────────────────────────────────────────── */}
       <div

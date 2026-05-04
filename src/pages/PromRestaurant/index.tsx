@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { SpiralEntry } from '../../components/ui/SpiralEntry'
 import { GridPixelateWipe } from '../../components/ui/GridPixelateWipe'
 import { PortanovaOrbit } from './PortanovaOrbit'
-import { Footer } from '../../components/layout/Footer'
 
 type Phase = 'spiral' | 'wipe' | 'menu'
 
@@ -82,10 +81,6 @@ export default function PromRestaurant() {
         )}
 
         <PortanovaOrbit />
-
-        <div className="border-t" style={{ borderColor: '#E8EEFA', background: 'white' }}>
-          <Footer />
-        </div>
       </motion.div>
     </>
   )

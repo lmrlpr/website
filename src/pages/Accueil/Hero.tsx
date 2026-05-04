@@ -37,6 +37,21 @@ export function Hero() {
           </h1>
         </motion.div>
 
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.38, duration: 0.7, ease: 'easeOut' }}
+          className="mt-5 mb-1 px-8 py-3 rounded-2xl text-center"
+          style={{ background: 'rgba(60,20,0,0.07)', border: '1px solid rgba(60,20,0,0.12)' }}
+        >
+          <p
+            className="font-bold tracking-tight"
+            style={{ fontSize: 'clamp(1.3rem, 4.5vw, 2.8rem)', color: '#1A0800' }}
+          >
+            Vill Gléck fir d'Examen!
+          </p>
+        </motion.div>
+
         <TextEffect
           per='word'
           preset='blur'

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { NavOverlay } from './NavOverlay'
 import { useCart } from '../../context/CartContext'
@@ -6,18 +6,26 @@ import { useScrollLock } from '../../hooks/useScrollLock'
 
 export function Nav() {
   const [open, setOpen] = useState(false)
+  const [panelOpen, setPanelOpen] = useState(false)
   const { totalItems, openCart } = useCart()
   const location = useLocation()
 
   useScrollLock(open)
 
+  useEffect(() => {
+    const handler = (e: Event) => setPanelOpen((e as CustomEvent<{ open: boolean }>).detail.open)
+    window.addEventListener('restaurant-panel', handler)
+    return () => window.removeEventListener('restaurant-panel', handler)
+  }, [])
+
   const isLight = location.pathname === '/' || location.pathname === '/merch' || location.pathname === '/prom/restaurant'
+  const hideNav = panelOpen && location.pathname === '/prom/restaurant'
 
   return (
     <>
       <nav
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-16"
-        style={{ pointerEvents: 'auto' }}
+        style={{ pointerEvents: hideNav ? 'none' : 'auto', opacity: hideNav ? 0 : 1, transition: 'opacity 0.25s ease' }}
       >
         {/* Logo */}
         <Link
