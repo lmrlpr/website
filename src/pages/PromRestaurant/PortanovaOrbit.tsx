@@ -210,7 +210,7 @@ function PanelShell({ id, fd, setFd, errs, setErrs, completed, onClose, onFood, 
   return (
     <>
       <div style={{ height: 3, background: accent, flexShrink: 0, borderRadius: '0 0 2px 2px' }} />
-      <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid #EEF3FA', flexShrink: 0 }}>
+      <div className="flex items-center justify-between px-6 py-2" style={{ borderBottom: '1px solid #EEF3FA', flexShrink: 0 }}>
         <div>
           {id === 'info' && (
             <h2 className="font-resto" style={{ fontSize: 20, color: '#1B2D52', letterSpacing: '0.05em' }}>
@@ -640,7 +640,7 @@ export function PortanovaOrbit() {
             <div className="flex justify-center pt-3 pb-1">
               <div style={{ width: 36, height: 4, borderRadius: 2, background: '#C3D1EC' }} />
             </div>
-            <PanelShell id={active} {...shellProps} scrollH="calc(88vh - 52px)" />
+            <PanelShell id={active} {...shellProps} scrollH="calc(88vh - 68px)" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -666,7 +666,7 @@ export function PortanovaOrbit() {
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               onClick={e => e.stopPropagation()}
             >
-              <PanelShell id={active} {...shellProps} scrollH="calc(82vh - 72px)" />
+              <PanelShell id={active} {...shellProps} scrollH="calc(82vh - 58px)" />
             </motion.div>
           )}
         </AnimatePresence>

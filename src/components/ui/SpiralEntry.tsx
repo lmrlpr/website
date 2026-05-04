@@ -115,18 +115,10 @@ const CHANGE_T = 0.32
 const NUM_STARS = 3200
 const Y_OFFSET = 28
 
-// Tightened sequenced timeline (~5.2s to MENU button):
-//   0 → 0.8s   → letters reveal on clean dark-blue background
-//   0.8 → 1.0s → brief hold, text fully formed
-//   1.0s       → BAM — text shatters into particles
-//   1.0 → 1.6s → particles disperse and fade
-//   1.4s       → starfield emerges (slight overlap with end of dispersal)
-//   1.4 → 5.9s → 4.5s warp / camera zoom (no central trail cluster)
-//   ~5.2s      → MENU button reveals
-const TEXT_DISSOLVE_TRIGGER_MS = 1000
-const TEXT_DISSOLVE_DURATION_MS = 600
-const SPIRAL_START_MS = 1400
-const SPIRAL_DURATION_MS = 4500
+const TEXT_DISSOLVE_TRIGGER_MS = 850
+const TEXT_DISSOLVE_DURATION_MS = 550
+const SPIRAL_START_MS = 1200
+const SPIRAL_DURATION_MS = 4000
 const MENU_REVEAL_T = 0.85
 
 interface SpiralEntryProps {
@@ -379,13 +371,6 @@ export function SpiralEntry({ onVerified }: SpiralEntryProps) {
     return () => cancelAnimationFrame(rafId)
   }, [])
 
-  const handleSkip = () => {
-    stoppedRef.current = true
-    textParticlesRef.current = []
-    setShowText(false)
-    setStage('menu')
-  }
-
   const handleVerify = async () => {
     if (code.trim().toUpperCase() === ACCESS_CODE) {
       sessionStorage.setItem('restaurant_access', 'true')
@@ -456,41 +441,6 @@ export function SpiralEntry({ onVerified }: SpiralEntryProps) {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Skip button — visible during intro animation */}
-      {stage === 'intro' && (
-        <motion.button
-          onClick={handleSkip}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 0.8 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 font-sans cursor-pointer transition-all duration-300"
-          style={{
-            fontSize: 11,
-            letterSpacing: '0.35em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.65)',
-            padding: '8px 22px',
-            border: '1px solid rgba(255,255,255,0.22)',
-            borderRadius: 999,
-            background: 'rgba(255,255,255,0.05)',
-          }}
-          onMouseEnter={e => {
-            const el = e.currentTarget as HTMLButtonElement
-            el.style.color = 'rgba(255,255,255,0.95)'
-            el.style.borderColor = 'rgba(255,255,255,0.5)'
-            el.style.background = 'rgba(255,255,255,0.12)'
-          }}
-          onMouseLeave={e => {
-            const el = e.currentTarget as HTMLButtonElement
-            el.style.color = 'rgba(255,255,255,0.65)'
-            el.style.borderColor = 'rgba(255,255,255,0.22)'
-            el.style.background = 'rgba(255,255,255,0.05)'
-          }}
-        >
-          Passer
-        </motion.button>
       )}
 
       {/* MENU stage — fully centered */}
