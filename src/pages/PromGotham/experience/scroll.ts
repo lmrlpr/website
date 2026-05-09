@@ -1,29 +1,40 @@
 /**
- * Read the page's vertical scroll progress, normalised to 0..1.
- * The Gotham experience uses a tall scroll container, but the visible
- * content is fixed — scroll progress drives a 3D timeline instead of
- * moving DOM content vertically.
+ * Scroll → cinematic-progress driver for the Gotham experience.
+ *
+ * The page is split into two scroll domains:
+ *   1. The cinematic intro spacer (configurable height, set on mount)
+ *      — drives all 3D phases (landing → portal → laser stage), reported
+ *        as `intro` ∈ [0, 1] while inside the spacer, then > 1 once past it.
+ *   2. Pinned content slides after the spacer
+ *      — each manages its own ScrollTrigger pin + depth animation (see
+ *        PinnedSlide). The camera continues to drift forward while content
+ *        is on screen, parameterised by the overflow past intro = 1.
  */
-export function getScrollProgress(): number {
-  if (typeof window === 'undefined') return 0
-  const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight)
-  return Math.max(0, Math.min(1, window.scrollY / max))
+
+let introHeightPx = 1
+
+export function setIntroHeight(px: number) {
+  introHeightPx = Math.max(1, px)
 }
 
-/**
- * Subscribe to a smoothed scroll-progress stream. Returns an unsubscribe fn.
- * Smoothed via critically-damped lerp inside a single shared rAF loop.
- */
-type ProgressFn = (smoothed: number, raw: number) => void
+export function getIntroHeight(): number {
+  return introHeightPx
+}
 
-let listeners = new Set<ProgressFn>()
-let raf = 0
+/** Raw intro progress. 0..1 inside the spacer, > 1 once we've scrolled past it. */
+export function getIntroProgress(): number {
+  if (typeof window === 'undefined') return 0
+  return window.scrollY / introHeightPx
+}
+
+type Listener = (smoothed: number, raw: number) => void
+const listeners = new Set<Listener>()
 let smoothed = 0
-let raw = 0
+let raf = 0
 let running = false
 
 function loop() {
-  raw = getScrollProgress()
+  const raw = getIntroProgress()
   smoothed += (raw - smoothed) * 0.12
   for (const fn of listeners) fn(smoothed, raw)
   raf = requestAnimationFrame(loop)
@@ -32,7 +43,7 @@ function loop() {
 function start() {
   if (running) return
   running = true
-  raw = smoothed = getScrollProgress()
+  smoothed = getIntroProgress()
   raf = requestAnimationFrame(loop)
 }
 
@@ -42,10 +53,10 @@ function stop() {
   cancelAnimationFrame(raf)
 }
 
-export function subscribeScroll(fn: ProgressFn): () => void {
+export function subscribeIntro(fn: Listener): () => void {
   listeners.add(fn)
   start()
-  fn(smoothed, raw)
+  fn(smoothed, getIntroProgress())
   return () => {
     listeners.delete(fn)
     if (listeners.size === 0) stop()

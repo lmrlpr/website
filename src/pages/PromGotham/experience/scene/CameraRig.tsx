@@ -1,16 +1,28 @@
 import { useEffect, useRef, type RefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { PHASES, lerp, easeInOut, easeOutExpo, remap } from '../phases'
+import { PHASES, lerp, easeInOut, easeOutExpo, remap, clamp } from '../phases'
+import { H_WORLD_X } from './GothamPortal'
 
 /**
- * Drives the camera along the master scroll timeline.
+ * Camera path along the cinematic timeline.
  *
- *   Z=18    landing
- *   Z=4     approach end (H dominates frame)
- *   Z=-8    portal end (camera has flown through the H)
- *   Z=-60   warp end (deep tunnel)
- *   Z=-120  laser end
- *   Z=-380  content end
+ *   Z=22    landing
+ *   Z=4     approach end (H dominates frame, camera just outside the doorway)
+ *   Z=-12   portal end   (camera flown through the H)
+ *   Z=-110  laser end    (deep into the stage, looking at the city silhouette)
+ *
+ * After the intro spacer (intro progress > 1) the camera continues to drift
+ * forward at a constant rate per pixel of further scroll, so the laser
+ * stage feels like it keeps unfolding while content slides traverse the
+ * foreground.
+ *
+ * X axis: glides from 0 → H_WORLD_X over approach so the H is dead-centre
+ * by the time we cross into portal phase, then pans back to 0 over laser
+ * so the city / floor are framed centrally.
+ *
+ * Y axis: starts slightly elevated for cinematic 3/4 framing; drops to 0 by
+ * portal so the camera goes flat through the gap; rises slightly on the
+ * laser stage to reveal the floor.
  */
 export function CameraRig({ progressRef }: { progressRef: RefObject<number> }) {
   const { camera } = useThree()
@@ -26,30 +38,43 @@ export function CameraRig({ progressRef }: { progressRef: RefObject<number> }) {
   }, [])
 
   useFrame(() => {
-    const p = progressRef.current
+    const p = progressRef.current ?? 0
+    const overflow = Math.max(0, p - 1)
 
     const tApproach = remap(p, PHASES.landing[0], PHASES.approach[1])
     const tPortal   = remap(p, PHASES.portal[0],  PHASES.portal[1])
-    const tWarp     = remap(p, PHASES.warp[0],    PHASES.warp[1])
     const tLaser    = remap(p, PHASES.laser[0],   PHASES.laser[1])
-    const tContent  = remap(p, PHASES.content[0], PHASES.content[1])
 
-    // Composed Z: each phase contributes its own delta on top
-    const z =
-        lerp(18,  4,    easeInOut(tApproach))
-      + lerp(0,  -12,   easeInOut(tPortal))
-      + lerp(0,  -52,   easeOutExpo(tWarp))
-      + lerp(0,  -60,   easeInOut(tLaser))
-      + lerp(0,  -260,  easeInOut(tContent))
+    // Z path
+    const zIntro =
+        lerp(22, 4,    easeInOut(tApproach))
+      + lerp(0, -58,   easeOutExpo(tPortal))   // absorbed flash phase distance
+      + lerp(0, -56,   easeInOut(tLaser))
 
-    camera.position.z = z
+    const zContent = -overflow * 32
+    camera.position.z = zIntro + zContent
 
-    const parallaxStrength = 0.35 * (1 - tApproach * 0.85)
-    camera.position.x = mouse.current.x * parallaxStrength
-    camera.position.y = 0.5 + mouse.current.y * parallaxStrength
+    // X path: pan toward H during approach, hold through portal, release on laser
+    const wordPan  = easeInOut(remap(p, PHASES.landing[0], PHASES.approach[1]))
+    const releaseX = easeInOut(remap(p, PHASES.laser[0],   PHASES.laser[1]))
+    const camBaseX = lerp(0, H_WORLD_X, wordPan) - lerp(0, H_WORLD_X, releaseX)
 
-    camera.rotation.z = Math.sin(performance.now() * 0.0005) * 0.02 * tWarp
-    camera.lookAt(0, 0, camera.position.z - 10)
+    // Y framing — slight elevation pre-portal, flat through portal, low overhead on stage
+    const baseY =
+        lerp(0.7, 0.0, easeInOut(clamp(tApproach + tPortal, 0, 1)))
+      + lerp(0,   1.6, easeInOut(tLaser))
+
+    // Parallax fades out hard once approach starts so traversal is stable
+    const parallax = 0.32 * (1 - clamp(tApproach + tPortal * 1.2, 0, 1))
+    camera.position.x = camBaseX + mouse.current.x * parallax
+    camera.position.y = baseY + mouse.current.y * parallax
+
+    // Subtle roll on the laser stage
+    camera.rotation.z = Math.sin(performance.now() * 0.0004) * 0.012 * tLaser
+
+    // Look forward — track camBaseX so we look straight ahead, not diagonally
+    const lookY = baseY - lerp(0, 0.6, tLaser)
+    camera.lookAt(camBaseX, lookY, camera.position.z - 12)
   })
 
   return null

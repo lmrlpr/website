@@ -3,36 +3,42 @@ import { useFrame } from '@react-three/fiber'
 import { CameraRig } from './scene/CameraRig'
 import { GothamPortal } from './scene/GothamPortal'
 import { AmbientField } from './scene/AmbientField'
-import { WarpTunnel } from './scene/WarpTunnel'
 import { LaserGrid } from './scene/LaserGrid'
-import { getScrollProgress } from './scroll'
+import { DottedCeiling } from './scene/DottedCeiling'
+import { Skyline } from './scene/Skyline'
+import { getIntroProgress } from './scroll'
 
 /**
- * Top-level R3F scene. Holds the smoothed scroll-progress ref that drives
- * every phase, and stacks each phase component plus the post-processing
- * pipeline (bloom + subtle chromatic aberration for cinematic flair).
+ * Top-level R3F scene. Holds the smoothed intro-progress ref that drives
+ * every cinematic phase, and stacks the world layers.
+ *
+ * Layer order (Z-axis, far → near):
+ *   Skyline       distant city silhouette on the horizon
+ *   LaserGrid     stage floor + scan beam + atmospheric fog
+ *   DottedCeiling wave-animated dot grid above the camera (the "roof")
+ *   AmbientField  soft volumetric glow behind the title
+ *   GothamPortal  the GOTHAM word + geometric H doorway
  */
 export function Scene() {
   const progressRef = useRef(0) as RefObject<number>
 
-  // Smooth window.scrollY-driven progress every frame, inside the R3F loop
   useFrame((_, delta) => {
-    const target = getScrollProgress()
+    const target = getIntroProgress()
     const k = Math.min(1, delta * 6)
     progressRef.current += (target - progressRef.current) * k
   })
 
   return (
     <>
-      {/* Lighting — minimal; mostly emissive materials and additive shaders */}
-      <ambientLight intensity={0.25} />
-      <pointLight position={[0, 6, 6]} intensity={0.6} color="#a78bfa" />
+      <ambientLight intensity={0.2} />
+      <pointLight position={[0, 8, 8]} intensity={0.5} color="#a78bfa" />
 
-      <CameraRig    progressRef={progressRef} />
-      <AmbientField progressRef={progressRef} />
-      <GothamPortal progressRef={progressRef} />
-      <WarpTunnel   progressRef={progressRef} />
-      <LaserGrid    progressRef={progressRef} />
+      <CameraRig     progressRef={progressRef} />
+      <Skyline       progressRef={progressRef} />
+      <LaserGrid     progressRef={progressRef} />
+      <DottedCeiling progressRef={progressRef} />
+      <AmbientField  progressRef={progressRef} />
+      <GothamPortal  progressRef={progressRef} />
     </>
   )
 }

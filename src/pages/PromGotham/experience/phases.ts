@@ -1,15 +1,16 @@
 /**
- * Phase boundaries along the master scroll timeline (0..1).
- * Every visual driven by scroll references these ranges so phases can be
- * retuned in one place without hunting through component code.
+ * Cinematic phase boundaries along the intro-spacer timeline (0..1).
+ *
+ * After the spacer (intro > 1) the world settles into "laser stage" mode and
+ * stays there while the user scrolls through pinned content slides — the
+ * camera continues to drift forward (see CameraRig) but no further phase
+ * transitions fire.
  */
 export const PHASES = {
-  landing:  [0.00, 0.08] as const, // P1 idle landing
-  approach: [0.08, 0.28] as const, // P2 camera pulls toward GOTHAM / focus to H
-  portal:   [0.28, 0.42] as const, // P3 H inner gap opens, camera enters
-  warp:     [0.42, 0.55] as const, // P4 tunnel transition
-  laser:    [0.55, 0.68] as const, // P5 laser grid forms
-  content:  [0.62, 1.00] as const, // P6/P7 panels approach (overlap with laser tail)
+  landing:  [0.00, 0.10] as const, // P1 GOTHAM idle, date reveals
+  approach: [0.10, 0.32] as const, // P2 camera glides toward the H
+  portal:   [0.32, 0.55] as const, // P3 doorway opens, camera enters
+  laser:    [0.48, 1.00] as const, // P4 laser stage forms (overlaps portal tail)
 } as const
 
 /** Linear remap of t into 0..1 over [a, b], clamped. */
@@ -28,3 +29,6 @@ export const easeInOut = (t: number) =>
 /** Exponential ease out — long, fast-decaying tail (cinematic camera). */
 export const easeOutExpo = (t: number) =>
   t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+
+/** Quartic ease-out — strong start, soft landing. */
+export const easeOutQuart = (t: number) => 1 - Math.pow(1 - t, 4)
