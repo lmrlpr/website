@@ -1,28 +1,23 @@
 import { useEffect, useRef, type RefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { PHASES, lerp, easeInOut, easeOutExpo, remap, clamp } from '../phases'
-import { H_WORLD_X } from './GothamPortal'
 
 /**
  * Camera path along the cinematic timeline.
  *
- *   Z=22    landing
- *   Z=4     approach end (H dominates frame, camera just outside the doorway)
- *   Z=-12   portal end   (camera flown through the H)
- *   Z=-110  laser end    (deep into the stage, looking at the city silhouette)
+ *   Phase     | Z       | Y      | Notes
+ *   ----------|---------|--------|---------------------------------------------
+ *   landing   | 22      | +0.5   | 3/4 frame of the whole word
+ *   approach  | 22 → 4  | 0.5→-1.5 | Y drops to align with H's *lower* void
+ *   portal    | 4 → -12 | -1.5   | Flat traversal through the doorway
+ *   laser     | -12→-110| -1.5→+1.6 | Y rises, looking slightly down at floor
+ *   content   | drift   | +1.6   | Slow forward Z drift while content slides pass
  *
- * After the intro spacer (intro progress > 1) the camera continues to drift
- * forward at a constant rate per pixel of further scroll, so the laser
- * stage feels like it keeps unfolding while content slides traverse the
- * foreground.
+ * The H sits at world (0,0,0) and the lower void spans approximately y=-2.9
+ * to y=+0.5 (below the high-set crossbar). Camera at y=-1.5 is dead-centre
+ * of that channel — the doorway feel is unmistakable.
  *
- * X axis: glides from 0 → H_WORLD_X over approach so the H is dead-centre
- * by the time we cross into portal phase, then pans back to 0 over laser
- * so the city / floor are framed centrally.
- *
- * Y axis: starts slightly elevated for cinematic 3/4 framing; drops to 0 by
- * portal so the camera goes flat through the gap; rises slightly on the
- * laser stage to reveal the floor.
+ * Word is symmetric around H so no X-pan is needed; camera stays at x=0.
  */
 export function CameraRig({ progressRef }: { progressRef: RefObject<number> }) {
   const { camera } = useThree()
@@ -45,36 +40,41 @@ export function CameraRig({ progressRef }: { progressRef: RefObject<number> }) {
     const tPortal   = remap(p, PHASES.portal[0],  PHASES.portal[1])
     const tLaser    = remap(p, PHASES.laser[0],   PHASES.laser[1])
 
-    // Z path
+    // ---- Z path ----
     const zIntro =
         lerp(22, 4,    easeInOut(tApproach))
-      + lerp(0, -58,   easeOutExpo(tPortal))   // absorbed flash phase distance
-      + lerp(0, -56,   easeInOut(tLaser))
+      + lerp(0, -16,   easeOutExpo(tPortal))
+      + lerp(0, -98,   easeInOut(tLaser))
 
     const zContent = -overflow * 32
     camera.position.z = zIntro + zContent
 
-    // X path: pan toward H during approach, hold through portal, release on laser
-    const wordPan  = easeInOut(remap(p, PHASES.landing[0], PHASES.approach[1]))
-    const releaseX = easeInOut(remap(p, PHASES.laser[0],   PHASES.laser[1]))
-    const camBaseX = lerp(0, H_WORLD_X, wordPan) - lerp(0, H_WORLD_X, releaseX)
+    // ---- Y path: drop into lower H void during approach/portal, rise on stage ----
+    const yLanding = 0.5
+    const yLowerVoid = -1.5
+    const yStage = 1.6
 
-    // Y framing — slight elevation pre-portal, flat through portal, low overhead on stage
-    const baseY =
-        lerp(0.7, 0.0, easeInOut(clamp(tApproach + tPortal, 0, 1)))
-      + lerp(0,   1.6, easeInOut(tLaser))
+    const yToVoid = lerp(yLanding, yLowerVoid, easeInOut(clamp(tApproach + tPortal * 0.3, 0, 1)))
+    const yToStage = lerp(0, yStage - yLowerVoid, easeInOut(tLaser))
+    const baseY = yToVoid + yToStage
 
-    // Parallax fades out hard once approach starts so traversal is stable
-    const parallax = 0.32 * (1 - clamp(tApproach + tPortal * 1.2, 0, 1))
-    camera.position.x = camBaseX + mouse.current.x * parallax
-    camera.position.y = baseY + mouse.current.y * parallax
+    // Subtle landing breath — tiny low-frequency sin so the landing frame still feels alive
+    const breath = (1 - tApproach) * Math.sin(performance.now() * 0.00045) * 0.05
 
-    // Subtle roll on the laser stage
-    camera.rotation.z = Math.sin(performance.now() * 0.0004) * 0.012 * tLaser
+    // Mouse parallax: strong at landing, off during portal traversal
+    const parallaxK = (1 - clamp(tApproach + tPortal * 1.3, 0, 1)) * 0.32
+                    + clamp((tLaser - 0.6) / 0.4, 0, 1) * 0.18
 
-    // Look forward — track camBaseX so we look straight ahead, not diagonally
-    const lookY = baseY - lerp(0, 0.6, tLaser)
-    camera.lookAt(camBaseX, lookY, camera.position.z - 12)
+    camera.position.x = mouse.current.x * parallaxK
+    camera.position.y = baseY + breath + mouse.current.y * parallaxK
+
+    // Roll removed — was barely visible and added noise
+    camera.rotation.z = 0
+
+    // lookAt — tracks position so we always look horizontal-forward, not diagonal.
+    // On the laser stage, dip slightly down so the floor reads.
+    const lookY = baseY - lerp(0, 0.7, tLaser)
+    camera.lookAt(0, lookY, camera.position.z - 12)
   })
 
   return null

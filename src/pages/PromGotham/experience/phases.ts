@@ -7,10 +7,10 @@
  * transitions fire.
  */
 export const PHASES = {
-  landing:  [0.00, 0.10] as const, // P1 GOTHAM idle, date reveals
-  approach: [0.10, 0.32] as const, // P2 camera glides toward the H
-  portal:   [0.32, 0.55] as const, // P3 doorway opens, camera enters
-  laser:    [0.48, 1.00] as const, // P4 laser stage forms (overlaps portal tail)
+  landing:  [0.00, 0.10] as const, // P1 GOTHAM! idle, date reveals
+  approach: [0.10, 0.32] as const, // P2 camera glides toward the H, Y drops to lower void
+  portal:   [0.32, 0.50] as const, // P3 doorway opens, camera enters lower void
+  laser:    [0.40, 1.00] as const, // P4 laser stage — overlaps approach tail + portal so transition is seamless
 } as const
 
 /** Linear remap of t into 0..1 over [a, b], clamped. */
