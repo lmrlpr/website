@@ -85,11 +85,19 @@ Deno.serve(async (req) => {
         dessert,
         drinks,
         has_alcohol,
+        user_type,
       } = session.metadata
+      // Proffen orders send class_group=''; substitute a label so the admin
+      // table shows something meaningful and any NOT-NULL / CHECK length
+      // constraints on class_group still pass.
+      const displayClassGroup =
+        user_type === 'proffen' ? 'Proffen' :
+        (class_group && class_group.trim()) ? class_group :
+        '—'
       const { error } = await supabase.from('restaurant_reservations').insert({
         first_name,
         last_name,
-        class_group,
+        class_group: displayClassGroup,
         email,
         phone: phone ?? null,
         menu_selection: { starter, main, dessert, drinks },
