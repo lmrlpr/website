@@ -88,6 +88,7 @@ export function ReservationForm({ menuSelection, surcharge }: ReservationFormPro
         dessert: menuSelection.dessert,
         drinks: menuSelection.drinks,
         hasAlcohol,
+        userType: 'primaner',
       })
     } catch (err) {
       setLoading(false)
