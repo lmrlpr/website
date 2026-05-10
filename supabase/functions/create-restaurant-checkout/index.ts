@@ -1,8 +1,11 @@
 import Stripe from 'npm:stripe'
+import { createClient } from 'npm:@supabase/supabase-js'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
   apiVersion: '2024-06-20',
 })
+
+const RESTAURANT_CAPACITY = 180
 
 const SITE_URL = Deno.env.get('SITE_URL') ?? 'http://localhost:5173'
 const ALLOWED_ORIGIN = new URL(SITE_URL).origin
@@ -39,6 +42,28 @@ Deno.serve(async (req) => {
     if (!isProffen && !classGroup) {
       return new Response(JSON.stringify({ error: 'Missing class group' }), {
         status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      })
+    }
+
+    // ── capacity check ──────────────────────────────────────────────────
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+    const { count, error: countError } = await supabase
+      .from('restaurant_reservations')
+      .select('*', { count: 'exact', head: true })
+    if (countError) {
+      console.error('Capacity check failed:', countError.message)
+      return new Response(JSON.stringify({ error: 'Capacity check failed' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      })
+    }
+    if ((count ?? 0) >= RESTAURANT_CAPACITY) {
+      return new Response(JSON.stringify({ error: 'Porta Nova ass komplett ausgebucht.' }), {
+        status: 409,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       })
     }

@@ -285,28 +285,50 @@ export default function Admin() {
         </div>
 
         {/* Summary cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            <div className="text-4xl font-bold text-gray-900">{gotham_registrations.length}</div>
-            <div className="text-sm text-gray-600 mt-1 font-medium">Gotham inscriptions</div>
-            <div className="text-xs text-gray-400 mt-1">
-              {gotham_registrations.filter(r => r.ticket_type === 'external').length} externes ·{' '}
-              {gotham_registrations.filter(r => r.ticket_type === 'primaner').length} primaneren
+        {(() => {
+          const primanerCount = gotham_registrations.filter(r => r.ticket_type === 'primaner').length
+          const externalCount = gotham_registrations.filter(r => r.ticket_type === 'external').length
+          const restoCount    = restaurant_reservations.length
+          const PRIMANER_CAP  = 200
+          const EXTERNAL_CAP  = 160
+          const RESTO_CAP     = 180
+          const bar = (cur: number, cap: number) => {
+            const pct = Math.min(100, (cur / cap) * 100)
+            const color = pct >= 100 ? 'bg-red-500' : pct >= 85 ? 'bg-amber-500' : 'bg-green-500'
+            return (
+              <div className="mt-3 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
+              </div>
+            )
+          }
+          return (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                <div className="text-4xl font-bold text-gray-900">{gotham_registrations.length}</div>
+                <div className="text-sm text-gray-600 mt-1 font-medium">Gotham inscriptions</div>
+                <div className="text-xs text-gray-500 mt-2 space-y-0.5">
+                  <div>Primaneren: <span className="font-semibold">{primanerCount} / {PRIMANER_CAP}</span></div>
+                  {bar(primanerCount, PRIMANER_CAP)}
+                  <div className="pt-1.5">Externe (Proff + +1): <span className="font-semibold">{externalCount} / {EXTERNAL_CAP}</span></div>
+                  {bar(externalCount, EXTERNAL_CAP)}
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                <div className="text-4xl font-bold text-gray-900">{merch_orders.length}</div>
+                <div className="text-sm text-gray-600 mt-1 font-medium">Commandes merch</div>
+                <div className="text-xs text-gray-400 mt-1">{totalMerchItems} articles au total</div>
+              </div>
+              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                <div className="text-4xl font-bold text-gray-900">{restoCount} <span className="text-base text-gray-400 font-normal">/ {RESTO_CAP}</span></div>
+                <div className="text-sm text-gray-600 mt-1 font-medium">Réservations restaurant</div>
+                {bar(restoCount, RESTO_CAP)}
+                <div className="text-xs text-gray-400 mt-2">
+                  {restaurant_reservations.filter(r => r.total_surcharge > 0).length} avec supplément boissons
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            <div className="text-4xl font-bold text-gray-900">{merch_orders.length}</div>
-            <div className="text-sm text-gray-600 mt-1 font-medium">Commandes merch</div>
-            <div className="text-xs text-gray-400 mt-1">{totalMerchItems} articles au total</div>
-          </div>
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            <div className="text-4xl font-bold text-gray-900">{restaurant_reservations.length}</div>
-            <div className="text-sm text-gray-600 mt-1 font-medium">Réservations restaurant</div>
-            <div className="text-xs text-gray-400 mt-1">
-              {restaurant_reservations.filter(r => r.total_surcharge > 0).length} avec supplément boissons
-            </div>
-          </div>
-        </div>
+          )
+        })()}
 
         {/* Gotham */}
         <section>

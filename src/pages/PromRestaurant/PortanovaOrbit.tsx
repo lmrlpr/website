@@ -263,6 +263,7 @@ export function PortanovaOrbit() {
   const [editing, setEditing] = useState<Set<string>>(new Set())
   const [errs, setErrs]   = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const profilRef   = useRef<HTMLDivElement>(null)
@@ -353,6 +354,7 @@ export function PortanovaOrbit() {
 
   const handleSubmit = async () => {
     setLoading(true)
+    setSubmitError(null)
     try {
       await redirectToRestaurantCheckout({
         firstName: fd.firstName, lastName: fd.lastName, classGroup: fd.classGroup,
@@ -361,7 +363,10 @@ export function PortanovaOrbit() {
         drinks: fd.drinks, hasAlcohol: hasAlc,
         userType: fd.userType as 'primaner' | 'proffen',
       })
-    } catch { setLoading(false) }
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Feeler. Probéier nach eng Kéier.')
+      setLoading(false)
+    }
   }
 
   // ── food section renderer ─────────────────────────────────────────────────
@@ -646,6 +651,16 @@ export function PortanovaOrbit() {
                   </div>
                 </div>
               </div>
+
+              {/* error banner */}
+              {submitError && (
+                <div
+                  className="mb-3 px-4 py-3 rounded-xl text-sm font-sans"
+                  style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', color: '#B42318' }}
+                >
+                  {submitError}
+                </div>
+              )}
 
               {/* pay button */}
               <motion.button
