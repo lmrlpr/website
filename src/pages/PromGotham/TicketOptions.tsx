@@ -265,7 +265,7 @@ export function TicketOptions() {
         </motion.div>
         <p className="text-gotham-blue/80 text-[10px] tracking-[0.4em] uppercase mb-2 relative">// Bezuelung erfollegräich</p>
         <h3 className="text-xl font-bold text-white mb-2 tracking-wide relative">Aschreiwung bestätegt</h3>
-        <p className="text-white/40 text-sm relative">Du bass op der Lëscht. Vergiess deng Personalausweis net.</p>
+        <p className="text-white/40 text-sm relative">Du bass op der Lëscht. Vergiess däin Personalausweis net.</p>
       </div>
     )
   }
