@@ -174,7 +174,7 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
           >
             {/* ── Left panel ─────────────────────────────────────────────── */}
             <div
-              className="relative h-[38vh] md:h-full md:w-[58%] shrink-0 flex items-center justify-center overflow-hidden"
+              className="relative h-[48vh] md:h-full md:w-[58%] shrink-0 flex items-center justify-center overflow-hidden"
               style={{ background: 'linear-gradient(145deg, #F2E8D5 0%, #EAD9C0 100%)' }}
               onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX }}
               onTouchEnd={(e) => {
@@ -258,15 +258,18 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
 
               {/* Photo gallery dots — multiple photos for same combination */}
               {visiblePhotos.length > 1 && (
-                <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-1.5">
+                <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-1">
                   {visiblePhotos.map((_, idx) => (
                     <button
                       key={idx}
                       onClick={() => setPhotoIdx(idx)}
-                      className={`w-1.5 h-1.5 rounded-full transition-all ${
+                      className="p-2 flex items-center justify-center"
+                      aria-label={`Photo ${idx + 1}`}
+                    >
+                      <span className={`block w-1.5 h-1.5 rounded-full transition-all ${
                         idx === photoIdx ? 'bg-white scale-125' : 'bg-white/50'
-                      }`}
-                    />
+                      }`} />
+                    </button>
                   ))}
                 </div>
               )}
@@ -308,7 +311,7 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
               {/* Mobile close */}
               <button
                 onClick={onClose}
-                className="md:hidden absolute top-4 right-4 w-8 h-8 rounded-full bg-black/10 flex items-center justify-center hover:bg-black/20 transition-colors"
+                className="md:hidden absolute top-4 right-4 w-11 h-11 rounded-full bg-black/15 flex items-center justify-center active:bg-black/30 transition-colors"
               >
                 <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -319,7 +322,7 @@ export function ProductView({ product, open, onClose }: ProductViewProps) {
             {/* ── Right panel ─────────────────────────────────────────────── */}
             <div
               className="relative flex-1 overflow-y-auto border-l border-[#E5D5BF]"
-              style={{ background: '#FAF6EE', paddingBottom: 'max(2.5rem, env(safe-area-inset-bottom))' }}
+              style={{ background: '#FAF6EE', paddingBottom: 'max(2.5rem, calc(1rem + env(safe-area-inset-bottom, 0px)))' }}
             >
               {/* Desktop close */}
               <button

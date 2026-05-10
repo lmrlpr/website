@@ -37,7 +37,7 @@ export function NavOverlay({ open, onClose }: NavOverlayProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-40 bg-ink flex flex-col justify-center px-10 md:px-20"
+          className="fixed inset-0 z-40 bg-ink flex flex-col justify-center px-10 md:px-20 overscroll-contain"
         >
           <nav className="flex flex-col items-center gap-2 text-center">
             {navItems.map((item, i) =>
@@ -97,7 +97,10 @@ export function NavOverlay({ open, onClose }: NavOverlayProps) {
             )}
           </nav>
 
-          <div className="absolute bottom-10 left-10 md:left-20 text-white/30 text-sm tracking-widest uppercase">
+          <div
+            className="absolute left-10 md:left-20 text-white/30 text-sm tracking-widest uppercase"
+            style={{ bottom: 'calc(2.5rem + env(safe-area-inset-bottom, 0px))' }}
+          >
             Primaner vum Michel Rodange
           </div>
         </motion.div>

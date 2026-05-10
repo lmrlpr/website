@@ -99,16 +99,16 @@ export function CartDrawer() {
                           </p>
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-                              <button onClick={() => updateQuantity(item.productId, item.color, item.size, item.quantity - 1)} className="px-2.5 py-1 text-ink hover:bg-gray-50 text-xs">−</button>
-                              <span className="px-2.5 py-1 text-xs font-medium">{item.quantity}</span>
-                              <button onClick={() => updateQuantity(item.productId, item.color, item.size, item.quantity + 1)} className="px-2.5 py-1 text-ink hover:bg-gray-50 text-xs">+</button>
+                              <button onClick={() => updateQuantity(item.productId, item.color, item.size, item.quantity - 1)} className="px-3.5 py-2 text-ink hover:bg-gray-50 text-sm min-w-[2.5rem] flex items-center justify-center">−</button>
+                              <span className="px-3 py-2 text-sm font-medium min-w-[2rem] text-center">{item.quantity}</span>
+                              <button onClick={() => updateQuantity(item.productId, item.color, item.size, item.quantity + 1)} className="px-3.5 py-2 text-ink hover:bg-gray-50 text-sm min-w-[2.5rem] flex items-center justify-center">+</button>
                             </div>
                             <p className="text-sm font-medium text-ink">{formatCurrency(item.price * item.quantity)}</p>
                           </div>
                         </div>
                         <button
                           onClick={() => removeFromCart(item.productId, item.color, item.size)}
-                          className="text-gray-300 hover:text-gray-500 transition-colors self-start mt-0.5"
+                          className="text-gray-300 hover:text-gray-500 transition-colors self-start -mt-1 -mr-1 p-2"
                         >
                           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -123,7 +123,10 @@ export function CartDrawer() {
 
             {/* Footer */}
             {items.length > 0 && (
-              <div className="px-6 py-5 border-t border-gray-100 flex flex-col gap-4">
+              <div
+                className="px-6 pt-5 border-t border-gray-100 flex flex-col gap-4"
+                style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}
+              >
                 <PromoCodeInput />
 
                 <div className="space-y-2 text-sm">

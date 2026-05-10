@@ -233,7 +233,7 @@ function Stepper({ done, doneCount }: { done: Set<string>; doneCount: number }) 
           const isDone = done.has(step.id)
           const isNext = i === doneCount
           return (
-            <div key={step.id} className="flex flex-col items-center" style={{ width: '20%' }}>
+            <div key={step.id} className="flex flex-col items-center flex-1 min-w-0">
               <span
                 className="font-sans text-center"
                 style={{
@@ -372,6 +372,7 @@ export function PortanovaOrbit() {
       <motion.div
         key={id}
         ref={el => { sectionRefs.current[id] = el }}
+        data-section
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: EASE }}
@@ -409,8 +410,14 @@ export function PortanovaOrbit() {
     >
       {/* ── sticky progress bar ───────────────────────────────────────────────── */}
       <div
-        className="sticky top-0 z-40"
-        style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(195,209,236,0.4)' }}
+        className="sticky z-40"
+        style={{
+          top: 'calc(4rem + env(safe-area-inset-top, 0px))',
+          background: 'rgba(255,255,255,0.82)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgba(195,209,236,0.4)',
+        }}
       >
         {/* thin fill line */}
         <div className="relative overflow-hidden" style={{ height: 2, background: '#EEF3FA' }}>
@@ -424,7 +431,8 @@ export function PortanovaOrbit() {
       </div>
 
       {/* ── page content ──────────────────────────────────────────────────────── */}
-      <div className="max-w-xl mx-auto px-4 pb-28">
+      {/* scroll-margin-top keeps sections from sliding under nav+progress bar on scrollIntoView */}
+      <div className="max-w-xl mx-auto px-4 pb-28 [&_[data-section]]:scroll-mt-28">
 
         {/* Address */}
         <motion.p
@@ -456,6 +464,7 @@ export function PortanovaOrbit() {
           {/* Gedrénks */}
           <motion.div
             ref={el => { sectionRefs.current['gedrenks'] = el }}
+            data-section
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.08, ease: EASE }}
@@ -503,6 +512,7 @@ export function PortanovaOrbit() {
             <motion.div
               key="profil-block"
               ref={profilRef}
+              data-section
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
@@ -543,6 +553,7 @@ export function PortanovaOrbit() {
             <motion.div
               key="personal-block"
               ref={personalRef}
+              data-section
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}

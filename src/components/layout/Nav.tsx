@@ -24,8 +24,14 @@ export function Nav() {
   return (
     <>
       <nav
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-16"
-        style={{ pointerEvents: hideNav ? 'none' : 'auto', opacity: hideNav ? 0 : 1, transition: 'opacity 0.25s ease' }}
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10"
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          height: 'calc(4rem + env(safe-area-inset-top, 0px))',
+          pointerEvents: hideNav ? 'none' : 'auto',
+          opacity: hideNav ? 0 : 1,
+          transition: 'opacity 0.25s ease',
+        }}
       >
         {/* Logo */}
         <Link
