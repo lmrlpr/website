@@ -413,9 +413,8 @@ export function PortanovaOrbit() {
     >
       {/* ── sticky progress bar ───────────────────────────────────────────────── */}
       <div
-        className="sticky z-40"
+        className="sticky top-0 z-40"
         style={{
-          top: 'calc(4rem + env(safe-area-inset-top, 0px))',
           background: 'rgba(255,255,255,0.82)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',

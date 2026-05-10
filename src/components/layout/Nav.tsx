@@ -19,12 +19,15 @@ export function Nav() {
   }, [])
 
   const isLight = location.pathname === '/' || location.pathname === '/merch' || location.pathname === '/prom/restaurant'
-  const hideNav = panelOpen && location.pathname === '/prom/restaurant'
+  const isRestaurant = location.pathname === '/prom/restaurant'
+  const isGotham = location.pathname === '/prom/gotham'
+  const scrollAway = isRestaurant || isGotham
+  const hideNav = panelOpen && isRestaurant
 
   return (
     <>
       <nav
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10"
+        className={`${scrollAway ? 'absolute' : 'fixed'} top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10`}
         style={{
           paddingTop: 'env(safe-area-inset-top, 0px)',
           height: 'calc(4rem + env(safe-area-inset-top, 0px))',
