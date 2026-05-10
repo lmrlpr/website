@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { redirectToGothamCheckout } from '../../services/stripe'
@@ -59,14 +59,21 @@ export function TicketOptions() {
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const done = searchParams.get('success') === '1'
+  // Capture URL flags into local state on mount so they persist after we
+  // clean the URL — otherwise the success state flashes and disappears.
+  const [done, setDone] = useState(false)
+  const [cancelled, setCancelled] = useState(false)
   const codeRef = useRef<HTMLDivElement>(null)
 
-  if (searchParams.get('success') === '1' || searchParams.get('cancelled') === '1') {
-    setSearchParams({}, { replace: true })
-  }
+  useEffect(() => {
+    const success = searchParams.get('success') === '1'
+    const cancelledFlag = searchParams.get('cancelled') === '1'
+    if (success) setDone(true)
+    if (cancelledFlag) setCancelled(true)
+    if (success || cancelledFlag) setSearchParams({}, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  const cancelled = searchParams.get('cancelled') === '1'
   const selectedTicket = tickets.find(t => t.id === selected)
 
   const handleTicketSelect = (id: typeof selected) => {
@@ -227,19 +234,38 @@ export function TicketOptions() {
 
   if (done) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center px-6">
+      <div className="flex flex-col items-center justify-center py-24 text-center px-6 relative">
+        {/* radiating success rings */}
+        {[0, 1, 2].map(i => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full pointer-events-none"
+            style={{ width: 180, height: 180, border: '1px solid rgba(0,212,255,0.45)' }}
+            initial={{ scale: 0.5, opacity: 0.7 }}
+            animate={{ scale: 3, opacity: 0 }}
+            transition={{ duration: 2.4, delay: i * 0.6, repeat: Infinity, ease: 'easeOut' }}
+          />
+        ))}
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
-          style={{ border: '1px solid rgba(0,212,255,0.4)', boxShadow: '0 0 30px rgba(0,212,255,0.2)' }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 220, damping: 14 }}
+          className="w-20 h-20 rounded-full flex items-center justify-center mb-6 relative"
+          style={{ background: 'linear-gradient(135deg, rgba(0,212,255,0.18) 0%, rgba(139,92,246,0.18) 100%)', border: '1.5px solid rgba(0,212,255,0.6)', boxShadow: '0 0 36px rgba(0,212,255,0.45)' }}
         >
-          <svg className="w-8 h-8 text-gotham-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
+          <svg className="w-9 h-9 text-gotham-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <motion.path
+              d="M5 13l4 4L19 7"
+              strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 0.4, duration: 0.5, ease: 'easeOut' }}
+            />
           </svg>
         </motion.div>
-        <h3 className="text-xl font-bold text-white mb-2 tracking-wide">Aschreiwung bestätegt</h3>
-        <p className="text-white/40 text-sm">Du bass op der Lëscht. Vergiess deng Personalausweis net.</p>
+        <p className="text-gotham-blue/80 text-[10px] tracking-[0.4em] uppercase mb-2 relative">// Bezuelung erfollegräich</p>
+        <h3 className="text-xl font-bold text-white mb-2 tracking-wide relative">Aschreiwung bestätegt</h3>
+        <p className="text-white/40 text-sm relative">Du bass op der Lëscht. Vergiess deng Personalausweis net.</p>
       </div>
     )
   }
