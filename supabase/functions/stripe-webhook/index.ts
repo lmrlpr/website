@@ -58,14 +58,15 @@ Deno.serve(async (req) => {
         ticket_type === 'eleve' ? 'primaner' :
         ticket_type === 'primaner' ? 'primaner' :
         'external'
+      // gotham_registrations doesn't have payment_status / stripe_session_id
+      // columns — omit them. checkout.session.completed only fires on a
+      // successful payment, so a row's existence already implies "paid".
       const { error } = await supabase.from('gotham_registrations').insert({
         first_name,
         last_name,
         email,
         ticket_type: normalized,
         price,
-        payment_status: 'paid',
-        stripe_session_id: session.id,
       })
       if (error) {
         console.error('DB insert failed (gotham):', error.message)
@@ -94,6 +95,9 @@ Deno.serve(async (req) => {
         user_type === 'proffen' ? 'Proffen' :
         (class_group && class_group.trim()) ? class_group :
         '—'
+      // restaurant_reservations.access_code is NOT NULL (legacy column from
+      // the old gated flow). Hardcode the constant access code so the insert
+      // passes — it has no functional meaning post-checkout.
       const { error } = await supabase.from('restaurant_reservations').insert({
         first_name,
         last_name,
@@ -102,6 +106,7 @@ Deno.serve(async (req) => {
         phone: phone ?? null,
         menu_selection: { starter, main, dessert, drinks },
         total_surcharge: has_alcohol === 'true' ? 7 : 0,
+        access_code: 'PROM2026',
         payment_status: 'paid',
         stripe_session_id: session.id,
       })
