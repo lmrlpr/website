@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { redirectToGothamCheckout } from '../../services/stripe'
 
-const ACCESS_CODE = 'GOTHAM2026'
+const ACCESS_CODE = 'PROM2026'
 
 const tickets = [
   {
@@ -60,6 +60,7 @@ export function TicketOptions() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const done = searchParams.get('success') === '1'
+  const codeRef = useRef<HTMLDivElement>(null)
 
   if (searchParams.get('success') === '1' || searchParams.get('cancelled') === '1') {
     setSearchParams({}, { replace: true })
@@ -73,6 +74,7 @@ export function TicketOptions() {
     setStep('code')
     setCode('')
     setCodeError('')
+    setTimeout(() => codeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80)
   }
 
   const handleCodeSubmit = (e: React.FormEvent) => {
@@ -166,20 +168,22 @@ export function TicketOptions() {
                 onClick={() => handleTicketSelect(ticket.id)}
                 className="text-left rounded-2xl p-7 cursor-pointer transition-all duration-200 relative overflow-hidden group"
                 style={{
-                  background: `linear-gradient(135deg, rgba(10,10,15,0.9) 0%, ${ticket.glowVar} 100%)`,
-                  border: `1px solid ${isSelected ? ticket.accentColor + '80' : ticket.borderFrom}`,
-                  boxShadow: isSelected ? `0 0 24px ${ticket.glowVar}, 0 8px 40px rgba(0,0,0,0.5)` : '0 8px 40px rgba(0,0,0,0.4)',
+                  background: `linear-gradient(135deg, rgba(20,20,32,0.96) 0%, ${ticket.accentColor}22 100%)`,
+                  border: `1.5px solid ${isSelected ? ticket.accentColor : ticket.accentColor + '55'}`,
+                  boxShadow: isSelected
+                    ? `0 0 32px ${ticket.accentColor}55, 0 12px 48px rgba(0,0,0,0.6)`
+                    : `0 0 16px ${ticket.accentColor}22, 0 12px 48px rgba(0,0,0,0.55)`,
                 }}
                 onMouseEnter={e => {
                   if (!isSelected) {
-                    (e.currentTarget as HTMLElement).style.borderColor = ticket.borderTo
-                    ;(e.currentTarget as HTMLElement).style.boxShadow = `0 0 24px ${ticket.glowVar}, 0 8px 40px rgba(0,0,0,0.5)`
+                    (e.currentTarget as HTMLElement).style.borderColor = ticket.accentColor + 'AA'
+                    ;(e.currentTarget as HTMLElement).style.boxShadow = `0 0 28px ${ticket.accentColor}44, 0 12px 48px rgba(0,0,0,0.6)`
                   }
                 }}
                 onMouseLeave={e => {
                   if (!isSelected) {
-                    (e.currentTarget as HTMLElement).style.borderColor = ticket.borderFrom
-                    ;(e.currentTarget as HTMLElement).style.boxShadow = '0 8px 40px rgba(0,0,0,0.4)'
+                    (e.currentTarget as HTMLElement).style.borderColor = ticket.accentColor + '55'
+                    ;(e.currentTarget as HTMLElement).style.boxShadow = `0 0 16px ${ticket.accentColor}22, 0 12px 48px rgba(0,0,0,0.55)`
                   }
                 }}
               >
@@ -232,6 +236,7 @@ export function TicketOptions() {
           {step === 'code' && selected && (
             <motion.div
               key="code-gate"
+              ref={codeRef}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}

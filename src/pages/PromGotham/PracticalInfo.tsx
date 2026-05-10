@@ -5,7 +5,7 @@ function PinIcon()     { return <svg width="16" height="16" fill="none" stroke="
 function IdCardIcon()  { return <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><path d="M14 10h4M14 14h2"/></svg> }
 
 const items = [
-  { icon: <ClockIcon />,   label: 'Zäiten',          value: '00h – 06h',                                  accent: '#00D4FF' },
+  { icon: <ClockIcon />,   label: 'Zäiten',          value: '23h59 – 06h',                                accent: '#00D4FF' },
   { icon: <PinIcon />,     label: 'Adress',          value: '14 Av. de la Faïencerie, 1510 Limpertsberg', accent: '#8B5CF6', link: 'https://maps.google.com/?q=14+Avenue+de+la+Faiencerie+1510+Luxembourg' },
   { icon: <IdCardIcon />,  label: 'Identifikatioun', value: 'Personalausweis obligatoresch um Agang',     accent: '#00D4FF' },
 ]

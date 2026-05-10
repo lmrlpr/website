@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 
-const EVENT_DATE = new Date('2026-07-03T00:00:00')
+const EVENT_DATE = new Date('2026-07-02T23:59:00')
 
 const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth <= 768
 
@@ -106,7 +106,7 @@ export function GothamHero() {
         >
           <div className="hidden sm:block h-px w-12 bg-gradient-to-r from-transparent to-gotham-blue/60" />
           <p className="text-gotham-blue/70 text-xs tracking-[0.22em] sm:tracking-[0.6em] uppercase font-medium">
-            Prom &nbsp;·&nbsp; 00h – 06h
+            Prom &nbsp;·&nbsp; 23h59 – 06h
           </p>
           <div className="hidden sm:block h-px w-12 bg-gradient-to-l from-transparent to-gotham-blue/60" />
         </motion.div>
@@ -165,7 +165,7 @@ export function GothamHero() {
           transition={{ delay: 0.8 }}
           className="text-white/20 text-xs tracking-[0.5em] uppercase mb-10"
         >
-          3. Juli 2026
+          2. Juli 2026
         </motion.p>
 
         {/* ── CTA Buttons ── */}
