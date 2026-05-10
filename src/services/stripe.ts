@@ -57,6 +57,7 @@ export async function redirectToRestaurantCheckout(data: {
   dessert: string
   drinks: string
   hasAlcohol: boolean
+  userType: 'primaner' | 'proffen'
 }): Promise<void> {
   const res = await fetch(`${SUPABASE_URL}/functions/v1/create-restaurant-checkout`, {
     method: 'POST',

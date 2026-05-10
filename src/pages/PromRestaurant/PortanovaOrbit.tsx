@@ -8,21 +8,24 @@ import { redirectToRestaurantCheckout } from '../../services/stripe'
 import type { DrinkPackage } from '../../types/menuSelection'
 
 type FoodId = 'entree' | 'hauptplat' | 'dessert' | 'gedrenks'
+type UserType = 'primaner' | 'proffen' | ''
 
 interface FD {
   starter: string; main: string; dessert: string
   drinks: DrinkPackage | ''
+  userType: UserType
   firstName: string; lastName: string; classGroup: string; email: string; phone: string
 }
 
 const BLANK: FD = {
   starter: '', main: '', dessert: '', drinks: '',
+  userType: '',
   firstName: '', lastName: '', classGroup: '', email: '', phone: '',
 }
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1]
 const FOOD_IDS: FoodId[] = ['entree', 'hauptplat', 'dessert', 'gedrenks']
-const ALL_REQUIRED = [...FOOD_IDS, 'personal']
+const ALL_REQUIRED = [...FOOD_IDS, 'profil', 'personal']
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -112,15 +115,65 @@ function CardTop() {
   return <div style={{ height: 3, background: 'linear-gradient(90deg, #1B2D52 0%, #2558C9 100%)', borderRadius: '2px 2px 0 0' }} />
 }
 
+function ProfileSelector({ selected, onChange }: { selected: UserType; onChange: (t: UserType) => void }) {
+  const options: { id: UserType; label: string; sub: string; price: string }[] = [
+    { id: 'primaner', label: 'Primaner', sub: 'Élève LMRL', price: '5 € / 12 €' },
+    { id: 'proffen',  label: 'Proffen',  sub: 'Professeur', price: '35 € / 42 €' },
+  ]
+  return (
+    <div>
+      <div className="relative mb-5">
+        <div className="absolute -top-3 -left-2 font-resto text-[5rem] leading-none pointer-events-none select-none" style={{ color: '#EBF0FA', zIndex: 0 }}>05</div>
+        <div style={{ zIndex: 1, position: 'relative' }}>
+          <h3 className="font-resto text-2xl" style={{ letterSpacing: '0.05em', color: '#1B2D52' }}>Profil</h3>
+          <div className="mt-1.5 h-0.5 w-10 rounded-full" style={{ background: 'linear-gradient(90deg, #2558C9, #F5C640)' }} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {options.map(opt => {
+          const isSel = selected === opt.id
+          return (
+            <motion.button
+              key={opt.id}
+              type="button"
+              onClick={() => onChange(opt.id)}
+              whileHover={isSel ? {} : { y: -2 }}
+              className="text-left rounded-xl border transition-colors duration-200 cursor-pointer overflow-hidden"
+              style={isSel ? {
+                background: 'linear-gradient(145deg, #1B2D52 0%, #2558C9 100%)',
+                borderColor: '#2558C9',
+                boxShadow: '0 6px 24px rgba(37,88,201,0.28)',
+              } : {
+                background: '#FFFFFF',
+                borderColor: '#C3D1EC',
+                boxShadow: '0 1px 4px rgba(37,88,201,0.06)',
+              }}
+            >
+              {isSel && <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, #F5C640, rgba(245,198,64,0.3))' }} />}
+              <div className="px-4 py-4">
+                <p className={`font-sans font-semibold text-sm mb-0.5 ${isSel ? 'text-white' : 'text-[#1B2D52]'}`}>{opt.label}</p>
+                <p className={`font-sans text-xs mb-3 ${isSel ? 'text-white/60' : 'text-[#7A91B8]'}`}>{opt.sub}</p>
+                <p className={`font-resto text-lg ${isSel ? 'text-white' : 'text-[#1B2D52]'}`}>{opt.price}</p>
+                <p className={`font-sans text-[10px] mt-0.5 ${isSel ? 'text-white/50' : 'text-[#B0BDD4]'}`}>mat / ouni alcool</p>
+              </div>
+            </motion.button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 const STEPS = [
   { id: 'entree',    label: 'Entrée' },
   { id: 'hauptplat', label: 'Haaptplat' },
   { id: 'dessert',   label: 'Dessert' },
   { id: 'gedrenks',  label: 'Gedrénks' },
+  { id: 'profil',    label: 'Profil' },
   { id: 'personal',  label: 'Donnéen' },
 ]
 
-const CIRC = 40
+const CIRC = 34
 
 function Stepper({ done, doneCount }: { done: Set<string>; doneCount: number }) {
   // scaleX relative to the track that runs exactly from circle-1-center to circle-5-center
@@ -212,15 +265,18 @@ export function PortanovaOrbit() {
   const [loading, setLoading] = useState(false)
 
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const profilRef   = useRef<HTMLDivElement>(null)
   const personalRef = useRef<HTMLDivElement>(null)
   const payRef      = useRef<HTMLDivElement>(null)
 
-  const foodDone    = FOOD_IDS.every(id => done.has(id))
+  const foodDone     = FOOD_IDS.every(id => done.has(id))
+  const profilDone   = done.has('profil')
   const personalDone = done.has('personal')
-  const allDone     = foodDone && personalDone
-  const doneCount   = ALL_REQUIRED.filter(id => done.has(id)).length
-  const hasAlc      = fd.drinks === 'alcoholic'
-  const total       = 20 + (hasAlc ? 7 : 0)
+  const allDone      = foodDone && profilDone && personalDone
+  const doneCount    = ALL_REQUIRED.filter(id => done.has(id)).length
+  const hasAlc       = fd.drinks === 'alcoholic'
+  const basePrice    = fd.userType === 'proffen' ? 35 : fd.userType === 'primaner' ? 5 : 0
+  const total        = basePrice + (hasAlc ? 7 : 0)
 
   const isCollapsed = (id: string) => done.has(id) && !editing.has(id)
 
@@ -241,10 +297,16 @@ export function PortanovaOrbit() {
   }
 
   useEffect(() => {
-    if (foodDone && !personalDone) {
-      setTimeout(() => personalRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 500)
+    if (foodDone && !profilDone) {
+      setTimeout(() => profilRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 500)
     }
   }, [foodDone])
+
+  useEffect(() => {
+    if (profilDone && !personalDone) {
+      setTimeout(() => personalRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 500)
+    }
+  }, [profilDone])
 
   useEffect(() => {
     if (allDone) {
@@ -273,12 +335,17 @@ export function PortanovaOrbit() {
     markDone('gedrenks')
   }
 
+  const onProfil = () => {
+    if (!fd.userType) return
+    markDone('profil')
+  }
+
   const onPersonal = () => {
     const e: Record<string, string> = {}
-    if (!fd.firstName.trim())    e.firstName  = 'Requis'
-    if (!fd.lastName.trim())     e.lastName   = 'Requis'
-    if (!fd.classGroup.trim())   e.classGroup = 'Requis'
-    if (!fd.email.includes('@')) e.email      = 'Email invalide'
+    if (!fd.firstName.trim())                                e.firstName  = 'Requis'
+    if (!fd.lastName.trim())                                 e.lastName   = 'Requis'
+    if (fd.userType !== 'proffen' && !fd.classGroup.trim()) e.classGroup = 'Requis'
+    if (!fd.email.includes('@'))                             e.email      = 'Email invalide'
     if (Object.keys(e).length)   { setErrs(e); return }
     setErrs({})
     markDone('personal')
@@ -292,6 +359,7 @@ export function PortanovaOrbit() {
         email: fd.email, phone: fd.phone,
         starter: fd.starter, main: fd.main, dessert: fd.dessert,
         drinks: fd.drinks, hasAlcohol: hasAlc,
+        userType: fd.userType as 'primaner' | 'proffen',
       })
     } catch { setLoading(false) }
   }
@@ -349,14 +417,14 @@ export function PortanovaOrbit() {
           <motion.div
             className="absolute inset-y-0 left-0"
             style={{ background: 'linear-gradient(90deg, #22c55e 0%, #2558C9 100%)' }}
-            animate={{ width: `${(doneCount / 5) * 100}%` }}
+            animate={{ width: `${(doneCount / 6) * 100}%` }}
             transition={{ duration: 0.65, ease: EASE }}
           />
         </div>
         {/* label row */}
         <div className="max-w-xl mx-auto flex items-center justify-between px-5 py-2.5">
           <span className="font-resto" style={{ fontSize: 13, letterSpacing: '0.2em', color: '#1B2D52' }}>PORTA NOVA</span>
-          <span className="font-sans" style={{ fontSize: 11, color: '#7A91B8' }}>{doneCount}/5</span>
+          <span className="font-sans" style={{ fontSize: 11, color: '#7A91B8' }}>{doneCount}/6</span>
         </div>
       </div>
 
@@ -417,7 +485,7 @@ export function PortanovaOrbit() {
           </motion.div>
         </div>
 
-        {/* ── gate indicator ────────────────────────────────────────────────── */}
+        {/* ── food gate indicator ───────────────────────────────────────────── */}
         <AnimatePresence>
           {!foodDone && (
             <motion.div
@@ -434,9 +502,49 @@ export function PortanovaOrbit() {
           )}
         </AnimatePresence>
 
-        {/* ── personal section ──────────────────────────────────────────────── */}
+        {/* ── profil section ────────────────────────────────────────────────── */}
         <AnimatePresence>
           {foodDone && (
+            <motion.div
+              key="profil-block"
+              ref={profilRef}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.55, ease: EASE }}
+              className="mt-8"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, transparent, #DDE8F5)' }} />
+                <span className="font-sans text-[10px] uppercase tracking-[0.3em]" style={{ color: '#7A91B8' }}>Profil</span>
+                <div style={{ flex: 1, height: 1, background: 'linear-gradient(90deg, #DDE8F5, transparent)' }} />
+              </div>
+              <CardShell done={isCollapsed('profil')}>
+                {isCollapsed('profil') ? (
+                  <DoneRow
+                    num="05" title="Profil"
+                    summary={fd.userType === 'primaner' ? 'Primaner — 5 € / 12 €' : 'Proffen — 35 € / 42 €'}
+                    onEdit={() => editSection('profil')}
+                  />
+                ) : (
+                  <>
+                    <CardTop />
+                    <div className="px-5 pt-5 pb-6">
+                      <ProfileSelector selected={fd.userType} onChange={v => setFd(d => ({ ...d, userType: v }))} />
+                      <div className="mt-5">
+                        <ConfirmBtn onClick={onProfil} disabled={!fd.userType} />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardShell>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── personal section ──────────────────────────────────────────────── */}
+        <AnimatePresence>
+          {profilDone && (
             <motion.div
               key="personal-block"
               ref={personalRef}
@@ -465,7 +573,7 @@ export function PortanovaOrbit() {
                     <CardTop />
                     <div className="px-5 pt-5 pb-6">
                       <div className="relative mb-5">
-                        <div className="absolute -top-3 -left-2 font-resto text-[5rem] leading-none pointer-events-none select-none" style={{ color: '#EBF0FA', zIndex: 0 }}>05</div>
+                        <div className="absolute -top-3 -left-2 font-resto text-[5rem] leading-none pointer-events-none select-none" style={{ color: '#EBF0FA', zIndex: 0 }}>06</div>
                         <div style={{ zIndex: 1, position: 'relative' }}>
                           <h3 className="font-resto text-2xl" style={{ letterSpacing: '0.05em', color: '#1B2D52' }}>Donnéeën</h3>
                           <div className="mt-1.5 h-0.5 w-10 rounded-full" style={{ background: 'linear-gradient(90deg, #2558C9, #F5C640)' }} />
@@ -476,7 +584,9 @@ export function PortanovaOrbit() {
                           <Field label="Prénom"  value={fd.firstName}  onChange={set('firstName')}  placeholder="Jean"   error={errs.firstName} />
                           <Field label="Nom"     value={fd.lastName}   onChange={set('lastName')}   placeholder="Dupont" error={errs.lastName} />
                         </div>
-                        <Field label="Classe"    value={fd.classGroup} onChange={set('classGroup')} placeholder="1CM2"              error={errs.classGroup} />
+                        {fd.userType !== 'proffen' && (
+                          <Field label="Classe" value={fd.classGroup} onChange={set('classGroup')} placeholder="1CM2" error={errs.classGroup} />
+                        )}
                         <Field label="Email"     value={fd.email}      onChange={set('email')}      placeholder="jean@lycee.lu"     error={errs.email} type="email" />
                         <Field label="Téléphone" value={fd.phone}      onChange={set('phone')}      placeholder="+352 621 000 000"  optional type="tel" />
                       </div>
