@@ -68,7 +68,14 @@ export function TicketOptions() {
   useEffect(() => {
     const success = searchParams.get('success') === '1'
     const cancelledFlag = searchParams.get('cancelled') === '1'
-    if (success) setDone(true)
+    if (success) {
+      setDone(true)
+      // Bring the success block into view — otherwise users land on the
+      // hero and don't see the confirmation without scrolling.
+      setTimeout(() => {
+        document.getElementById('tickets')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 120)
+    }
     if (cancelledFlag) setCancelled(true)
     if (success || cancelledFlag) setSearchParams({}, { replace: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
