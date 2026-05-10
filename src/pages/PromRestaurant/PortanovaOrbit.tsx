@@ -120,19 +120,26 @@ const STEPS = [
   { id: 'personal',  label: 'Donnéen' },
 ]
 
+const CIRC = 40
+
 function Stepper({ done, doneCount }: { done: Set<string>; doneCount: number }) {
+  // scaleX relative to the track that runs exactly from circle-1-center to circle-5-center
+  const trackScale = Math.max(0, doneCount - 1) / (STEPS.length - 1)
+
   return (
     <div className="pt-8 pb-6">
       {/* connecting track */}
       <div className="relative flex items-center justify-between mb-3">
+        {/* grey background track — inset by half a circle on each side */}
         <div
-          className="absolute left-0 right-0"
-          style={{ top: '50%', height: 2, background: '#DDE8F5', transform: 'translateY(-50%)', zIndex: 0 }}
+          className="absolute"
+          style={{ left: CIRC / 2, right: CIRC / 2, top: '50%', height: 2, background: '#DDE8F5', transform: 'translateY(-50%)', zIndex: 0 }}
         />
+        {/* progress fill — same inset, animated via scaleX from left */}
         <motion.div
-          className="absolute left-0"
-          style={{ top: '50%', height: 2, background: 'linear-gradient(90deg, #22c55e, #2558C9)', transform: 'translateY(-50%)', zIndex: 1, transformOrigin: 'left' }}
-          animate={{ width: doneCount === 0 ? '0%' : `${((doneCount - 1) / 4) * 100 + (1 / 4) * 50}%` }}
+          className="absolute"
+          style={{ left: CIRC / 2, right: CIRC / 2, top: '50%', height: 2, background: 'linear-gradient(90deg, #22c55e, #2558C9)', transform: 'translateY(-50%)', transformOrigin: 'left', zIndex: 1 }}
+          animate={{ scaleX: trackScale }}
           transition={{ duration: 0.65, ease: EASE }}
         />
         {STEPS.map((step, i) => {
