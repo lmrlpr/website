@@ -104,6 +104,127 @@ export function TicketOptions() {
     }
   }
 
+  // Mobile inline panels — same content as the desktop ones, just rendered without AnimatePresence
+  const renderCodeGate = () => (
+    <div
+      ref={codeRef}
+      className="rounded-2xl p-6 flex flex-col gap-4 mt-1"
+      style={{ background: 'rgba(10,10,15,0.85)', border: '1px solid rgba(0,212,255,0.18)', boxShadow: '0 0 40px rgba(0,212,255,0.08)' }}
+    >
+      <div>
+        <p className="text-gotham-blue/70 text-xs tracking-[0.4em] uppercase mb-1">// Zougangscode erfuerderlech</p>
+        <p className="text-white/60 text-sm leading-relaxed">
+          Reservéiert fir Primaneren, hiren +1, an d'Professeren.
+        </p>
+      </div>
+      <form onSubmit={handleCodeSubmit} className="flex flex-col gap-3">
+        <motion.div
+          key={shake ? 'shake' : 'still'}
+          animate={shake ? { x: [-8, 8, -8, 8, 0] } : { x: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <input
+            type="text"
+            value={code}
+            onChange={e => { setCode(e.target.value.toUpperCase()); setCodeError('') }}
+            placeholder="CODE D'ACCÈS"
+            autoFocus
+            className="w-full text-white placeholder:text-white/20 text-center text-base tracking-[0.35em] uppercase px-4 py-4 rounded-xl outline-none transition-all duration-200"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(0,212,255,0.25)' }}
+            onFocus={e => { e.target.style.borderColor = 'rgba(0,212,255,0.6)'; e.target.style.boxShadow = '0 0 12px rgba(0,212,255,0.15)' }}
+            onBlur={e => { e.target.style.borderColor = 'rgba(0,212,255,0.25)'; e.target.style.boxShadow = '' }}
+          />
+        </motion.div>
+        {codeError && (
+          <p className="text-center text-red-400 text-xs">{codeError}</p>
+        )}
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => { setStep('select'); setSelected(null) }}
+            className="flex-1 py-3.5 text-sm rounded-xl cursor-pointer transition-all duration-200"
+            style={{ border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.5)' }}
+          >
+            ← Zréck
+          </button>
+          <button
+            type="submit"
+            className="flex-1 py-3.5 text-sm font-semibold rounded-xl cursor-pointer transition-all duration-200 text-gotham-blue"
+            style={{ border: '1px solid rgba(0,212,255,0.5)', background: 'rgba(0,212,255,0.08)' }}
+          >
+            Bestätegen →
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+
+  const renderDetailsForm = () => (
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-2xl p-6 flex flex-col gap-4 mt-1"
+      style={{ background: 'rgba(10,10,15,0.85)', border: '1px solid rgba(0,212,255,0.18)', boxShadow: '0 0 40px rgba(0,212,255,0.08)' }}
+    >
+      <div className="flex items-center justify-between">
+        <p className="text-white/40 text-xs tracking-[0.4em] uppercase">// Är Informatioune</p>
+        {selectedTicket && <span className="text-xs font-medium" style={{ color: selectedTicket.accentColor }}>{selectedTicket.label} — {selectedTicket.priceLabel}</span>}
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4">
+        {[
+          { label: 'Virnumm', field: 'firstName', placeholder: 'Jean' },
+          { label: 'Familljenumm', field: 'lastName', placeholder: 'Dupont' },
+        ].map(({ label, field, placeholder }) => (
+          <div key={field}>
+            <label className="text-xs text-white/40 uppercase tracking-wider block mb-1.5">{label}</label>
+            <input
+              required
+              value={form[field as keyof typeof form]}
+              onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
+              placeholder={placeholder}
+              className="w-full text-white placeholder:text-white/20 px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)' }}
+            />
+          </div>
+        ))}
+      </div>
+      <div>
+        <label className="text-xs text-white/40 uppercase tracking-wider block mb-1.5">Email</label>
+        <input
+          type="email"
+          required
+          value={form.email}
+          onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+          placeholder="jean@example.com"
+          className="w-full text-white placeholder:text-white/20 px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)' }}
+        />
+      </div>
+      {error && (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+          <span className="text-xs text-red-300">{error}</span>
+        </div>
+      )}
+      <div className="flex gap-3 mt-1">
+        <button
+          type="button"
+          onClick={() => setStep('code')}
+          className="flex-1 py-3.5 text-sm rounded-xl cursor-pointer"
+          style={{ border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.5)' }}
+        >
+          ← Zréck
+        </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex-1 py-3.5 text-sm font-semibold rounded-xl cursor-pointer text-gotham-blue disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ border: '1px solid rgba(0,212,255,0.5)', background: 'rgba(0,212,255,0.08)' }}
+        >
+          {loading ? 'Weiderleeden...' : selectedTicket ? `Bezuelen ${selectedTicket.price} € →` : '→'}
+        </button>
+      </div>
+    </form>
+  )
+
   if (done) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center px-6">
@@ -153,85 +274,93 @@ export function TicketOptions() {
           </motion.div>
         )}
 
-        {/* Ticket cards */}
-        <div className="grid sm:grid-cols-3 gap-5 mb-10">
+        {/* Ticket cards — each wrapped so its inline mobile panel sits directly below */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
           {tickets.map((ticket, i) => {
             const isSelected = selected === ticket.id && step !== 'select'
             return (
-              <motion.button
-                key={ticket.id}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.5 }}
-                whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                onClick={() => handleTicketSelect(ticket.id)}
-                className="text-left rounded-2xl p-7 cursor-pointer transition-all duration-200 relative overflow-hidden group"
-                style={{
-                  background: `linear-gradient(135deg, rgba(20,20,32,0.96) 0%, ${ticket.accentColor}22 100%)`,
-                  border: `1.5px solid ${isSelected ? ticket.accentColor : ticket.accentColor + '55'}`,
-                  boxShadow: isSelected
-                    ? `0 0 32px ${ticket.accentColor}55, 0 12px 48px rgba(0,0,0,0.6)`
-                    : `0 0 16px ${ticket.accentColor}22, 0 12px 48px rgba(0,0,0,0.55)`,
-                }}
-                onMouseEnter={e => {
-                  if (!isSelected) {
-                    (e.currentTarget as HTMLElement).style.borderColor = ticket.accentColor + 'AA'
-                    ;(e.currentTarget as HTMLElement).style.boxShadow = `0 0 28px ${ticket.accentColor}44, 0 12px 48px rgba(0,0,0,0.6)`
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (!isSelected) {
-                    (e.currentTarget as HTMLElement).style.borderColor = ticket.accentColor + '55'
-                    ;(e.currentTarget as HTMLElement).style.boxShadow = `0 0 16px ${ticket.accentColor}22, 0 12px 48px rgba(0,0,0,0.55)`
-                  }
-                }}
-              >
-                {/* Corner bracket accent */}
-                <div className="absolute top-0 left-0 w-5 h-5 transition-all duration-200"
-                  style={{ borderTop: `2px solid ${ticket.accentColor}40`, borderLeft: `2px solid ${ticket.accentColor}40` }}
-                />
-                <div className="absolute bottom-0 right-0 w-5 h-5 transition-all duration-200"
-                  style={{ borderBottom: `2px solid ${ticket.accentColor}40`, borderRight: `2px solid ${ticket.accentColor}40` }}
-                />
-
-                {/* Badge */}
-                <div
-                  className="inline-flex items-center px-2.5 py-1 rounded text-xs font-bold tracking-widest mb-5"
-                  style={{ background: `${ticket.accentColor}18`, color: ticket.accentColor, border: `1px solid ${ticket.accentColor}30` }}
+              <div key={ticket.id} className="contents">
+                <motion.button
+                  initial={{ opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.12, duration: 0.5 }}
+                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  onClick={() => handleTicketSelect(ticket.id)}
+                  className="text-left rounded-2xl p-7 cursor-pointer transition-all duration-200 relative overflow-hidden group"
+                  style={{
+                    background: `linear-gradient(135deg, ${ticket.accentColor}26 0%, rgba(6,8,16,0.94) 55%, ${ticket.accentColor}1A 100%)`,
+                    border: `2px solid ${isSelected ? ticket.accentColor : ticket.accentColor + 'B0'}`,
+                    boxShadow: isSelected
+                      ? `0 0 0 3px ${ticket.accentColor}30, 0 0 36px ${ticket.accentColor}66, 0 18px 56px rgba(0,0,0,0.7)`
+                      : `0 0 24px ${ticket.accentColor}3A, 0 14px 48px rgba(0,0,0,0.65)`,
+                  }}
+                  onMouseEnter={e => {
+                    if (!isSelected) {
+                      (e.currentTarget as HTMLElement).style.borderColor = ticket.accentColor
+                      ;(e.currentTarget as HTMLElement).style.boxShadow = `0 0 32px ${ticket.accentColor}55, 0 14px 48px rgba(0,0,0,0.7)`
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!isSelected) {
+                      (e.currentTarget as HTMLElement).style.borderColor = ticket.accentColor + 'B0'
+                      ;(e.currentTarget as HTMLElement).style.boxShadow = `0 0 24px ${ticket.accentColor}3A, 0 14px 48px rgba(0,0,0,0.65)`
+                    }
+                  }}
                 >
-                  {ticket.badge}
-                </div>
+                  {/* Corner bracket accent */}
+                  <div className="absolute top-0 left-0 w-5 h-5 transition-all duration-200"
+                    style={{ borderTop: `2px solid ${ticket.accentColor}`, borderLeft: `2px solid ${ticket.accentColor}` }}
+                  />
+                  <div className="absolute bottom-0 right-0 w-5 h-5 transition-all duration-200"
+                    style={{ borderBottom: `2px solid ${ticket.accentColor}`, borderRight: `2px solid ${ticket.accentColor}` }}
+                  />
 
-                {/* Label */}
-                <p className="text-white/60 text-xs tracking-wider uppercase mb-3">{ticket.label}</p>
+                  {/* Badge */}
+                  <div
+                    className="inline-flex items-center px-2.5 py-1 rounded text-xs font-bold tracking-widest mb-5"
+                    style={{ background: `${ticket.accentColor}28`, color: ticket.accentColor, border: `1px solid ${ticket.accentColor}60` }}
+                  >
+                    {ticket.badge}
+                  </div>
 
-                {/* Price */}
-                <p
-                  className="font-gotham leading-none mb-4 tracking-wide"
-                  style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', color: ticket.accentColor, textShadow: `0 0 20px ${ticket.accentColor}60` }}
-                >
-                  {ticket.priceLabel}
-                </p>
+                  {/* Label */}
+                  <p className="text-white/75 text-xs tracking-wider uppercase mb-3 font-medium">{ticket.label}</p>
 
-                {/* Divider */}
-                <div className="w-full h-px mb-4" style={{ background: `linear-gradient(90deg, ${ticket.accentColor}30, transparent)` }} />
+                  {/* Price */}
+                  <p
+                    className="font-gotham leading-none mb-4 tracking-wide"
+                    style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', color: ticket.accentColor, textShadow: `0 0 24px ${ticket.accentColor}AA` }}
+                  >
+                    {ticket.priceLabel}
+                  </p>
 
-                <p className="text-white/50 text-sm leading-relaxed mb-2">{ticket.description}</p>
-                <p className="text-white/25 text-xs">{ticket.highlight}</p>
+                  {/* Divider */}
+                  <div className="w-full h-px mb-4" style={{ background: `linear-gradient(90deg, ${ticket.accentColor}80, transparent)` }} />
 
-                {/* Arrow indicator */}
-                <div className="absolute right-5 bottom-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ color: ticket.accentColor }}>
-                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              </motion.button>
+                  <p className="text-white/70 text-sm leading-relaxed mb-2">{ticket.description}</p>
+                  <p className="text-white/40 text-xs">{ticket.highlight}</p>
+
+                  {/* Arrow indicator */}
+                  <div className="absolute right-5 bottom-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200" style={{ color: ticket.accentColor }}>
+                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                </motion.button>
+
+                {/* Mobile-only inline panel — sits directly under the selected card */}
+                {isSelected && (
+                  <div className="sm:hidden">
+                    {step === 'code' ? renderCodeGate() : selectedTicket ? renderDetailsForm() : null}
+                  </div>
+                )}
+              </div>
             )
           })}
         </div>
 
-        {/* Step 2 & 3 forms */}
+        {/* Desktop-only panel below the grid */}
         <AnimatePresence mode="wait">
           {step === 'code' && selected && (
             <motion.div
@@ -240,7 +369,7 @@ export function TicketOptions() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              className="rounded-2xl p-7 flex flex-col gap-4"
+              className="hidden sm:flex rounded-2xl p-7 flex-col gap-4"
               style={{ background: 'rgba(10,10,15,0.8)', border: '1px solid rgba(0,212,255,0.12)', boxShadow: '0 0 40px rgba(0,212,255,0.05)' }}
             >
               <div>
@@ -309,7 +438,7 @@ export function TicketOptions() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               onSubmit={handleSubmit}
-              className="rounded-2xl p-7 flex flex-col gap-4"
+              className="hidden sm:flex rounded-2xl p-7 flex-col gap-4"
               style={{ background: 'rgba(10,10,15,0.8)', border: '1px solid rgba(0,212,255,0.12)', boxShadow: '0 0 40px rgba(0,212,255,0.05)' }}
             >
               <div className="flex items-center justify-between">
