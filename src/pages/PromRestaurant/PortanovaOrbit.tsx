@@ -112,6 +112,89 @@ function CardTop() {
   return <div style={{ height: 3, background: 'linear-gradient(90deg, #1B2D52 0%, #2558C9 100%)', borderRadius: '2px 2px 0 0' }} />
 }
 
+const STEPS = [
+  { id: 'entree',    label: 'Entrée' },
+  { id: 'hauptplat', label: 'Haaptplat' },
+  { id: 'dessert',   label: 'Dessert' },
+  { id: 'gedrenks',  label: 'Gedrénks' },
+  { id: 'personal',  label: 'Donnéen' },
+]
+
+function Stepper({ done, doneCount }: { done: Set<string>; doneCount: number }) {
+  return (
+    <div className="pt-8 pb-6">
+      {/* connecting track */}
+      <div className="relative flex items-center justify-between mb-3">
+        <div
+          className="absolute left-0 right-0"
+          style={{ top: '50%', height: 2, background: '#DDE8F5', transform: 'translateY(-50%)', zIndex: 0 }}
+        />
+        <motion.div
+          className="absolute left-0"
+          style={{ top: '50%', height: 2, background: 'linear-gradient(90deg, #22c55e, #2558C9)', transform: 'translateY(-50%)', zIndex: 1, transformOrigin: 'left' }}
+          animate={{ width: doneCount === 0 ? '0%' : `${((doneCount - 1) / 4) * 100 + (1 / 4) * 50}%` }}
+          transition={{ duration: 0.65, ease: EASE }}
+        />
+        {STEPS.map((step, i) => {
+          const isDone = done.has(step.id)
+          const isNext = i === doneCount
+          return (
+            <div key={step.id} className="relative flex flex-col items-center" style={{ zIndex: 2 }}>
+              <motion.div
+                animate={{
+                  background: isDone ? '#22c55e' : isNext ? '#EBF3FF' : '#F0F4FB',
+                  borderColor: isDone ? '#22c55e' : isNext ? '#2558C9' : '#C3D1EC',
+                  scale: isDone && i === doneCount - 1 ? [1, 1.25, 1] : 1,
+                }}
+                transition={{ duration: 0.45, ease: EASE }}
+                style={{
+                  width: 40, height: 40, borderRadius: '50%',
+                  border: '2px solid',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                {isDone ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 13l4 4L19 7" stroke="white" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <span className="font-sans font-semibold" style={{ fontSize: 12, color: isNext ? '#2558C9' : '#B0BDD4' }}>
+                    {i + 1}
+                  </span>
+                )}
+              </motion.div>
+            </div>
+          )
+        })}
+      </div>
+      {/* labels row */}
+      <div className="flex items-start justify-between">
+        {STEPS.map((step, i) => {
+          const isDone = done.has(step.id)
+          const isNext = i === doneCount
+          return (
+            <div key={step.id} className="flex flex-col items-center" style={{ width: '20%' }}>
+              <span
+                className="font-sans text-center"
+                style={{
+                  fontSize: 9,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: isDone ? '#16a34a' : isNext ? '#2558C9' : '#B0BDD4',
+                  fontWeight: isDone || isNext ? 600 : 400,
+                  lineHeight: 1.3,
+                }}
+              >
+                {step.label}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ── main component ────────────────────────────────────────────────────────────
 
 export function PortanovaOrbit() {
@@ -254,11 +337,11 @@ export function PortanovaOrbit() {
         className="sticky top-0 z-40"
         style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(195,209,236,0.4)' }}
       >
-        {/* progress fill */}
-        <div className="relative overflow-hidden" style={{ height: 3, background: '#EEF3FA' }}>
+        {/* thin fill line */}
+        <div className="relative overflow-hidden" style={{ height: 2, background: '#EEF3FA' }}>
           <motion.div
             className="absolute inset-y-0 left-0"
-            style={{ background: 'linear-gradient(90deg, #2558C9 0%, #F5C640 100%)' }}
+            style={{ background: 'linear-gradient(90deg, #22c55e 0%, #2558C9 100%)' }}
             animate={{ width: `${(doneCount / 5) * 100}%` }}
             transition={{ duration: 0.65, ease: EASE }}
           />
@@ -266,69 +349,33 @@ export function PortanovaOrbit() {
         {/* label row */}
         <div className="max-w-xl mx-auto flex items-center justify-between px-5 py-2.5">
           <span className="font-resto" style={{ fontSize: 13, letterSpacing: '0.2em', color: '#1B2D52' }}>PORTA NOVA</span>
-          <div className="flex items-center gap-1.5">
-            {ALL_REQUIRED.map((_, i) => (
-              <motion.div
-                key={i}
-                animate={{
-                  background: i < doneCount ? '#22c55e' : '#C3D1EC',
-                  scale: i === doneCount - 1 ? [1, 1.4, 1] : 1,
-                }}
-                transition={{ duration: 0.4, ease: EASE }}
-                style={{ width: 7, height: 7, borderRadius: '50%' }}
-              />
-            ))}
-            <span className="font-sans ml-1" style={{ fontSize: 11, color: '#7A91B8' }}>{doneCount}/5</span>
-          </div>
+          <span className="font-sans" style={{ fontSize: 11, color: '#7A91B8' }}>{doneCount}/5</span>
         </div>
       </div>
 
       {/* ── page content ──────────────────────────────────────────────────────── */}
       <div className="max-w-xl mx-auto px-4 pb-28">
 
-        {/* Hero */}
-        <div className="text-center pt-10 pb-8">
-          <motion.h1
-            className="font-resto"
-            style={{ fontSize: 'clamp(2.4rem, 9vw, 4.8rem)', letterSpacing: '0.22em', color: '#1B2D52' }}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
-          >
-            PORTA NOVA
-          </motion.h1>
-          <motion.div
-            style={{ height: 1, width: 72, margin: '7px auto 0', background: 'linear-gradient(90deg, transparent, #F5C640, transparent)' }}
-            initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
-            transition={{ duration: 0.55, delay: 0.35, ease: 'easeOut' }}
-          />
-          <motion.p
-            className="font-sans mt-2"
-            style={{ fontSize: 9, letterSpacing: '0.4em', textTransform: 'uppercase', color: '#7A91B8' }}
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.55 }}
-          >
-            Prom Restaurant · 2026
-          </motion.p>
-          <motion.p
-            className="font-sans mt-1"
-            style={{ fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#B8C9E0' }}
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.75 }}
-          >
-            20h – 00h &nbsp;·&nbsp; 14 Av. de la Faïencerie &nbsp;·&nbsp; 20 € / 27 €
-          </motion.p>
-        </div>
-
-        {/* Section label */}
+        {/* Address */}
         <motion.p
-          className="font-sans text-[10px] uppercase tracking-[0.35em] mb-4"
-          style={{ color: '#7A91B8' }}
+          className="font-sans text-center"
+          style={{ fontSize: 15, letterSpacing: '0.06em', color: '#1B2D52', paddingTop: 20, paddingBottom: 2, fontWeight: 500 }}
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.9 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
-          Wiel däi Menu
+          14 Av. de la Faïencerie, Limpertsberg
         </motion.p>
+        <motion.p
+          className="font-sans text-center"
+          style={{ fontSize: 11, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#7A91B8' }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.35 }}
+        >
+          20h – 00h &nbsp;·&nbsp; 20 € / 27 €
+        </motion.p>
+
+        {/* Stepper */}
+        <Stepper done={done} doneCount={doneCount} />
 
         {/* ── food sections ─────────────────────────────────────────────────── */}
         <div className="space-y-3">
