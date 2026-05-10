@@ -20,9 +20,9 @@ function getCorsHeaders(req: Request) {
 }
 
 const PRICE_MAP: Record<string, number> = {
-  eleve: 1000,
-  prof: 5500,
-  plus_un: 5500,
+  eleve: 1500,
+  prof: 3500,
+  plus_un: 3500,
 }
 
 const NAME_MAP: Record<string, string> = {
