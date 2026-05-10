@@ -27,14 +27,23 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { firstName, lastName, classGroup, email, phone, starter, main, dessert, drinks, hasAlcohol } = await req.json()
+    const { firstName, lastName, classGroup, email, phone, starter, main, dessert, drinks, hasAlcohol, userType } = await req.json()
 
-    if (!firstName || !lastName || !classGroup || !email || !starter || !main || !dessert || !drinks) {
+    const isProffen = userType === 'proffen'
+    if (!firstName || !lastName || !email || !starter || !main || !dessert || !drinks) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       })
     }
+    if (!isProffen && !classGroup) {
+      return new Response(JSON.stringify({ error: 'Missing class group' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      })
+    }
+
+    const baseAmount = isProffen ? 3500 : 500
 
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [
       {
@@ -44,7 +53,7 @@ Deno.serve(async (req) => {
             name: 'Porta Nova',
             description: `${firstName} ${lastName} — Dîner Prom Night`,
           },
-          unit_amount: 2000,
+          unit_amount: baseAmount,
         },
         quantity: 1,
       },
@@ -69,9 +78,10 @@ Deno.serve(async (req) => {
       line_items,
       metadata: {
         type: 'restaurant_reservation',
+        user_type: userType ?? 'primaner',
         first_name: firstName,
         last_name: lastName,
-        class_group: classGroup,
+        class_group: classGroup ?? '',
         email,
         phone: phone ?? '',
         starter,

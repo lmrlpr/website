@@ -154,7 +154,7 @@ function ProfileSelector({ selected, onChange }: { selected: UserType; onChange:
                 <p className={`font-sans font-semibold text-sm mb-0.5 ${isSel ? 'text-white' : 'text-[#1B2D52]'}`}>{opt.label}</p>
                 <p className={`font-sans text-xs mb-3 ${isSel ? 'text-white/60' : 'text-[#7A91B8]'}`}>{opt.sub}</p>
                 <p className={`font-resto text-lg ${isSel ? 'text-white' : 'text-[#1B2D52]'}`}>{opt.price}</p>
-                <p className={`font-sans text-[10px] mt-0.5 ${isSel ? 'text-white/50' : 'text-[#B0BDD4]'}`}>mat / ouni alcool</p>
+                <p className={`font-sans text-[10px] mt-0.5 ${isSel ? 'text-white/50' : 'text-[#B0BDD4]'}`}>ouni / mat alcool</p>
               </div>
             </motion.button>
           )
@@ -421,11 +421,6 @@ export function PortanovaOrbit() {
             transition={{ duration: 0.65, ease: EASE }}
           />
         </div>
-        {/* label row */}
-        <div className="max-w-xl mx-auto flex items-center justify-between px-5 py-2.5">
-          <span className="font-resto" style={{ fontSize: 13, letterSpacing: '0.2em', color: '#1B2D52' }}>PORTA NOVA</span>
-          <span className="font-sans" style={{ fontSize: 11, color: '#7A91B8' }}>{doneCount}/6</span>
-        </div>
       </div>
 
       {/* ── page content ──────────────────────────────────────────────────────── */}
@@ -446,7 +441,7 @@ export function PortanovaOrbit() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.35 }}
         >
-          20h – 00h &nbsp;·&nbsp; 20 € / 27 €
+          20h – 00h
         </motion.p>
 
         {/* Stepper */}
