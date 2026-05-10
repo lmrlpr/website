@@ -52,11 +52,17 @@ Deno.serve(async (req) => {
     if (session.metadata?.type === 'gotham_ticket') {
       const { first_name, last_name, email, ticket_type } = session.metadata
       const price = (session.amount_total ?? 0) / 100
+      // Normalize new checkout values (eleve/prof/plus_un) to the legacy
+      // schema values the gotham_registrations table accepts (primaner/external).
+      const normalized =
+        ticket_type === 'eleve' ? 'primaner' :
+        ticket_type === 'primaner' ? 'primaner' :
+        'external'
       const { error } = await supabase.from('gotham_registrations').insert({
         first_name,
         last_name,
         email,
-        ticket_type,
+        ticket_type: normalized,
         price,
         payment_status: 'paid',
         stripe_session_id: session.id,
