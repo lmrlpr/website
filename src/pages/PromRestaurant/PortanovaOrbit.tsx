@@ -406,7 +406,10 @@ export function PortanovaOrbit() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: 'linear-gradient(160deg, #E6F3FF 0%, #F0F8FF 30%, #FFFFFF 58%, #EEF6FF 85%, #F5FBFF 100%)' }}
+      style={{
+        background: 'linear-gradient(160deg, #E6F3FF 0%, #F0F8FF 30%, #FFFFFF 58%, #EEF6FF 85%, #F5FBFF 100%)',
+        paddingTop: 'calc(4rem + env(safe-area-inset-top, 0px))',
+      }}
     >
       {/* ── sticky progress bar ───────────────────────────────────────────────── */}
       <div
