@@ -68,7 +68,7 @@ function ClosedScreen() {
           <p className="text-resto-text/30 text-[10px] tracking-[0.35em] uppercase mb-6 font-sans">Prom Restaurant · 2026</p>
           <p className="font-resto text-3xl mb-3" style={{ color: '#1B2D52' }}>Keng Plaatzen mei</p>
           <p className="text-sm font-sans leading-relaxed" style={{ color: '#5A7AB0' }}>
-            De Restaurant ass voll.<br/>Merci fir äert Interessi.
+            De Restaurant ass voll.
           </p>
         </div>
         <p className="text-white/25 text-xs mt-4 tracking-wider">Porta Nova · 2026</p>

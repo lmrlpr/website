@@ -280,7 +280,7 @@ export function PortanovaOrbit() {
           <p className="font-sans text-[10px] uppercase tracking-[0.4em] mb-1" style={{ color: '#2558C9' }}>Porta Nova · 2026</p>
           <h2 className="font-resto text-3xl mb-3" style={{ color: '#1B2D52' }}>Keng Plaatzen mei</h2>
           <p className="text-sm font-sans leading-relaxed" style={{ color: '#5A7AB0' }}>
-            De Restaurant ass voll.<br />Merci fir äert Interessi.
+            De Restaurant ass voll.
           </p>
         </motion.div>
       </div>
