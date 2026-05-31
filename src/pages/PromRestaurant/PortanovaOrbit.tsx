@@ -6,6 +6,7 @@ import { DrinkSelector } from './DrinkSelector'
 import { STARTERS, MAINS, DESSERTS } from '../../utils/constants'
 import { redirectToRestaurantCheckout } from '../../services/stripe'
 import type { DrinkPackage } from '../../types/menuSelection'
+import { RESTAURANT_CLOSED } from './config'
 
 type FoodId = 'entree' | 'hauptplat' | 'dessert' | 'gedrenks'
 type UserType = 'primaner' | 'proffen' | ''
@@ -258,6 +259,34 @@ function Stepper({ done, doneCount }: { done: Set<string>; doneCount: number }) 
 // ── main component ────────────────────────────────────────────────────────────
 
 export function PortanovaOrbit() {
+  if (RESTAURANT_CLOSED) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center px-6"
+        style={{ background: 'linear-gradient(160deg, #E6F3FF 0%, #F0F8FF 35%, #FFFFFF 65%, #F5FBFF 100%)' }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center max-w-sm"
+        >
+          <div
+            className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5"
+            style={{ background: 'linear-gradient(135deg, #1B2D52 0%, #2558C9 100%)', boxShadow: '0 0 40px rgba(37,88,201,0.3)' }}
+          >
+            <Lock size={22} color="white" />
+          </div>
+          <p className="font-sans text-[10px] uppercase tracking-[0.4em] mb-1" style={{ color: '#2558C9' }}>Porta Nova · 2026</p>
+          <h2 className="font-resto text-3xl mb-3" style={{ color: '#1B2D52' }}>Keng Plaatzen mei</h2>
+          <p className="text-sm font-sans leading-relaxed" style={{ color: '#5A7AB0' }}>
+            De Restaurant ass voll.<br />Merci fir äert Interessi.
+          </p>
+        </motion.div>
+      </div>
+    )
+  }
+
   const [fd, setFd]       = useState<FD>(BLANK)
   const [done, setDone]   = useState<Set<string>>(new Set())
   const [editing, setEditing] = useState<Set<string>>(new Set())

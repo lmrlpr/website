@@ -4,8 +4,7 @@ import { motion } from 'framer-motion'
 import { SpiralEntry } from '../../components/ui/SpiralEntry'
 import { GridPixelateWipe } from '../../components/ui/GridPixelateWipe'
 import { PortanovaOrbit } from './PortanovaOrbit'
-
-const RESTAURANT_CLOSED = true
+import { RESTAURANT_CLOSED } from './config'
 
 // Pre-computed star positions (reused from AccessCodeGate)
 const STARS = [
